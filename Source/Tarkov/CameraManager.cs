@@ -107,6 +107,7 @@ namespace eft_dma_radar
                 else if (!foundFPSCamera && cameraName.Contains("FPS Camera", StringComparison.OrdinalIgnoreCase))
                 {
                     this._fpsCamera = cameraObject;
+                    _staticfpsCamera = cameraObject;
 
                     if (!this.visorComponentFound) {
                         this.visorComponent = this.GetComponentFromGameObject(this._fpsCamera, "VisorEffect");
