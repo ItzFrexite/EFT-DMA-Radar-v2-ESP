@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using Offsets;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Numerics;
@@ -10,11 +11,17 @@ namespace eft_dma_radar
 {
     internal static class Memory
     {
+        /// <summary>
+        ///     Adjust this to achieve desired mem/sec performance. Higher = slower, Lower = faster.
+        /// </summary>
+        private const int LOOP_DELAY = 25;
+
         private static Vmm vmmInstance;
         private static volatile bool _running = false;
         private static volatile bool _restart = false;
         private static volatile bool _ready = false;
         private static Thread _workerThread;
+        private static Thread _gameInputThread;
         private static CancellationTokenSource _workerCancellationTokenSource;
         private static VmmProcess _process;
         private static ulong _unityBase;
@@ -22,7 +29,7 @@ namespace eft_dma_radar
         private static int _ticksCounter = 0;
         private static volatile int _ticks = 0;
         private static readonly Stopwatch _tickSw = new();
-        private static InputManager _inputManager;
+        public static InputManager _inputManager;
 
         public static Game.GameStatus GameStatus = Game.GameStatus.NotFound;
 
@@ -172,6 +179,72 @@ namespace eft_dma_radar
                 return game.Players.FirstOrDefault((KeyValuePair<string, Player> x) => x.Value.Type == PlayerType.LocalPlayer).Value;
             }
         }
+        #endregion
+
+        #region GameInputThread
+
+        /// <summary>
+        ///     Main worker thread to perform DMA Reads on.
+        /// </summary>
+        private static void GameInputWorkerThread(CancellationToken cancellationToken)
+        {
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                try
+                {
+                    while (true) // Game is running
+                        try
+                        {
+                            while (_game is not null && frmMain.isOverlayShown)
+                            {
+                                if (_inputManager is null) _inputManager = new InputManager(_unityBase + ModuleBase.ManagerContext);
+                                //MessageBox.Show("InputWorker Running");
+                                _game.MenuLoop();
+                                Thread.SpinWait(LOOP_DELAY * 1000); // rate-limit, high performance
+                            }
+                        }
+                        catch (GameNotRunningException)
+                        {
+                            break;
+                        }
+                        catch (ThreadInterruptedException)
+                        {
+                            throw;
+                        }
+                        catch (DMAShutdown)
+                        {
+                            throw;
+                        }
+                        catch (Exception)
+                        {
+                            //Program.Log($"CRITICAL ERROR in Game Loop: {ex}");
+                        }
+                        finally
+                        {
+                            Thread.Sleep(100);
+                        }
+                }
+                catch (ThreadInterruptedException)
+                {
+                } // Do nothing
+                catch (DMAShutdown)
+                {
+                } // Do nothing
+                catch (Exception ex)
+                {
+                    Environment.FailFast($"FATAL ERROR on Loot Thread: {ex}"); // Force shutdown asap
+                }
+                finally
+                {
+                    //Program.Log("Uninitializing DMA Device...");
+                    vmmInstance.Close(); // Un-init DMA
+                                         //Program.Log("Memory Thread closing down gracefully...");
+                }
+
+            }
+            Program.Log("[Memory] Refresh thread stopped.");
+        }
+
         #endregion
 
         #region Startup
@@ -354,8 +427,14 @@ namespace eft_dma_radar
                 Priority = ThreadPriority.BelowNormal,
                 IsBackground = true
             };
+            Memory._gameInputThread = new Thread(() => Memory.GameInputWorkerThread(cancellationToken))
+            {
+                Priority = ThreadPriority.BelowNormal,
+                IsBackground = true
+            };
             Memory._running = true;
             Memory._workerThread.Start();
+            Memory._gameInputThread.Start();
         }
 
         public static async void StopMemoryWorker()

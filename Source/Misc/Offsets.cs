@@ -28,6 +28,7 @@
         public const uint GameObjectManager = 0x17FFD28; // to GameObjectManager
         public const uint CameraObjectManager = 0x0179F500; // to Camera
         public const uint TimeScale = 0x17FFAE0; // to TimeScale
+        public const uint ManagerContext = 0x17FFAE0;
     }
 
     public struct TimeScale

@@ -23,6 +23,8 @@ namespace eft_dma_radar
         private Toolbox _toolbox;
         private Chams _chams;
         private CorpseManager _corpseManager;
+        private InputManager _inputManager;
+        private frmMain _frmMain;
         private ulong _localGameWorld;
         private readonly ulong _unityBase;
         private bool _inHideout = false;
@@ -31,6 +33,15 @@ namespace eft_dma_radar
         private volatile bool _refreshLoot = false;
         private volatile string _mapName = string.Empty;
         private volatile bool _isScav = false;
+
+        private readonly KeyHandler keyHandler = new();
+
+        public static bool pressingInsert;
+        public bool pressingDown;
+        public bool pressingEnter;
+        public bool pressingUp;
+        public bool pressingLeft;
+        public bool pressingRight;
 
         public enum GameStatus
         {
@@ -150,6 +161,12 @@ namespace eft_dma_radar
         {
             get => _corpseManager?.Corpses;
         }
+
+        private bool MenuShown
+        {
+            get => Overlay.isMenuShown;
+            set => Overlay.isMenuShown = value;
+        }
         #endregion
 
         /// <summary>
@@ -191,6 +208,69 @@ namespace eft_dma_radar
                 HandleUnexpectedException(ex);
             }
         }
+        #endregion
+
+        #region Input Detection
+
+        public void MenuLoop()
+        {
+            try
+            {
+                Check();
+            }
+            catch (DMAShutdown)
+            {
+                _inGame = false;
+                throw;
+            }
+        }
+
+        private void Check()
+        {
+            pressingInsert = IsHoldingMenuKey();
+            pressingUp = IsHoldingUpKey();
+            pressingDown = IsHoldingDownKey();
+            pressingEnter = IsHoldingEnterKey();
+            pressingLeft = IsHoldingLeftKey();
+            pressingRight = IsHoldingRightKey();
+            if (pressingUp && keyHandler.IsDebouncedKeyPress()) MenuManager.MenuUp();
+            if (pressingDown && keyHandler.IsDebouncedKeyPress()) MenuManager.MenuDown();
+            if (pressingEnter && keyHandler.IsDebouncedKeyPress()) MenuManager.SelectMenuItem();
+            if (pressingLeft && keyHandler.IsDebouncedKeyPress()) MenuManager.MenuLeft();
+            if (pressingRight && keyHandler.IsDebouncedKeyPress()) MenuManager.MenuRight();
+            if (pressingInsert && frmMain.isOverlayShown && keyHandler.IsDebouncedKeyPress()) MenuManager.ToggleMenu();
+        }
+
+        private bool IsHoldingMenuKey() 
+        {
+            return Memory._inputManager.IsGameKeyPressed(KeyCode.Insert);
+        }
+
+        private bool IsHoldingUpKey()
+        {
+            return Memory._inputManager.IsGameKeyPressed(KeyCode.UpArrow);
+        }
+
+        private bool IsHoldingDownKey()
+        {
+            return Memory._inputManager.IsGameKeyPressed(KeyCode.DownArrow);
+        }
+
+        private bool IsHoldingEnterKey()
+        {
+            return Memory._inputManager.IsGameKeyPressed(KeyCode.Return);
+        }
+
+        private bool IsHoldingLeftKey()
+        {
+            return Memory._inputManager.IsGameKeyPressed(KeyCode.LeftArrow);
+        }
+
+        private bool IsHoldingRightKey()
+        {
+            return Memory._inputManager.IsGameKeyPressed(KeyCode.RightArrow);
+        }
+
         #endregion
 
         #region Methods

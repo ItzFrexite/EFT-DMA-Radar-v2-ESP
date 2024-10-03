@@ -55,14 +55,14 @@ public partial class Overlay : Form
     }
 
 
-    //private InGameMenu menu;
+    private InGameMenu menu;
 
     private void CreateMenu()
     {
-        //var menu = InGameMenu.Instance;
-        //menu.Show();
-        //menu.BringToFront();
-        //menu.Focus();
+        var menu = InGameMenu.Instance;
+        menu.Show();
+        menu.BringToFront();
+        menu.Focus();
     }
 
 private void DirectXThread(object sender)
@@ -526,7 +526,7 @@ private void DirectXThread(object sender)
 
         if (keyData == Keys.Insert)
         {
-            //MenuManager.ToggleMenu();
+            MenuManager.ToggleMenu();
             return true;
         }
 

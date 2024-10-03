@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Diagnostics;
+using System.Text;
 using Vmmsharp;
 
 namespace eft_dma_radar
@@ -26,9 +27,17 @@ namespace eft_dma_radar
 
         public static bool IsManagerLoaded => InputManager.keyboardInitialized;
 
+        private readonly Stopwatch _sw = new();
+        public ulong context;
+
         static InputManager()
         {
 
+        }
+
+        public InputManager(ulong context)
+        {
+            this.context = Memory.ReadPtr(context + 8);
         }
 
         public static void SetVmmInstance(Vmm vmmInstance)
@@ -216,6 +225,27 @@ namespace eft_dma_radar
 
             return InputManager.pressedKeys.Contains(virtualKeyCode) &&
                    (InputManager.previousStateBitmap[(virtualKeyCode * 2 / 8)] & (1 << (virtualKeyCode % 4 * 2))) == 0;
+        }
+
+        public bool IsGameKeyPressed(KeyCode keycode)
+        {
+            try
+            {
+                var v3 = (uint)keycode;
+                var v6 = v3 >> 5;
+
+                var v10 = Memory.ReadPtr(context + 0x58);
+                var v11 = v3 & 0x1F;
+                var v12 = Memory.ReadValue<uint>(v10 + v6 * 0x4);
+
+                return v12 != 0 && v12 == 1 << (int)v11;
+            }
+            catch (Exception ex)
+            {
+                Program.Log($"error getting is key pressed: {ex}");
+            }
+
+            return false;
         }
     }
 }

@@ -16,6 +16,9 @@ namespace eft_dma_radar
 {
     public partial class frmMain : MaterialForm
     {
+        private Overlay overlay;
+        public static bool isOverlayShown;
+
         private readonly Config config;
         private readonly Watchlist watchlist;
         private readonly LootFilterManager lootFilterManager;
@@ -125,9 +128,6 @@ namespace eft_dma_radar
             "Zoom In",
             "Zoom Out"
         };
-
-        private Overlay overlay;
-        private bool isOverlayShown;
 
         #region Getters
         /// <summary>
@@ -802,6 +802,19 @@ namespace eft_dma_radar
             swChamsTeammates.Checked = this.config.Chams["Teammates"];
             swChamsCorpses.Checked = this.config.Chams["Corpses"];
             swChamsRevert.Checked = this.config.Chams["RevertOnClose"];
+
+            // ESP Features
+            mcSettingsESP.Enabled = this.config.MasterSwitch;
+            swToggleESP.Checked = this.config.ToggleESP;
+            swInGameMenu.Checked = this.config.InGameMenu;
+            swPlayerESP.Checked = this.config.PlayerESP;
+            swTeamESP.Checked = this.config.TeamESP;
+            swScavESP.Checked = this.config.ScavESP;
+            swItemESP.Checked = this.config.ItemESP;
+            sldrPlayerDist.Value = this.config.PlayerDist;
+            sldrTeamDist.Value = this.config.TeamDist;
+            sldrScavDist.Value = this.config.ScavDist;
+            sldrItemDist.Value = this.config.ItemDist;
 
             this.ToggleChamsControls();
             #endregion
@@ -3732,6 +3745,7 @@ namespace eft_dma_radar
             mcSettingsMemoryWritingThermal.Enabled = isChecked;
             mcSettingsMemoryWritingSkillBuffs.Enabled = isChecked;
             mcSettingsMemoryWritingChams.Enabled = isChecked;
+            mcSettingsESP.Enabled = isChecked;
 
             if (isChecked)
                 Memory.Toolbox?.StartToolbox();

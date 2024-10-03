@@ -224,6 +224,36 @@ namespace eft_dma_radar
 
         [JsonPropertyName("zoomSensitivity")]
         public int ZoomSensitivity { get; set; }
+
+        [JsonPropertyName("toggleESP")]
+        public bool ToggleESP { get; set; }
+
+        [JsonPropertyName("toggleInGameGUI")]
+        public bool InGameMenu { get; set; }
+
+        [JsonPropertyName("playerESP")]
+        public bool PlayerESP { get; set; }
+
+        [JsonPropertyName("teamESP")]
+        public bool TeamESP { get; set; }
+
+        [JsonPropertyName("scavESP")]
+        public bool ScavESP { get; set; }
+
+        [JsonPropertyName("itemESP")]
+        public bool ItemESP { get; set; }
+
+        [JsonPropertyName("playerDist")]
+        public int PlayerDist { get; set; }
+
+        [JsonPropertyName("teamDist")]
+        public int TeamDist { get; set; }
+
+        [JsonPropertyName("scavDist")]
+        public int ScavDist { get; set; }
+
+        [JsonPropertyName("itemDist")]
+        public int ItemDist { get; set; }
         #endregion
 
         #region Json Ignore
@@ -513,6 +543,17 @@ namespace eft_dma_radar
             UnknownQuestItems = false;
             VSync = true;
             ZoomSensitivity = 25;
+            // ESP
+            ToggleESP = true;
+            InGameMenu = true;
+            PlayerESP = true;
+            TeamESP = true;
+            ScavESP = true;
+            ItemESP = true;
+            PlayerDist = 750;
+            TeamDist = 750;
+            ScavDist = 350;
+            ItemDist = 250;
         }
 
         /// <summary>
