@@ -604,4 +604,9 @@
     {
         public const uint GameDateTime = 0x18; // [18] GameDateTime : EFT.GameDateTime
     }
+
+    public struct CameraShit
+    {
+        public static uint[] viewmatrix = new uint[] { 0x30, 0x18 };
+    }
 }

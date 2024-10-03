@@ -446,8 +446,10 @@ namespace eft_dma_radar
                         bool p3 = true;
 
                         if (posOK)
+                        {
                             p3 = player.SetPosition(posBufs);
-
+                            player.SetBone(); // Probably not the most efficient place but for now it works
+                        }
                         if (checkHealth && !player.IsLocalPlayer)
                             if (scatterMap.Results[i][6].TryGetResult<int>(out var hp))
                                 player.SetHealth(hp);

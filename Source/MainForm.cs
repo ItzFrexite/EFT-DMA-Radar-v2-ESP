@@ -126,6 +126,10 @@ namespace eft_dma_radar
             "Zoom Out"
         };
 
+        private Overlay overlay;
+        private bool isOverlayShown = false;
+        private static Thread overlayThread;
+
         #region Getters
         /// <summary>
         /// Radar has found Escape From Tarkov process and is ready.
@@ -284,10 +288,41 @@ namespace eft_dma_radar
             Keys.F2 => this.ZoomOut(5),
             Keys.F4 => swAimview.Checked = !swAimview.Checked,
             Keys.F5 => this.ToggleMap(),
+            Keys.F7 => ToggleOverlay(),
             Keys.Control | Keys.N => swNightVision.Checked = !swNightVision.Checked,
             Keys.Control | Keys.T => swThermalVision.Checked = !swThermalVision.Checked,
             _ => base.ProcessCmdKey(ref msg, keyData),
         };
+
+        // Overlay Method
+        private bool ToggleOverlay()
+        {
+            if (swMasterSwitch.Checked)
+            {
+                if (!isOverlayShown)
+                {
+                    if (overlay is null)
+                    {
+                        overlay = new Overlay();
+                    }
+
+                    overlay.Show();
+                    isOverlayShown = true;
+                }
+                else
+                {
+                    overlay.Close();
+                    isOverlayShown = false;
+
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please enable Memory Writes");
+            }
+
+            return true;
+        }
 
         /// <summary>
         /// Process mousewheel events.

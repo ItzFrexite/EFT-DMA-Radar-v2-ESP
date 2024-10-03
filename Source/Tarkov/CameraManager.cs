@@ -23,6 +23,8 @@ namespace eft_dma_radar
         private ulong _fpsCamera;
         private ulong _fovPtr;
 
+        public static ulong _staticfpsCamera;
+
         public bool IsReady
         {
             get => this._opticCamera != 0 && this._fpsCamera != 0;

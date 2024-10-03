@@ -70,6 +70,7 @@ namespace eft_dma_radar
         public ulong PlayerBody { get; set; }
 
         private Vector3 _pos = new Vector3(0, 0, 0); // backing field
+        private Vector3 _headPos = new Vector3(0, 0, 0); // backing field
 
         /// <summary>
         /// Player's Unity Position in Local Game World.
@@ -85,6 +86,20 @@ namespace eft_dma_radar
             {
                 lock (_posLock)
                     _pos = value;
+            }
+        }
+        // Player's Head Position
+        public Vector3 HeadPosition // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _headPos;
+            }
+            private set
+            {
+                lock (_posLock)
+                    _headPos = value;
             }
         }
         /// <summary>
@@ -797,6 +812,30 @@ namespace eft_dma_radar
         {
             _groups.Clear();
         }
+
+        #region Bones
+        public Vector3 GetBonePosition(Player player, PlayerBones bone)
+        {
+            // Read the bone matrix pointer chain
+            var boneMatrix = Memory.ReadPtrChain(player.PlayerBody, new uint[] { 0x28, 0x28, 0x10 });
+
+            // Calculate the specific bone pointer based on the bone type
+            var pointer = Memory.ReadPtrChain(boneMatrix, new uint[] { 0x20 + ((uint)bone * 0x8), 0x10 });
+
+            // Create a transform object from the pointer and get the position
+            Transform boneTransform = new Transform(pointer, false);
+            Vector3 position = boneTransform.GetPosition();
+
+            return position;
+        }
+
+        public bool SetBone()
+        {
+            this.HeadPosition = GetBonePosition(this, PlayerBones.HumanHead);
+            return true;
+        }
+        #endregion
+
         #endregion
     }
 }
