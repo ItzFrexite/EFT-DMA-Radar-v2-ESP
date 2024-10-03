@@ -82,16 +82,7 @@ private void DirectXThread(object sender)
 
                 WriteTopLeftText("Tarkov Overlay", Brushes.WHITE);
 
-                // Update the inGame state and check if we need to change the text
-                //while (InGame is false)
-                //{
-                    //MessageBox.Show("Not in raid");
-                    //WriteTopLeftText("NOT IN RAID", Brushes.RED, 13, "Arial Unicode MS", 10, 30); // Update text for not in-game
-                    //_device.Flush();
-                    //_device.EndDraw();
-                    //inGame = InGame;
-                    //Thread.Sleep(5);
-                //}
+
                 while (localPlayer is null)
                 {
                     localPlayer = LocalPlayer;
