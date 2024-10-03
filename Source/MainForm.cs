@@ -127,8 +127,7 @@ namespace eft_dma_radar
         };
 
         private Overlay overlay;
-        private bool isOverlayShown = false;
-        private static Thread overlayThread;
+        private bool isOverlayShown;
 
         #region Getters
         /// <summary>
@@ -293,36 +292,6 @@ namespace eft_dma_radar
             Keys.Control | Keys.T => swThermalVision.Checked = !swThermalVision.Checked,
             _ => base.ProcessCmdKey(ref msg, keyData),
         };
-
-        // Overlay Method
-        private bool ToggleOverlay()
-        {
-            if (swMasterSwitch.Checked)
-            {
-                if (!isOverlayShown)
-                {
-                    if (overlay is null)
-                    {
-                        overlay = new Overlay();
-                    }
-
-                    overlay.Show();
-                    isOverlayShown = true;
-                }
-                else
-                {
-                    overlay.Close();
-                    isOverlayShown = false;
-
-                }
-            }
-            else
-            {
-                MessageBox.Show("Please enable Memory Writes");
-            }
-
-            return true;
-        }
 
         /// <summary>
         /// Process mousewheel events.
@@ -1084,6 +1053,33 @@ namespace eft_dma_radar
 
                 panel.Controls.Add(playerCard);
             }
+        }
+
+        // Overlay Method
+        private bool ToggleOverlay()
+        {
+            if (swMasterSwitch.Checked)
+            {
+                if (!isOverlayShown)
+                {
+                    if (overlay is null || overlay.IsDisposed) overlay = new Overlay();
+
+                    overlay.Show();
+                    isOverlayShown = true;
+                }
+                else
+                {
+                    isOverlayShown = false;
+                }
+
+                return true;
+            }
+            else
+            {
+                MessageBox.Show("Please enable Memory Writes");
+            }
+
+            return true;
         }
         #endregion
 

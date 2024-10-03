@@ -83,38 +83,26 @@ private void DirectXThread(object sender)
                 WriteTopLeftText("Tarkov Overlay", Brushes.WHITE);
 
                 // Update the inGame state and check if we need to change the text
-                inGame = InGame; // update cached inGame state
-
-                if (inGame != lastInGameState) // If the state has changed
-                {
-                    lastInGameState = inGame; // Update the cached state
-                    if (inGame)
-                    {
-                        WriteTopLeftText("IN RAID", Brushes.GREEN, 13, "Arial Unicode MS", 10, 30); // Update text for in-game
-                        Thread.Sleep(5);
-                    }
-                    else
-                    {
-                        WriteTopLeftText("NOT IN RAID", Brushes.RED, 13, "Arial Unicode MS", 10, 30); // Update text for not in-game
-                        Thread.Sleep(5);
-                    }
-                }
-                else if (inGame is false)
-                {
-                    WriteTopLeftText("NOT IN RAID", Brushes.RED, 13, "Arial Unicode MS", 10, 30);  // Will appear 10px from top and left
-                    Thread.Sleep(5);
-                    _device.Flush();
-                    _device.EndDraw();
-                }
-
+                //while (InGame is false)
+                //{
+                    //MessageBox.Show("Not in raid");
+                    //WriteTopLeftText("NOT IN RAID", Brushes.RED, 13, "Arial Unicode MS", 10, 30); // Update text for not in-game
+                    //_device.Flush();
+                    //_device.EndDraw();
+                    //inGame = InGame;
+                    //Thread.Sleep(5);
+                //}
                 while (localPlayer is null)
                 {
                     localPlayer = LocalPlayer;
+                    WriteTopLeftText("NOT IN RAID", Brushes.RED, 13, "Arial Unicode MS", 10, 30);
+                    _device.Flush();
+                    _device.EndDraw();
                     Thread.Sleep(5);
-                }
+                } 
 
                 var strBuild = new StringBuilder();
-                if (inGame && localPlayer is not null)
+                if (InGame && localPlayer is not null)
                 {
                     WriteTopLeftText("IN RAID", Brushes.GREEN, 13, "Arial Unicode MS", 10, 30);
                     var allPlayers = AllPlayers?.Select(x => x.Value);
@@ -375,6 +363,13 @@ private void DirectXThread(object sender)
                         _device.EndDraw();
                     }
                 }
+                else if (InGame is false)
+                {
+                    WriteTopLeftText("NOT IN RAID", Brushes.RED, 13, "Arial Unicode MS", 10, 30); // Update text for not in-game
+                    _device.Flush();
+                    _device.EndDraw();
+                }
+                Console.WriteLine("Local player is " + LocalPlayer);
             }
             catch (SharpDXException e)
             {
@@ -389,7 +384,7 @@ private void DirectXThread(object sender)
                 }
             }
 
-        Thread.Sleep(500);
+        Thread.Sleep(10);
     }
     #region Declaration
 
@@ -524,7 +519,7 @@ private void DirectXThread(object sender)
     {
         _handle = Handle;
         InitializeComponent();
-        //ApplicationManager.CloseOverlayRequested += CloseOverlay;
+        ApplicationManager.CloseOverlayRequested += CloseOverlay;
         Move += OverlayForm_Move;
     }
 
@@ -534,9 +529,7 @@ private void DirectXThread(object sender)
     {
         if (keyData == Keys.F7)
         {
-            //_tokenSource.Cancel();
             Hide();
-            //MainForm.isOverlayShown = false;
             return true;
         }
 
@@ -549,51 +542,64 @@ private void DirectXThread(object sender)
         return base.ProcessCmdKey(ref msg, keyData);
     }
 
-    private void LoadOverlay(object sender, EventArgs e)
+private void LoadOverlay(object sender, EventArgs e)
+{
+    // Dispose of the existing overlay if it is already running
+    if (_threadDx != null && _threadDx.IsAlive)
     {
-        DoubleBuffered = true;
-        SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint |
-                 ControlStyles.Opaque | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
+        _running = false; // Stop the thread
+        _tokenSource.Cancel(); // Signal cancellation
 
-        _factory = new Factory();
-        _renderProperties = new HwndRenderTargetProperties
-        {
-            Hwnd = Handle,
-            PixelSize = new Size2(Size.Width, Size.Height),
-            PresentOptions = PresentOptions.None
-        };
+        // Wait for the thread to finish
+        _threadDx.Join();
+        
+        // Dispose of the DirectX device and factory
+        _device?.Dispose();
+        _factory?.Dispose();
 
-        marg.Left = 0;
-        marg.Top = 0;
-        marg.Right = Width;
-        marg.Bottom = Height;
-
-        //DwmExtendFrameIntoClientArea(this.Handle, ref marg);
-        // Initialize DirectX
-        _device = new WindowRenderTarget(_factory,
-            new RenderTargetProperties(new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied)),
-            _renderProperties);
-        _tokenSource = new CancellationTokenSource();
-
-        token = _tokenSource.Token;
-        try
-        {
-            _threadDx = new Thread(DirectXThread)
-            {
-                Priority = ThreadPriority.Highest,
-                IsBackground = true
-            };
-        }
-        catch (OperationCanceledException)
-        {
-        }
-
-        _running = true;
-        TopMost = true;
-        _threadDx.Start(token);
-
-        CreateMenu();
+        _device = null;
+        _factory = null;
     }
+
+    DoubleBuffered = true;
+    SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint |
+             ControlStyles.Opaque | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
+
+    _factory = new Factory();
+    _renderProperties = new HwndRenderTargetProperties
+    {
+        Hwnd = Handle,
+        PixelSize = new Size2(Size.Width, Size.Height),
+        PresentOptions = PresentOptions.None
+    };
+
+    marg.Left = 0;
+    marg.Top = 0;
+    marg.Right = Width;
+    marg.Bottom = Height;
+
+    // Initialize DirectX
+    _device = new WindowRenderTarget(_factory,
+        new RenderTargetProperties(new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied)),
+        _renderProperties);
+    
+    _tokenSource = new CancellationTokenSource();
+    token = _tokenSource.Token;
+    
+    // Start the DirectX thread
+    _threadDx = new Thread(DirectXThread)
+    {
+        Priority = ThreadPriority.Highest,
+        IsBackground = true
+    };
+    
+    _running = true;
+    TopMost = true;
+    _threadDx.Start(token);
+
+    CreateMenu();
+}
+
 
     #endregion
 
