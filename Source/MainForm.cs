@@ -1072,8 +1072,6 @@ namespace eft_dma_radar
         // Overlay Method
         private bool ToggleOverlay()
         {
-            //if (swMasterSwitch.Checked)
-            //{
                 if (!isOverlayShown)
                 {
                     if (overlay is null || overlay.IsDisposed) overlay = new Overlay();
@@ -1087,11 +1085,6 @@ namespace eft_dma_radar
                 }
 
                 return true;
-            //}
-            //else
-            //{
-                //MessageBox.Show("Please enable Memory Writes");
-            //}
 
             return true;
         }
@@ -3747,10 +3740,10 @@ namespace eft_dma_radar
             mcSettingsMemoryWritingSkillBuffs.Enabled = isChecked;
             mcSettingsMemoryWritingChams.Enabled = isChecked;
 
-            //if (isChecked)
-                //Memory.Toolbox?.StartToolbox();
-            //else
-                //Memory.Toolbox?.StopToolbox();
+            if (isChecked)
+                Memory.Toolbox?.StartToolbox();
+            else
+                Memory.Toolbox?.StopToolbox();
         }
 
         private void swMaxEndurance_CheckedChanged(object sender, EventArgs e)
