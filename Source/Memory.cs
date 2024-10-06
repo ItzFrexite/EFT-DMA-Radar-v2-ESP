@@ -434,7 +434,7 @@ namespace eft_dma_radar
             };
             Memory._running = true;
             Memory._workerThread.Start();
-            Memory._gameInputThread.Start();
+            //Memory._gameInputThread.Start();
         }
 
         public static async void StopMemoryWorker()
