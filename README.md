@@ -35,6 +35,9 @@ This project builds upon the original work created by [Git link](https://github.
 ![image](https://github.com/xx0m/EFT-DMA-Radar-v2/assets/63579245/0043ef34-8048-4865-bd21-32ccaf38955d)
 ![image](https://github.com/xx0m/EFT-DMA-Radar-v2/assets/63579245/60a2a04b-d123-4913-bef1-87b40f0c56f5)
 
-## Preview of fuser ESP
+## Preview of Skeleton ESP
+![IMG_5391](https://github.com/user-attachments/assets/02a6709b-aa43-446c-bf27-67556cf27e32)
+
+## Preview of Bounding Box and Head Dot ESP
 ![ezgif-1-4ce9f0b0ce](https://github.com/user-attachments/assets/97a835fe-8f6f-43ab-a025-6c1ad56ff448)
 ![ezgif-1-bc6d179fe6](https://github.com/user-attachments/assets/7e4e738d-b099-4eef-b28f-b3dbc5b089d4)
