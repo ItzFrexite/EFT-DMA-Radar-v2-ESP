@@ -191,15 +191,6 @@
             rdbOnKey = new MaterialSkin.Controls.MaterialRadioButton();
             swNoSway = new MaterialSkin.Controls.MaterialSwitch();
             cboHotkeyKey = new MaterialSkin.Controls.MaterialComboBox();
-            swToggleESP = new MaterialSkin.Controls.MaterialSwitch();
-            swPlayerESP = new MaterialSkin.Controls.MaterialSwitch();
-            swTeamESP = new MaterialSkin.Controls.MaterialSwitch();
-            swScavESP = new MaterialSkin.Controls.MaterialSwitch();
-            swItemESP = new MaterialSkin.Controls.MaterialSwitch();
-            sldrPlayerDist = new MaterialSkin.Controls.MaterialSlider();
-            sldrTeamDist = new MaterialSkin.Controls.MaterialSlider();
-            sldrScavDist = new MaterialSkin.Controls.MaterialSlider();
-            sldrItemDist = new MaterialSkin.Controls.MaterialSlider();
             sldrThermalColorCoefficient = new MaterialSkin.Controls.MaterialSlider();
             sldrMinTemperature = new MaterialSkin.Controls.MaterialSlider();
             sldrThermalRampShift = new MaterialSkin.Controls.MaterialSlider();
@@ -255,8 +246,6 @@
             colHotkeysType = new ColumnHeader();
             materialLabel1 = new MaterialSkin.Controls.MaterialLabel();
             tabSettingsMemoryWriting = new TabPage();
-            mcSettingsESP = new MaterialSkin.Controls.MaterialCard();
-            lblESPOverlay = new MaterialSkin.Controls.MaterialLabel();
             mcSettingsMemoryWritingChams = new MaterialSkin.Controls.MaterialCard();
             lblSettingsMemoryWritingChams = new MaterialSkin.Controls.MaterialLabel();
             mcSettingsMemoryWritingSkillBuffs = new MaterialSkin.Controls.MaterialCard();
@@ -290,6 +279,10 @@
             colFactionName = new ColumnHeader();
             lblSettingsAIFactionsFactions = new MaterialSkin.Controls.MaterialLabel();
             tabSettingsColors = new TabPage();
+            picTransitIcon = new PictureBox();
+            lblSettingsColorsTransitIcon = new MaterialSkin.Controls.MaterialLabel();
+            picTransitText = new PictureBox();
+            lblSettingsColorsTransitText = new MaterialSkin.Controls.MaterialLabel();
             mcSettingsColorsGameWorld = new MaterialSkin.Controls.MaterialCard();
             picTripwires = new PictureBox();
             lblSettingsColorsGameWorldTripwire = new MaterialSkin.Controls.MaterialLabel();
@@ -331,12 +324,8 @@
             lblSettingsColorsLootRegular = new MaterialSkin.Controls.MaterialLabel();
             lblSettingsColorsLootQuests = new MaterialSkin.Controls.MaterialLabel();
             mcSettingsColorsExfiltration = new MaterialSkin.Controls.MaterialCard();
-            picTransitIcon = new PictureBox();
             picExfilClosedIcon = new PictureBox();
-            lblSettingsColorsTransitIcon = new MaterialSkin.Controls.MaterialLabel();
             lblSettingsColorsExfilClosedIcon = new MaterialSkin.Controls.MaterialLabel();
-            picTransitText = new PictureBox();
-            lblSettingsColorsTransitText = new MaterialSkin.Controls.MaterialLabel();
             picExfilClosedText = new PictureBox();
             lblSettingsColorsExfilClosedText = new MaterialSkin.Controls.MaterialLabel();
             picExfilPendingIcon = new PictureBox();
@@ -422,7 +411,6 @@
             colLootFilterItemName = new ColumnHeader();
             colLootFilterItemValue = new ColumnHeader();
             iconList = new ImageList(components);
-            swInGameMenu = new MaterialSkin.Controls.MaterialSwitch();
             tabControlMain.SuspendLayout();
             tabRadar.SuspendLayout();
             mcRadarLootItemViewer.SuspendLayout();
@@ -439,7 +427,6 @@
             tabSettingsHotkeys.SuspendLayout();
             mcSettingsHotkeys.SuspendLayout();
             tabSettingsMemoryWriting.SuspendLayout();
-            mcSettingsESP.SuspendLayout();
             mcSettingsMemoryWritingChams.SuspendLayout();
             mcSettingsMemoryWritingSkillBuffs.SuspendLayout();
             mcSettingsMemoryWritingThermal.SuspendLayout();
@@ -454,6 +441,8 @@
             mcSettingsAIFactionsEntryManagement.SuspendLayout();
             mcSettingsAIFactionsFactions.SuspendLayout();
             tabSettingsColors.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)picTransitIcon).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)picTransitText).BeginInit();
             mcSettingsColorsGameWorld.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picTripwires).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picGrenades).BeginInit();
@@ -475,9 +464,7 @@
             ((System.ComponentModel.ISupportInitialize)picLootImportant).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picLootRegular).BeginInit();
             mcSettingsColorsExfiltration.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)picTransitIcon).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picExfilClosedIcon).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)picTransitText).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picExfilClosedText).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picExfilPendingIcon).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picExfilPendingText).BeginInit();
@@ -3675,154 +3662,6 @@
             cboHotkeyKey.UseTallSize = false;
             cboHotkeyKey.SelectedIndexChanged += cboHotkeyKey_SelectedIndexChanged;
             // 
-            // swToggleESP
-            // 
-            swToggleESP.Depth = 0;
-            swToggleESP.Font = new Font("Segoe UI", 9F);
-            swToggleESP.Location = new Point(15, 45);
-            swToggleESP.Margin = new Padding(0);
-            swToggleESP.MouseLocation = new Point(-1, -1);
-            swToggleESP.MouseState = MaterialSkin.MouseState.HOVER;
-            swToggleESP.Name = "swToggleESP";
-            swToggleESP.Ripple = true;
-            swToggleESP.Size = new Size(150, 28);
-            swToggleESP.TabIndex = 36;
-            swToggleESP.Text = "Toggle ESP";
-            toolTip.SetToolTip(swToggleESP, "Toggles ESP");
-            swToggleESP.UseVisualStyleBackColor = true;
-            // 
-            // swPlayerESP
-            // 
-            swPlayerESP.Depth = 0;
-            swPlayerESP.Font = new Font("Segoe UI", 9F);
-            swPlayerESP.Location = new Point(15, 83);
-            swPlayerESP.Margin = new Padding(0);
-            swPlayerESP.MouseLocation = new Point(-1, -1);
-            swPlayerESP.MouseState = MaterialSkin.MouseState.HOVER;
-            swPlayerESP.Name = "swPlayerESP";
-            swPlayerESP.Ripple = true;
-            swPlayerESP.Size = new Size(150, 28);
-            swPlayerESP.TabIndex = 37;
-            swPlayerESP.Text = "Player ESP";
-            toolTip.SetToolTip(swPlayerESP, "Toggles Player ESP");
-            swPlayerESP.UseVisualStyleBackColor = true;
-            // 
-            // swTeamESP
-            // 
-            swTeamESP.Depth = 0;
-            swTeamESP.Font = new Font("Segoe UI", 9F);
-            swTeamESP.Location = new Point(15, 123);
-            swTeamESP.Margin = new Padding(0);
-            swTeamESP.MouseLocation = new Point(-1, -1);
-            swTeamESP.MouseState = MaterialSkin.MouseState.HOVER;
-            swTeamESP.Name = "swTeamESP";
-            swTeamESP.Ripple = true;
-            swTeamESP.Size = new Size(150, 28);
-            swTeamESP.TabIndex = 38;
-            swTeamESP.Text = "Team ESP";
-            toolTip.SetToolTip(swTeamESP, "Toggles Team ESP");
-            swTeamESP.UseVisualStyleBackColor = true;
-            // 
-            // swScavESP
-            // 
-            swScavESP.Depth = 0;
-            swScavESP.Font = new Font("Segoe UI", 9F);
-            swScavESP.Location = new Point(17, 163);
-            swScavESP.Margin = new Padding(0);
-            swScavESP.MouseLocation = new Point(-1, -1);
-            swScavESP.MouseState = MaterialSkin.MouseState.HOVER;
-            swScavESP.Name = "swScavESP";
-            swScavESP.Ripple = true;
-            swScavESP.Size = new Size(150, 28);
-            swScavESP.TabIndex = 39;
-            swScavESP.Text = "Scav ESP";
-            toolTip.SetToolTip(swScavESP, "Toggles Scav ESP");
-            swScavESP.UseVisualStyleBackColor = true;
-            // 
-            // swItemESP
-            // 
-            swItemESP.Depth = 0;
-            swItemESP.Font = new Font("Segoe UI", 9F);
-            swItemESP.Location = new Point(17, 204);
-            swItemESP.Margin = new Padding(0);
-            swItemESP.MouseLocation = new Point(-1, -1);
-            swItemESP.MouseState = MaterialSkin.MouseState.HOVER;
-            swItemESP.Name = "swItemESP";
-            swItemESP.Ripple = true;
-            swItemESP.Size = new Size(150, 28);
-            swItemESP.TabIndex = 40;
-            swItemESP.Text = "Item ESP";
-            toolTip.SetToolTip(swItemESP, "Toggles Item ESP");
-            swItemESP.UseVisualStyleBackColor = true;
-            // 
-            // sldrPlayerDist
-            // 
-            sldrPlayerDist.Depth = 0;
-            sldrPlayerDist.ForeColor = Color.Black;
-            sldrPlayerDist.Location = new Point(177, 77);
-            sldrPlayerDist.MouseState = MaterialSkin.MouseState.HOVER;
-            sldrPlayerDist.Name = "sldrPlayerDist";
-            sldrPlayerDist.RangeMax = 1000;
-            sldrPlayerDist.RangeMin = 1;
-            sldrPlayerDist.Size = new Size(219, 40);
-            sldrPlayerDist.TabIndex = 45;
-            sldrPlayerDist.Text = "Distance";
-            toolTip.SetToolTip(sldrPlayerDist, "The distance for player esp");
-            sldrPlayerDist.UseAccentColor = true;
-            sldrPlayerDist.Value = 750;
-            sldrPlayerDist.ValueMax = 1000;
-            // 
-            // sldrTeamDist
-            // 
-            sldrTeamDist.Depth = 0;
-            sldrTeamDist.ForeColor = Color.Black;
-            sldrTeamDist.Location = new Point(177, 117);
-            sldrTeamDist.MouseState = MaterialSkin.MouseState.HOVER;
-            sldrTeamDist.Name = "sldrTeamDist";
-            sldrTeamDist.RangeMax = 1000;
-            sldrTeamDist.RangeMin = 1;
-            sldrTeamDist.Size = new Size(219, 40);
-            sldrTeamDist.TabIndex = 46;
-            sldrTeamDist.Text = "Distance";
-            toolTip.SetToolTip(sldrTeamDist, "The distance for team esp");
-            sldrTeamDist.UseAccentColor = true;
-            sldrTeamDist.Value = 750;
-            sldrTeamDist.ValueMax = 1000;
-            // 
-            // sldrScavDist
-            // 
-            sldrScavDist.Depth = 0;
-            sldrScavDist.ForeColor = Color.Black;
-            sldrScavDist.Location = new Point(177, 157);
-            sldrScavDist.MouseState = MaterialSkin.MouseState.HOVER;
-            sldrScavDist.Name = "sldrScavDist";
-            sldrScavDist.RangeMax = 1000;
-            sldrScavDist.RangeMin = 1;
-            sldrScavDist.Size = new Size(219, 40);
-            sldrScavDist.TabIndex = 47;
-            sldrScavDist.Text = "Distance";
-            toolTip.SetToolTip(sldrScavDist, "The distance for scav esp");
-            sldrScavDist.UseAccentColor = true;
-            sldrScavDist.Value = 350;
-            sldrScavDist.ValueMax = 1000;
-            // 
-            // sldrItemDist
-            // 
-            sldrItemDist.Depth = 0;
-            sldrItemDist.ForeColor = Color.Black;
-            sldrItemDist.Location = new Point(177, 197);
-            sldrItemDist.MouseState = MaterialSkin.MouseState.HOVER;
-            sldrItemDist.Name = "sldrItemDist";
-            sldrItemDist.RangeMax = 1000;
-            sldrItemDist.RangeMin = 1;
-            sldrItemDist.Size = new Size(219, 40);
-            sldrItemDist.TabIndex = 48;
-            sldrItemDist.Text = "Distance";
-            toolTip.SetToolTip(sldrItemDist, "The distance for item esp");
-            sldrItemDist.UseAccentColor = true;
-            sldrItemDist.Value = 250;
-            sldrItemDist.ValueMax = 1000;
-            // 
             // sldrThermalColorCoefficient
             // 
             sldrThermalColorCoefficient.Depth = 0;
@@ -3887,7 +3726,7 @@
             tabControlMain.Multiline = true;
             tabControlMain.Name = "tabControlMain";
             tabControlMain.SelectedIndex = 0;
-            tabControlMain.Size = new Size(1673, 746);
+            tabControlMain.Size = new Size(1400, 746);
             tabControlMain.TabIndex = 10;
             tabControlMain.SelectedIndexChanged += TabControl_SelectedIndexChanged;
             // 
@@ -3904,7 +3743,7 @@
             tabRadar.Location = new Point(4, 39);
             tabRadar.Name = "tabRadar";
             tabRadar.Padding = new Padding(3);
-            tabRadar.Size = new Size(1665, 703);
+            tabRadar.Size = new Size(1392, 703);
             tabRadar.TabIndex = 0;
             tabRadar.Text = "Radar";
             // 
@@ -4328,7 +4167,7 @@
             skMapCanvas.Location = new Point(3, 3);
             skMapCanvas.Margin = new Padding(4, 3, 4, 3);
             skMapCanvas.Name = "skMapCanvas";
-            skMapCanvas.Size = new Size(1659, 697);
+            skMapCanvas.Size = new Size(1386, 697);
             skMapCanvas.TabIndex = 13;
             skMapCanvas.VSync = true;
             skMapCanvas.PaintSurface += skMapCanvas_PaintSurface;
@@ -4345,7 +4184,7 @@
             tabSettings.Location = new Point(4, 39);
             tabSettings.Margin = new Padding(0);
             tabSettings.Name = "tabSettings";
-            tabSettings.Size = new Size(1665, 703);
+            tabSettings.Size = new Size(1392, 703);
             tabSettings.TabIndex = 1;
             tabSettings.Text = "Settings";
             // 
@@ -4360,7 +4199,7 @@
             tabSelector.Margin = new Padding(0);
             tabSelector.MouseState = MaterialSkin.MouseState.HOVER;
             tabSelector.Name = "tabSelector";
-            tabSelector.Size = new Size(1665, 36);
+            tabSelector.Size = new Size(1392, 36);
             tabSelector.TabIndex = 29;
             tabSelector.TabIndicatorHeight = 1;
             tabSelector.Text = "tabSelectorSettings";
@@ -4382,7 +4221,7 @@
             tabControlSettings.Multiline = true;
             tabControlSettings.Name = "tabControlSettings";
             tabControlSettings.SelectedIndex = 0;
-            tabControlSettings.Size = new Size(1664, 668);
+            tabControlSettings.Size = new Size(1392, 668);
             tabControlSettings.TabIndex = 28;
             // 
             // tabSettingsGeneral
@@ -4395,7 +4234,7 @@
             tabSettingsGeneral.Location = new Point(4, 24);
             tabSettingsGeneral.Margin = new Padding(0);
             tabSettingsGeneral.Name = "tabSettingsGeneral";
-            tabSettingsGeneral.Size = new Size(1656, 640);
+            tabSettingsGeneral.Size = new Size(1384, 640);
             tabSettingsGeneral.TabIndex = 0;
             tabSettingsGeneral.Text = "General";
             // 
@@ -4547,7 +4386,7 @@
             tabSettingsHotkeys.Location = new Point(4, 24);
             tabSettingsHotkeys.Name = "tabSettingsHotkeys";
             tabSettingsHotkeys.Padding = new Padding(3);
-            tabSettingsHotkeys.Size = new Size(1656, 640);
+            tabSettingsHotkeys.Size = new Size(1384, 640);
             tabSettingsHotkeys.TabIndex = 5;
             tabSettingsHotkeys.Text = "Hotkeys";
             tabSettingsHotkeys.UseVisualStyleBackColor = true;
@@ -4626,7 +4465,6 @@
             // tabSettingsMemoryWriting
             // 
             tabSettingsMemoryWriting.BackColor = Color.White;
-            tabSettingsMemoryWriting.Controls.Add(mcSettingsESP);
             tabSettingsMemoryWriting.Controls.Add(mcSettingsMemoryWritingChams);
             tabSettingsMemoryWriting.Controls.Add(mcSettingsMemoryWritingSkillBuffs);
             tabSettingsMemoryWriting.Controls.Add(mcSettingsMemoryWritingThermal);
@@ -4636,48 +4474,9 @@
             tabSettingsMemoryWriting.Location = new Point(4, 24);
             tabSettingsMemoryWriting.Name = "tabSettingsMemoryWriting";
             tabSettingsMemoryWriting.Padding = new Padding(3);
-            tabSettingsMemoryWriting.Size = new Size(1656, 640);
+            tabSettingsMemoryWriting.Size = new Size(1384, 640);
             tabSettingsMemoryWriting.TabIndex = 1;
             tabSettingsMemoryWriting.Text = "Memory Writing";
-            // 
-            // mcSettingsESP
-            // 
-            mcSettingsESP.BackColor = Color.FromArgb(255, 255, 255);
-            mcSettingsESP.Controls.Add(swInGameMenu);
-            mcSettingsESP.Controls.Add(sldrItemDist);
-            mcSettingsESP.Controls.Add(sldrScavDist);
-            mcSettingsESP.Controls.Add(sldrTeamDist);
-            mcSettingsESP.Controls.Add(sldrPlayerDist);
-            mcSettingsESP.Controls.Add(swItemESP);
-            mcSettingsESP.Controls.Add(swScavESP);
-            mcSettingsESP.Controls.Add(swTeamESP);
-            mcSettingsESP.Controls.Add(swPlayerESP);
-            mcSettingsESP.Controls.Add(swToggleESP);
-            mcSettingsESP.Controls.Add(lblESPOverlay);
-            mcSettingsESP.Depth = 0;
-            mcSettingsESP.ForeColor = Color.FromArgb(222, 0, 0, 0);
-            mcSettingsESP.Location = new Point(1111, 56);
-            mcSettingsESP.Margin = new Padding(14);
-            mcSettingsESP.MouseState = MaterialSkin.MouseState.HOVER;
-            mcSettingsESP.Name = "mcSettingsESP";
-            mcSettingsESP.Padding = new Padding(14);
-            mcSettingsESP.Size = new Size(530, 256);
-            mcSettingsESP.TabIndex = 46;
-            // 
-            // lblESPOverlay
-            // 
-            lblESPOverlay.AutoSize = true;
-            lblESPOverlay.Depth = 0;
-            lblESPOverlay.Font = new Font("Roboto Medium", 20F, FontStyle.Bold, GraphicsUnit.Pixel);
-            lblESPOverlay.FontType = MaterialSkin.MaterialSkinManager.fontType.H6;
-            lblESPOverlay.HighEmphasis = true;
-            lblESPOverlay.Location = new Point(17, 12);
-            lblESPOverlay.MouseState = MaterialSkin.MouseState.HOVER;
-            lblESPOverlay.Name = "lblESPOverlay";
-            lblESPOverlay.Size = new Size(294, 24);
-            lblESPOverlay.TabIndex = 33;
-            lblESPOverlay.Text = "ESP Overlay (Not yet setup here)";
-            lblESPOverlay.UseAccent = true;
             // 
             // mcSettingsMemoryWritingChams
             // 
@@ -4929,7 +4728,7 @@
             tabSettingsLoot.Location = new Point(4, 24);
             tabSettingsLoot.Margin = new Padding(0);
             tabSettingsLoot.Name = "tabSettingsLoot";
-            tabSettingsLoot.Size = new Size(1656, 640);
+            tabSettingsLoot.Size = new Size(1384, 640);
             tabSettingsLoot.TabIndex = 2;
             tabSettingsLoot.Text = "Loot/Quests";
             // 
@@ -5100,7 +4899,7 @@
             tabSettingsAIFactions.Location = new Point(4, 24);
             tabSettingsAIFactions.Margin = new Padding(0);
             tabSettingsAIFactions.Name = "tabSettingsAIFactions";
-            tabSettingsAIFactions.Size = new Size(1656, 640);
+            tabSettingsAIFactions.Size = new Size(1384, 640);
             tabSettingsAIFactions.TabIndex = 3;
             tabSettingsAIFactions.Text = "AI Factions";
             // 
@@ -5237,9 +5036,57 @@
             tabSettingsColors.Location = new Point(4, 24);
             tabSettingsColors.Margin = new Padding(0);
             tabSettingsColors.Name = "tabSettingsColors";
-            tabSettingsColors.Size = new Size(1656, 640);
+            tabSettingsColors.Size = new Size(1384, 640);
             tabSettingsColors.TabIndex = 4;
             tabSettingsColors.Text = "Colors";
+            // 
+            // picTransitIcon
+            // 
+            picTransitIcon.BackColor = Color.Transparent;
+            picTransitIcon.BorderStyle = BorderStyle.FixedSingle;
+            picTransitIcon.Location = new Point(106, 255);
+            picTransitIcon.Name = "picTransitIcon";
+            picTransitIcon.Size = new Size(70, 23);
+            picTransitIcon.TabIndex = 48;
+            picTransitIcon.TabStop = false;
+            picTransitIcon.Click += picTransitIcon_Click;
+            // 
+            // lblSettingsColorsTransitIcon
+            // 
+            lblSettingsColorsTransitIcon.AutoSize = true;
+            lblSettingsColorsTransitIcon.Depth = 0;
+            lblSettingsColorsTransitIcon.Font = new Font("Roboto", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblSettingsColorsTransitIcon.FontType = MaterialSkin.MaterialSkinManager.fontType.Body2;
+            lblSettingsColorsTransitIcon.Location = new Point(22, 255);
+            lblSettingsColorsTransitIcon.MouseState = MaterialSkin.MouseState.HOVER;
+            lblSettingsColorsTransitIcon.Name = "lblSettingsColorsTransitIcon";
+            lblSettingsColorsTransitIcon.Size = new Size(78, 17);
+            lblSettingsColorsTransitIcon.TabIndex = 47;
+            lblSettingsColorsTransitIcon.Text = "Transit Icon:";
+            // 
+            // picTransitText
+            // 
+            picTransitText.BackColor = Color.Transparent;
+            picTransitText.BorderStyle = BorderStyle.FixedSingle;
+            picTransitText.Location = new Point(106, 225);
+            picTransitText.Name = "picTransitText";
+            picTransitText.Size = new Size(70, 23);
+            picTransitText.TabIndex = 46;
+            picTransitText.TabStop = false;
+            picTransitText.Click += picTransitText_Click;
+            // 
+            // lblSettingsColorsTransitText
+            // 
+            lblSettingsColorsTransitText.AutoSize = true;
+            lblSettingsColorsTransitText.Depth = 0;
+            lblSettingsColorsTransitText.Font = new Font("Roboto", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblSettingsColorsTransitText.FontType = MaterialSkin.MaterialSkinManager.fontType.Body2;
+            lblSettingsColorsTransitText.Location = new Point(22, 225);
+            lblSettingsColorsTransitText.MouseState = MaterialSkin.MouseState.HOVER;
+            lblSettingsColorsTransitText.Name = "lblSettingsColorsTransitText";
+            lblSettingsColorsTransitText.Size = new Size(78, 17);
+            lblSettingsColorsTransitText.TabIndex = 44;
+            lblSettingsColorsTransitText.Text = "Transit Text:";
             // 
             // mcSettingsColorsGameWorld
             // 
@@ -5804,17 +5651,6 @@
             mcSettingsColorsExfiltration.Size = new Size(183, 322);
             mcSettingsColorsExfiltration.TabIndex = 41;
             // 
-            // picTransitIcon
-            // 
-            picTransitIcon.BackColor = Color.Transparent;
-            picTransitIcon.BorderStyle = BorderStyle.FixedSingle;
-            picTransitIcon.Location = new Point(106, 255);
-            picTransitIcon.Name = "picTransitIcon";
-            picTransitIcon.Size = new Size(70, 23);
-            picTransitIcon.TabIndex = 48;
-            picTransitIcon.TabStop = false;
-            picTransitIcon.Click += picTransitIcon_Click;
-            // 
             // picExfilClosedIcon
             // 
             picExfilClosedIcon.BackColor = Color.Transparent;
@@ -5825,19 +5661,6 @@
             picExfilClosedIcon.TabIndex = 56;
             picExfilClosedIcon.TabStop = false;
             picExfilClosedIcon.Click += picExfilClosedIcon_Click;
-            // 
-            // lblSettingsColorsTransitIcon
-            // 
-            lblSettingsColorsTransitIcon.AutoSize = true;
-            lblSettingsColorsTransitIcon.Depth = 0;
-            lblSettingsColorsTransitIcon.Font = new Font("Roboto", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblSettingsColorsTransitIcon.FontType = MaterialSkin.MaterialSkinManager.fontType.Body2;
-            lblSettingsColorsTransitIcon.Location = new Point(22, 255);
-            lblSettingsColorsTransitIcon.MouseState = MaterialSkin.MouseState.HOVER;
-            lblSettingsColorsTransitIcon.Name = "lblSettingsColorsTransitIcon";
-            lblSettingsColorsTransitIcon.Size = new Size(78, 17);
-            lblSettingsColorsTransitIcon.TabIndex = 47;
-            lblSettingsColorsTransitIcon.Text = "Transit Icon:";
             // 
             // lblSettingsColorsExfilClosedIcon
             // 
@@ -5851,30 +5674,6 @@
             lblSettingsColorsExfilClosedIcon.Size = new Size(76, 17);
             lblSettingsColorsExfilClosedIcon.TabIndex = 55;
             lblSettingsColorsExfilClosedIcon.Text = "Closed Icon:";
-            // 
-            // picTransitText
-            // 
-            picTransitText.BackColor = Color.Transparent;
-            picTransitText.BorderStyle = BorderStyle.FixedSingle;
-            picTransitText.Location = new Point(106, 225);
-            picTransitText.Name = "picTransitText";
-            picTransitText.Size = new Size(70, 23);
-            picTransitText.TabIndex = 46;
-            picTransitText.TabStop = false;
-            picTransitText.Click += picTransitText_Click;
-            // 
-            // lblSettingsColorsTransitText
-            // 
-            lblSettingsColorsTransitText.AutoSize = true;
-            lblSettingsColorsTransitText.Depth = 0;
-            lblSettingsColorsTransitText.Font = new Font("Roboto", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblSettingsColorsTransitText.FontType = MaterialSkin.MaterialSkinManager.fontType.Body2;
-            lblSettingsColorsTransitText.Location = new Point(22, 225);
-            lblSettingsColorsTransitText.MouseState = MaterialSkin.MouseState.HOVER;
-            lblSettingsColorsTransitText.Name = "lblSettingsColorsTransitText";
-            lblSettingsColorsTransitText.Size = new Size(78, 17);
-            lblSettingsColorsTransitText.TabIndex = 44;
-            lblSettingsColorsTransitText.Text = "Transit Text:";
             // 
             // picExfilClosedText
             // 
@@ -6468,7 +6267,7 @@
             tabPlayerLoadouts.ImageKey = "loadouts.png";
             tabPlayerLoadouts.Location = new Point(4, 39);
             tabPlayerLoadouts.Name = "tabPlayerLoadouts";
-            tabPlayerLoadouts.Size = new Size(1665, 703);
+            tabPlayerLoadouts.Size = new Size(1392, 703);
             tabPlayerLoadouts.TabIndex = 2;
             tabPlayerLoadouts.Text = "Player Loadouts";
             // 
@@ -6614,7 +6413,7 @@
             tabWatchlist.ImageKey = "watchlist.png";
             tabWatchlist.Location = new Point(4, 39);
             tabWatchlist.Name = "tabWatchlist";
-            tabWatchlist.Size = new Size(1665, 703);
+            tabWatchlist.Size = new Size(1392, 703);
             tabWatchlist.TabIndex = 3;
             tabWatchlist.Text = "Watchlist";
             // 
@@ -6816,7 +6615,7 @@
             tabLootFilter.ImageKey = "loot.png";
             tabLootFilter.Location = new Point(4, 39);
             tabLootFilter.Name = "tabLootFilter";
-            tabLootFilter.Size = new Size(1665, 703);
+            tabLootFilter.Size = new Size(1392, 703);
             tabLootFilter.TabIndex = 4;
             tabLootFilter.Text = "Loot Filter";
             // 
@@ -7025,27 +6824,11 @@
             iconList.Images.SetKeyName(3, "watchlist.png");
             iconList.Images.SetKeyName(4, "loot.png");
             // 
-            // swInGameMenu
-            // 
-            swInGameMenu.Depth = 0;
-            swInGameMenu.Font = new Font("Segoe UI", 9F);
-            swInGameMenu.Location = new Point(177, 45);
-            swInGameMenu.Margin = new Padding(0);
-            swInGameMenu.MouseLocation = new Point(-1, -1);
-            swInGameMenu.MouseState = MaterialSkin.MouseState.HOVER;
-            swInGameMenu.Name = "swInGameMenu";
-            swInGameMenu.Ripple = true;
-            swInGameMenu.Size = new Size(219, 28);
-            swInGameMenu.TabIndex = 49;
-            swInGameMenu.Text = "Enable In-Game GUI";
-            toolTip.SetToolTip(swInGameMenu, "Toggles ESP");
-            swInGameMenu.UseVisualStyleBackColor = true;
-            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1673, 770);
+            ClientSize = new Size(1400, 770);
             Controls.Add(tabControlMain);
             DrawerShowIconsWhenHidden = true;
             DrawerTabControl = tabControlMain;
@@ -7078,8 +6861,6 @@
             mcSettingsHotkeys.ResumeLayout(false);
             mcSettingsHotkeys.PerformLayout();
             tabSettingsMemoryWriting.ResumeLayout(false);
-            mcSettingsESP.ResumeLayout(false);
-            mcSettingsESP.PerformLayout();
             mcSettingsMemoryWritingChams.ResumeLayout(false);
             mcSettingsMemoryWritingChams.PerformLayout();
             mcSettingsMemoryWritingSkillBuffs.ResumeLayout(false);
@@ -7105,6 +6886,8 @@
             mcSettingsAIFactionsFactions.ResumeLayout(false);
             mcSettingsAIFactionsFactions.PerformLayout();
             tabSettingsColors.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)picTransitIcon).EndInit();
+            ((System.ComponentModel.ISupportInitialize)picTransitText).EndInit();
             mcSettingsColorsGameWorld.ResumeLayout(false);
             mcSettingsColorsGameWorld.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)picTripwires).EndInit();
@@ -7131,9 +6914,7 @@
             ((System.ComponentModel.ISupportInitialize)picLootRegular).EndInit();
             mcSettingsColorsExfiltration.ResumeLayout(false);
             mcSettingsColorsExfiltration.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)picTransitIcon).EndInit();
             ((System.ComponentModel.ISupportInitialize)picExfilClosedIcon).EndInit();
-            ((System.ComponentModel.ISupportInitialize)picTransitText).EndInit();
             ((System.ComponentModel.ISupportInitialize)picExfilClosedText).EndInit();
             ((System.ComponentModel.ISupportInitialize)picExfilPendingIcon).EndInit();
             ((System.ComponentModel.ISupportInitialize)picExfilPendingText).EndInit();
@@ -7564,26 +7345,5 @@
         private MaterialSkin.Controls.MaterialLabel lblSettingsColorsTransitIcon;
         private PictureBox picTransitText;
         private MaterialSkin.Controls.MaterialLabel lblSettingsColorsTransitText;
-        private MaterialSkin.Controls.MaterialCard mcSettingsESP;
-        private MaterialSkin.Controls.MaterialSwitch swInGameMenu;
-        private MaterialSkin.Controls.MaterialSwitch materialSwitch2;
-        private MaterialSkin.Controls.MaterialSwitch materialSwitch3;
-        private MaterialSkin.Controls.MaterialSwitch materialSwitch4;
-        private MaterialSkin.Controls.MaterialSwitch materialSwitch5;
-        private MaterialSkin.Controls.MaterialSwitch materialSwitch6;
-        private MaterialSkin.Controls.MaterialSwitch materialSwitch7;
-        private MaterialSkin.Controls.MaterialSwitch materialSwitch8;
-        private MaterialSkin.Controls.MaterialSwitch materialSwitch9;
-        private MaterialSkin.Controls.MaterialSwitch swToggleESP;
-        private MaterialSkin.Controls.MaterialLabel lblESPOverlay;
-        private MaterialSkin.Controls.MaterialSwitch swTeamESP;
-        private MaterialSkin.Controls.MaterialSwitch swPlayerESP;
-        private MaterialSkin.Controls.MaterialSlider sldrPlayerDist;
-        private MaterialSkin.Controls.MaterialSwitch swItemESP;
-        private MaterialSkin.Controls.MaterialSwitch swScavESP;
-        private MaterialSkin.Controls.MaterialSlider sldrItemDist;
-        private MaterialSkin.Controls.MaterialSlider sldrScavDist;
-        private MaterialSkin.Controls.MaterialSlider sldrTeamDist;
     }
 }
-

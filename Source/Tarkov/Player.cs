@@ -14,6 +14,195 @@ namespace eft_dma_radar
         private GearManager _gearManager;
         private Transform _transform;
 
+        #region Bones
+
+        public ulong boneMatrix;
+        Dictionary<PlayerBones, Transform> boneTransforms = new Dictionary<PlayerBones, Transform>();
+        private int frameCounter = 0; // Track frames to throttle updates
+        private int updateInterval = 20; // Update skeleton every x frames;
+        private Player LocalPlayer => Memory.Players?.FirstOrDefault(x => x.Value.Type is PlayerType.LocalPlayer).Value;
+
+        private bool boneCache = false;
+        private ScatterReadMap boneScatterMap;
+        private int boneCounter;
+        private Matrix4x4 temp;
+
+        private Vector3 _headPos; // Backing field for HeadPosition
+        private Vector3 _spine3Pos;
+        private Vector3 _lPalmPos;
+        private Vector3 _rPalmPos;
+        private Vector3 _pevlisPos;
+        private Vector3 _lFootPos;
+        private Vector3 _rFootPos;
+        private Vector3 _lForearm1Pos;
+        private Vector3 _rForearm1Pos;
+        private Vector3 _lCalfPos;
+        private Vector3 _rCalfPos;
+
+
+        private int BoneLimit
+        {
+            get => Overlay.boneLimit;
+        }
+
+        private bool ESPOn
+        {
+            get => Overlay.isESPOn;
+        }
+
+        public static ulong FPSCamera
+        {
+            get => CameraManager._staticfpsCamera;  // Access static field directly
+        }
+
+        private Vector3 translationVector;
+
+        public Vector3 HeadPosition // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _headPos; // Return the head position
+            }
+            private set
+            {
+                lock (_posLock)
+                    _headPos = value; // Set the head position
+            }
+        }
+        public Vector3 Spine3Position // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _spine3Pos;
+            }
+            private set
+            {
+                lock (_posLock)
+                    _spine3Pos = value;
+            }
+        }
+        public Vector3 LPalmPosition // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _lPalmPos; // Return the foot position
+            }
+            private set
+            {
+                lock (_posLock)
+                    _lPalmPos = value; // Set the foot position
+            }
+        }
+        public Vector3 RPalmPosition // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _rPalmPos; // Return the foot position
+            }
+            private set
+            {
+                lock (_posLock)
+                    _rPalmPos = value; // Set the foot position
+            }
+        }
+        public Vector3 PelvisPosition // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _pevlisPos;
+            }
+            private set
+            {
+                lock (_posLock)
+                    _pevlisPos = value;
+            }
+        }
+        public Vector3 LFootPosition // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _lFootPos; // Return the foot position
+            }
+            private set
+            {
+                lock (_posLock)
+                    _lFootPos = value; // Set the foot position
+            }
+        }
+        public Vector3 RFootPosition // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _rFootPos; // Return the foot position
+            }
+            private set
+            {
+                lock (_posLock)
+                    _rFootPos = value; // Set the foot position
+            }
+        }
+        public Vector3 LForearm1Position // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _lForearm1Pos; // Return the foot position
+            }
+            private set
+            {
+                lock (_posLock)
+                    _lForearm1Pos = value; // Set the foot position
+            }
+        }
+        public Vector3 RForearm1Position // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _rForearm1Pos; // Return the foot position
+            }
+            private set
+            {
+                lock (_posLock)
+                    _rForearm1Pos = value; // Set the foot position
+            }
+        }
+        public Vector3 LCalfPosition // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _lCalfPos; // Return the foot position
+            }
+            private set
+            {
+                lock (_posLock)
+                    _lCalfPos = value; // Set the foot position
+            }
+        }
+        public Vector3 RCalfPosition // 96 bits, cannot set atomically
+        {
+            get
+            {
+                lock (_posLock)
+                    return _rCalfPos; // Return the foot position
+            }
+            private set
+            {
+                lock (_posLock)
+                    _rCalfPos = value; // Set the foot position
+            }
+        }
+
+        #endregion
+
         #region PlayerProperties
         /// <summary>
         /// Player is a PMC Operator.
@@ -70,8 +259,6 @@ namespace eft_dma_radar
         public ulong PlayerBody { get; set; }
 
         private Vector3 _pos = new Vector3(0, 0, 0); // backing field
-        private Vector3 _headPos = new Vector3(0, 0, 0); // backing field
-
         /// <summary>
         /// Player's Unity Position in Local Game World.
         /// </summary>
@@ -86,20 +273,6 @@ namespace eft_dma_radar
             {
                 lock (_posLock)
                     _pos = value;
-            }
-        }
-        // Player's Head Position
-        public Vector3 HeadPosition // 96 bits, cannot set atomically
-        {
-            get
-            {
-                lock (_posLock)
-                    return _headPos;
-            }
-            private set
-            {
-                lock (_posLock)
-                    _headPos = value;
             }
         }
         /// <summary>
@@ -814,26 +987,171 @@ namespace eft_dma_radar
         }
 
         #region Bones
-        public Vector3 GetBonePosition(Player player, PlayerBones bone)
+        public void ReadAllBonePositions(Player player)
         {
-            // Read the bone matrix pointer chain
-            var boneMatrix = Memory.ReadPtrChain(player.PlayerBody, new uint[] { 0x28, 0x28, 0x10 });
+            var localPlayerPos = LocalPlayer.Position;
+            var dist = Vector3.Distance(localPlayerPos, player.Position);
 
-            // Calculate the specific bone pointer based on the bone type
-            var pointer = Memory.ReadPtrChain(boneMatrix, new uint[] { 0x20 + ((uint)bone * 0x8), 0x10 });
+            if (boneCache is false)
+            {
+                // Get the view matrix (same as in the overlay)
+                var viewMatrix = RegisteredPlayers.ViewMatrixPtr2;
+                var tempMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShit.viewmatrix);
+                var tempCache = System.Numerics.Matrix4x4.Transpose(Memory.ReadValue<System.Numerics.Matrix4x4>(tempMatrixPtr + 0xDC));
+                temp = tempCache;
+            }
 
-            // Create a transform object from the pointer and get the position
-            Transform boneTransform = new Transform(pointer, false);
-            Vector3 position = boneTransform.GetPosition();
+            var translationVector = new Vector3(temp.M41, temp.M42, temp.M43);
+            var cameraForward = new Vector3(temp.M31, temp.M32, temp.M33);
 
-            return position;
+            float fov = 75f;
+
+            // Check if the player is behind the camera
+            //var w = D3DXVec3Dot(translationVector, player.Position) + temp.M44;
+            //if (w < 0.098f)
+            //{
+            //if (player.Name == "Knight")
+            //{
+            //Console.WriteLine("Knight is behind the camera.");
+            //}
+            //return; // Skip players behind the camera
+            //}
+
+            List<PlayerBones> bones = new List<PlayerBones>
+            {
+                PlayerBones.HumanHead,
+                PlayerBones.HumanSpine3,
+                PlayerBones.HumanLPalm,
+                PlayerBones.HumanRPalm,
+                PlayerBones.HumanPelvis,
+                PlayerBones.HumanLFoot,
+                PlayerBones.HumanRFoot,
+                PlayerBones.HumanLForearm1,
+                PlayerBones.HumanRForearm1,
+                PlayerBones.HumanLCalf,
+                PlayerBones.HumanRCalf
+
+            };
+
+            if (boneCache is false)
+            {
+                var boneCountCache = bones.Count;
+                var boneScatterMapCache = new ScatterReadMap(boneCountCache);
+
+                var round1 = boneScatterMapCache.AddRound(); // First round: Read bone matrix base
+                var round2 = boneScatterMapCache.AddRound(); // Second round: Dereference bone matrix pointer
+
+                for (int i = 0; i < boneCountCache; i++)
+                {
+                    // Bone retrieval based on matrix
+                    var p1 = round1.AddEntry<MemPointer>(i, 0, boneMatrix, null, 0x20 + ((uint)bones[i] * 0x8));
+                    var p2 = round2.AddEntry<MemPointer>(i, 1, p1, null, 0x10);
+                    //MessageBox.Show("Loop");
+                    Console.WriteLine("Caching Bone " + bones[i]);
+                }
+
+                // Execute the scatter read
+                boneScatterMapCache.Execute();
+
+                boneCounter = boneCountCache;
+                boneScatterMap = boneScatterMapCache;
+                boneCache = true;
+            }
+
+            if (ESPOn is true)
+            {
+                // Update every [updateInterval] amount of frames, for example if updateInterval is 6 it will update every 6 frames. The higher this number the more performance.
+                if (frameCounter++ % updateInterval == 0)
+                {
+                    for (int i = 0; i < boneCounter; i++)
+                    {
+                        if (boneScatterMap.Results[i][1].TryGetResult<MemPointer>(out var p5Value))
+                        {
+                            #region Manual Test
+                            //var boneMatrixManual = Memory.ReadPtrChain(player.PlayerBody, new uint[] { 0x28, 0x28, 0x10 });
+                            //var pointer = Memory.ReadPtrChain(boneMatrixManual, new uint[] { 0x20 + ((uint)bones[i] * 0x8), 0x10 });
+                            //if (pointer == 0)
+                            //{
+                            //    MessageBox.Show($"Pointer for Bone {i} is invalid (Pointer: {pointer.ToString("X")}).");
+                            //    continue; // Skip the rest of the loop for this iteration
+                            //}
+
+                            //Transform boneTransform = new Transform(pointer, false);
+                            //Vector3 position = boneTransform.GetPosition();
+
+                            //MessageBox.Show($"Manual Bone {i} Pointer: 0x{pointer:X}");
+                            //Console.WriteLine("Manual Bone " + i + " Pointer: 0x" + pointer.ToString("X") + " at Position: " + position);
+                            #endregion
+
+                            #region Scatter
+                            if (!boneTransforms.ContainsKey(bones[i]))
+                            {
+                                boneTransforms[bones[i]] = new Transform(p5Value, false);
+                                Console.WriteLine("Bone Transform create for bone " + bones[i] + " for player " + player.Name);
+                            }
+
+                            if (dist > BoneLimit && bones[i] == PlayerBones.HumanHead) // Make sure this condition matches your bone enum
+                            {
+                                Vector3 bonePosition = boneTransforms[bones[i]].GetPosition();
+                                this.HeadPosition = bonePosition;
+                            }
+
+
+                            else if (dist <= BoneLimit)
+                            {
+                                Vector3 bonePosition = boneTransforms[bones[i]].GetPosition();
+
+                                // Debugging output to compare the result
+                                //Console.WriteLine("Scatter Bone " + i + " Pointer: 0x" + p5Value + " at Position: " + bonePosition);
+
+                                #region Case Switch
+                                switch (bones[i])
+                                {
+                                    case PlayerBones.HumanHead:
+                                        this.HeadPosition = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanSpine3:
+                                        this.Spine3Position = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanLPalm:
+                                        this.LPalmPosition = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanRPalm:
+                                        this.RPalmPosition = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanPelvis:
+                                        this.PelvisPosition = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanLFoot:
+                                        this.LFootPosition = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanRFoot:
+                                        this.RFootPosition = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanLForearm1:
+                                        this.LForearm1Position = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanRForearm1:
+                                        this.RForearm1Position = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanLCalf:
+                                        this.LCalfPosition = bonePosition;
+                                        break;
+                                    case PlayerBones.HumanRCalf:
+                                        this.RCalfPosition = bonePosition;
+                                        break;
+
+                                }
+                                #endregion
+                            }
+                            #endregion
+                        }
+                    }
+                }
+            }
+            
         }
 
-        public bool SetBone()
-        {
-            this.HeadPosition = GetBonePosition(this, PlayerBones.HumanHead);
-            return true;
-        }
         #endregion
 
         #endregion

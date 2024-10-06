@@ -26,7 +26,7 @@ namespace eft_dma_radar
         private InputManager _inputManager;
         private frmMain _frmMain;
         private ulong _localGameWorld;
-        private readonly ulong _unityBase;
+        public readonly ulong _unityBase;
         private bool _inHideout = false;
         private volatile bool _inGame = false;
         private volatile bool _loadingLoot = false;
@@ -537,7 +537,7 @@ namespace eft_dma_radar
                     this._loadingLoot = false;
                 }
 
-                if (this._config.MasterSwitch && Memory.GameStatus == Game.GameStatus.InGame)
+                if (Memory.GameStatus == Game.GameStatus.InGame)
                 {
                     if (this._cameraManager is null)
                     {

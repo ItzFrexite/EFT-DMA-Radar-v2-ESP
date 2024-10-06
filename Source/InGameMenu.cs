@@ -91,15 +91,19 @@ public partial class InGameMenu : Form
         // When adding more remember to add here (SetupMenu()), MenuForm_KeyDown() (If Incremental), ToggleMenuItem() and AdjustSelectionValue() within MenuManager if Incremental
 
         CreateMenuItem("ESP", isESPOn, new Point(10, 50));
-        CreateMenuItem("Player ESP", isPlayerESPOn, new Point(10, 70));
-        CreateMenuItem("Team ESP", isTeamESPOn, new Point(10, 90));
-        CreateMenuItem("Scav ESP", isScavESPOn, new Point(10, 110));
-        CreateMenuItem("Loot ESP", isLootESPOn, new Point(10, 130));
+        CreateMenuItem("Bone ESP", isPlayerESPOn, new Point(10, 70));
+        CreateMenuItem("Player ESP", isPlayerESPOn, new Point(10, 90));
+        CreateMenuItem("Team ESP", isTeamESPOn, new Point(10, 110));
+        CreateMenuItem("Scav ESP", isScavESPOn, new Point(10, 130));
+        CreateMenuItem("Loot ESP", isLootESPOn, new Point(10, 150));
+        CreateMenuItem("Bounding Box", isBoxESPOn, new Point(10, 170));
+        CreateMenuItem("Head Dot", isHeadDotOn, new Point(10, 190));
 
-        CreateMenuItem("Player Distance", PlayerDistance, new Point(10, 150)); 
-        CreateMenuItem("Team Distance", TeamDistance, new Point(10, 170)); 
-        CreateMenuItem("Scav Distance", ScavDistance, new Point(10, 190));
-        CreateMenuItem("Loot Distance", LootDistance, new Point(10, 210));
+        CreateMenuItem("Bone Distance", BoneDistance, new Point(10, 210));
+        CreateMenuItem("Player Distance", PlayerDistance, new Point(10, 230)); 
+        CreateMenuItem("Team Distance", TeamDistance, new Point(10, 250)); 
+        CreateMenuItem("Scav Distance", ScavDistance, new Point(10, 270));
+        CreateMenuItem("Loot Distance", LootDistance, new Point(10, 290));
 
         //CreateMenuItem("Aimbot", isAimbotOn, new Point(10, 230));
         //CreateMenuItem("No Recoil", isNoRecoilOn, new Point(10, 250));
@@ -172,44 +176,54 @@ public partial class InGameMenu : Form
                 break;
 
             case Keys.Left:
-                if (currentSelection == 5) // Player Distance
+                if (currentSelection == 8) // Bone Distance
+                {
+                    BoneDistance = Math.Max(0, BoneDistance - 10); // Decrement
+                    UpdateMenuItem("Bone Distance", BoneDistance);
+                }
+                else if (currentSelection == 9) // Player Distance
                 {
                     PlayerDistance = Math.Max(0, PlayerDistance - 10); // Decrement
                     UpdateMenuItem("Player Distance", PlayerDistance);
                 }
-                else if (currentSelection == 6) // Team Distance
+                else if (currentSelection == 10) // Team Distance
                 {
                     TeamDistance = Math.Max(0, TeamDistance - 10); // Decrement
                     UpdateMenuItem("Team Distance", TeamDistance);
                 }
-                else if (currentSelection == 7) // Scav Distance
+                else if (currentSelection == 11) // Scav Distance
                 {
                     ScavDistance = Math.Max(0, ScavDistance - 10); // Decrement
                     UpdateMenuItem("Scav Distance", ScavDistance);
                 }
-                else if (currentSelection == 8) // Loot Distance
+                else if (currentSelection == 12) // Loot Distance
                 {
                     LootDistance = Math.Max(0, LootDistance - 10); // Decrement
-                    UpdateMenuItem("Scav Distance", LootDistance);
+                    UpdateMenuItem("Loot Distance", LootDistance);
                 }
                 break;
             case Keys.Right:
-                if (currentSelection == 5) // Player Distance
+                if (currentSelection == 8) // Bone Distance Distance
+                {
+                    BoneDistance += 10; // Increment
+                    UpdateMenuItem("Bone Distance", BoneDistance);
+                }
+                else if (currentSelection == 9) // Player Distance
                 {
                     PlayerDistance += 10; // Increment
                     UpdateMenuItem("Player Distance", PlayerDistance);
                 }
-                else if (currentSelection == 6) // Team Distance
+                else if (currentSelection == 11) // Team Distance
                 {
                     TeamDistance += 10; // Increment
                     UpdateMenuItem("Team Distance", TeamDistance);
                 }
-                else if (currentSelection == 7) // Scav Distance
+                else if (currentSelection == 11) // Scav Distance
                 {
                     ScavDistance += 10; // Increment
                     UpdateMenuItem("Scav Distance", ScavDistance);
                 }
-                else if (currentSelection == 8) // Loot Distance
+                else if (currentSelection == 12) // Loot Distance
                 {
                     LootDistance += 10; // Increment
                     UpdateMenuItem("Loot Distance", LootDistance);
@@ -250,34 +264,50 @@ public partial class InGameMenu : Form
                 UpdateMenuItem("ESP", isESPOn);
                 break;
             case 1:
+                isBoneESPOn = !isBoneESPOn;
+                UpdateMenuItem("Bone ESP", isBoneESPOn);
+                break;
+            case 2:
                 isPlayerESPOn = !isPlayerESPOn;
                 UpdateMenuItem("Player ESP", isPlayerESPOn);
                 break;
-            case 2:
+            case 3:
                 isTeamESPOn = !isTeamESPOn;
                 UpdateMenuItem("Team ESP", isTeamESPOn);
                 break;
-            case 3:
+            case 4:
                 isScavESPOn = !isScavESPOn;
                 UpdateMenuItem("Scav ESP", isScavESPOn);
                 break;
-            case 4:
+            case 5:
                 isLootESPOn = !isLootESPOn;
                 UpdateMenuItem("Loot ESP", isLootESPOn);
                 break;
-            case 5: // Player Distance
+            case 6:
+                isBoxESPOn = !isBoxESPOn;
+                UpdateMenuItem("Bounding Box", isBoxESPOn);
+                break;
+            case 7:
+                isHeadDotOn = !isHeadDotOn;
+                UpdateMenuItem("Head Dot", isHeadDotOn);
+                break;
+            case 8: // Bone Distance
+                BoneDistance += 10; // Adjust the increment as needed
+                UpdateMenuItem("Bone Distance", BoneDistance);
+                break;
+            case 9: // Player Distance
                 PlayerDistance += 10; // Adjust the increment as needed
                 UpdateMenuItem("Player Distance", PlayerDistance);
                 break;
-            case 6: // Team Distance
+            case 10: // Team Distance
                 TeamDistance += 10; // Adjust the increment as needed
                 UpdateMenuItem("Team Distance", TeamDistance);
                 break;
-            case 7: // Scav Distance
+            case 11: // Scav Distance
                 ScavDistance += 10; // Adjust the increment as needed
                 UpdateMenuItem("Scav Distance", ScavDistance);
                 break;
-            case 8: // Loot Distance
+            case 12: // Loot Distance
                 LootDistance += 10; // Adjust the increment as needed
                 UpdateMenuItem("Loot Distance", LootDistance);
                 break;
@@ -313,6 +343,12 @@ public partial class InGameMenu : Form
         set => Overlay.isESPOn = value;
     }
 
+    private bool isBoneESPOn
+    {
+        get => Overlay.isBoneESPOn;
+        set => Overlay.isBoneESPOn = value;
+    }
+
     private bool isPlayerESPOn
     {
         get => Overlay.isPMCOn;
@@ -335,6 +371,24 @@ public partial class InGameMenu : Form
     {
         get => Overlay.isLootOn;
         set => Overlay.isLootOn = value;
+    }
+
+    private bool isBoxESPOn
+    {
+        get => Overlay.isBoxOn;
+        set => Overlay.isBoxOn = value;
+    }
+
+    private bool isHeadDotOn
+    {
+        get => Overlay.isHeadDotOn;
+        set => Overlay.isHeadDotOn = value;
+    }
+
+    public int BoneDistance
+    {
+        get => Overlay.boneLimit;
+        set => Overlay.boneLimit = value;
     }
 
     public int PlayerDistance

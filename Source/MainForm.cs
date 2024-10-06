@@ -804,17 +804,18 @@ namespace eft_dma_radar
             swChamsRevert.Checked = this.config.Chams["RevertOnClose"];
 
             // ESP Features
-            mcSettingsESP.Enabled = this.config.MasterSwitch;
+            /*mcSettingsESP.Enabled = this.config.MasterSwitch;
             swToggleESP.Checked = this.config.ToggleESP;
-            swInGameMenu.Checked = this.config.InGameMenu;
+            swBoneESP.Checked = this.config.BoneESP;
             swPlayerESP.Checked = this.config.PlayerESP;
             swTeamESP.Checked = this.config.TeamESP;
             swScavESP.Checked = this.config.ScavESP;
             swItemESP.Checked = this.config.ItemESP;
+            sldrBoneDist.Value = this.config.BoneLimit;
             sldrPlayerDist.Value = this.config.PlayerDist;
             sldrTeamDist.Value = this.config.TeamDist;
             sldrScavDist.Value = this.config.ScavDist;
-            sldrItemDist.Value = this.config.ItemDist;
+            sldrItemDist.Value = this.config.ItemDist;*/
 
             this.ToggleChamsControls();
             #endregion
@@ -1071,8 +1072,8 @@ namespace eft_dma_radar
         // Overlay Method
         private bool ToggleOverlay()
         {
-            if (swMasterSwitch.Checked)
-            {
+            //if (swMasterSwitch.Checked)
+            //{
                 if (!isOverlayShown)
                 {
                     if (overlay is null || overlay.IsDisposed) overlay = new Overlay();
@@ -1086,11 +1087,11 @@ namespace eft_dma_radar
                 }
 
                 return true;
-            }
-            else
-            {
-                MessageBox.Show("Please enable Memory Writes");
-            }
+            //}
+            //else
+            //{
+                //MessageBox.Show("Please enable Memory Writes");
+            //}
 
             return true;
         }
@@ -3745,12 +3746,11 @@ namespace eft_dma_radar
             mcSettingsMemoryWritingThermal.Enabled = isChecked;
             mcSettingsMemoryWritingSkillBuffs.Enabled = isChecked;
             mcSettingsMemoryWritingChams.Enabled = isChecked;
-            mcSettingsESP.Enabled = isChecked;
 
-            if (isChecked)
-                Memory.Toolbox?.StartToolbox();
-            else
-                Memory.Toolbox?.StopToolbox();
+            //if (isChecked)
+                //Memory.Toolbox?.StartToolbox();
+            //else
+                //Memory.Toolbox?.StopToolbox();
         }
 
         private void swMaxEndurance_CheckedChanged(object sender, EventArgs e)

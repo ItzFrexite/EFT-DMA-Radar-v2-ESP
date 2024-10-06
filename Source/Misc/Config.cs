@@ -225,35 +225,83 @@ namespace eft_dma_radar
         [JsonPropertyName("zoomSensitivity")]
         public int ZoomSensitivity { get; set; }
 
-        [JsonPropertyName("toggleESP")]
-        public bool ToggleESP { get; set; }
+        /*[JsonPropertyName("toggleESP")]
+        public bool ToggleESP
+        {
+            get => Overlay.isESPOn;
+            set => Overlay.isESPOn = value;
+        }
 
-        [JsonPropertyName("toggleInGameGUI")]
-        public bool InGameMenu { get; set; }
+        [JsonPropertyName("boneESP")]
+        public bool BoneESP
+        {
+            get => Overlay.isBoneESPOn;
+            set => Overlay.isBoneESPOn = value;
+        }
 
         [JsonPropertyName("playerESP")]
-        public bool PlayerESP { get; set; }
+        public bool PlayerESP
+        {
+            get => Overlay.isPMCOn;
+            set => Overlay.isPMCOn = value;
+        }
 
         [JsonPropertyName("teamESP")]
-        public bool TeamESP { get; set; }
+        public bool TeamESP
+        {
+            get => Overlay.isTeamOn;
+            set => Overlay.isTeamOn = value;
+        }
 
         [JsonPropertyName("scavESP")]
-        public bool ScavESP { get; set; }
+        public bool ScavESP
+        {
+            get => Overlay.isScavOn;
+            set => Overlay.isScavOn = value;
+        }
 
         [JsonPropertyName("itemESP")]
-        public bool ItemESP { get; set; }
+        public bool ItemESP
+        {
+            get => Overlay.isLootOn;
+            set => Overlay.isLootOn = value;
+        }
+
+        [JsonPropertyName("boneDist")]
+        public int BoneLimit
+        {
+            get => Overlay.boneLimit;
+            set => Overlay.boneLimit = value;
+        }
 
         [JsonPropertyName("playerDist")]
-        public int PlayerDist { get; set; }
+        public int PlayerDist
+        {
+            get => Overlay.playerLimit;
+            set => Overlay.playerLimit = value;
+        }
 
         [JsonPropertyName("teamDist")]
-        public int TeamDist { get; set; }
+        public int TeamDist
+        {
+            get => Overlay.teamLimit;
+            set => Overlay.teamLimit = value;
+        }
 
         [JsonPropertyName("scavDist")]
-        public int ScavDist { get; set; }
+        public int ScavDist
+        {
+            get => Overlay.npcLimit;
+            set => Overlay.npcLimit = value;
+        }
 
         [JsonPropertyName("itemDist")]
-        public int ItemDist { get; set; }
+        public int ItemDist
+        {
+            get => Overlay.lootLimit;
+            set => Overlay.lootLimit = value;
+        }*/
+
         #endregion
 
         #region Json Ignore
@@ -543,17 +591,6 @@ namespace eft_dma_radar
             UnknownQuestItems = false;
             VSync = true;
             ZoomSensitivity = 25;
-            // ESP
-            ToggleESP = true;
-            InGameMenu = true;
-            PlayerESP = true;
-            TeamESP = true;
-            ScavESP = true;
-            ItemESP = true;
-            PlayerDist = 750;
-            TeamDist = 750;
-            ScavDist = 350;
-            ItemDist = 250;
         }
 
         /// <summary>

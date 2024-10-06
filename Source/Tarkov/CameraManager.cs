@@ -18,7 +18,7 @@ namespace eft_dma_radar
 
         private bool fovPtrFound = false;
 
-        private ulong _unityBase;
+        public ulong _unityBase;
         private ulong _opticCamera;
         private ulong _fpsCamera;
         private ulong _fovPtr;
@@ -56,7 +56,7 @@ namespace eft_dma_radar
             this.GetCamera();
         }
 
-        private bool GetCamera()
+        public bool GetCamera()
         {
             var count = 400;
             var foundFPSCamera = false;

@@ -74,19 +74,23 @@ public static class MenuManager
         switch (menu.currentSelection)
         {
             // Case is index as set within InGameMenu
-            case 5: // Assuming 'Player Distance' is at index 5
+            case 8: // 'Bone Distance' is at index 6
+                menu.BoneDistance = Math.Max(0, menu.BoneDistance + adjustAmount);
+                menu.UpdateDistanceMenuItem("Player Distance", menu.BoneDistance);
+                break;
+            case 9: // 'Player Distance' is at index 7
                 menu.PlayerDistance = Math.Max(0, menu.PlayerDistance + adjustAmount);
                 menu.UpdateDistanceMenuItem("Player Distance", menu.PlayerDistance);
                 break;
-            case 6: // Assuming 'Team Distance' is at index 6
+            case 10: // 'Team Distance' is at index 8
                 menu.TeamDistance = Math.Max(0, menu.TeamDistance + adjustAmount);
                 menu.UpdateDistanceMenuItem("Team Distance", menu.TeamDistance);
                 break;
-            case 7: // Assuming 'Scav Distance' is at index 7
+            case 11: // 'Scav Distance' is at index 9
                 menu.ScavDistance = Math.Max(0, menu.ScavDistance + adjustAmount);
                 menu.UpdateDistanceMenuItem("Scav Distance", menu.ScavDistance);
                 break;
-            case 8: // Assuming 'Loot Distance' is at index 7
+            case 12: // 'Loot Distance' is at index 10
                 menu.LootDistance = Math.Max(0, menu.LootDistance + adjustAmount);
                 menu.UpdateDistanceMenuItem("Loot Distance", menu.LootDistance);
                 break;

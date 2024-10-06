@@ -17,8 +17,22 @@ namespace eft_dma_radar
 
         private readonly ConcurrentDictionary<string, Player> _players = new(StringComparer.OrdinalIgnoreCase);
 
+        private CameraManager _cameraManager;
+
         private int _localPlayerGroup = -100;
         private readonly Vector3 DEFAULT_POSITION = new Vector3(0, 0, -9999);
+
+        #region Bones
+
+        public static ulong FPSCamera
+        {
+            get => CameraManager._staticfpsCamera;  // Access static field directly
+        }
+
+        public ulong ViewMatrixPtr;
+        public static System.Numerics.Matrix4x4 ViewMatrixPtr2;
+
+        #endregion
 
         #region Getters
         public ReadOnlyDictionary<string, Player> Players { get; }
@@ -445,11 +459,24 @@ namespace eft_dma_radar
 
                         bool p3 = true;
 
+                        if (player.boneMatrix == 0)
+                        {
+                            player.boneMatrix = Memory.ReadPtrChain(player.PlayerBody, new uint[] { 0x28, 0x28, 0x10 });
+                        }
+
+                        if (FPSCamera == 0)
+                        {
+                            ViewMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShit.viewmatrix);
+                            ViewMatrixPtr2 = System.Numerics.Matrix4x4.Transpose(Memory.ReadValue<System.Numerics.Matrix4x4>(ViewMatrixPtr + 0xDC));
+                        }
+
                         if (posOK)
                         {
                             p3 = player.SetPosition(posBufs);
-                            player.SetBone(); // Probably not the most efficient place but for now it works
+                            //player.SetBone(); // Probably not the most efficient place but for now it works
+                            player.ReadAllBonePositions(player);
                         }
+
                         if (checkHealth && !player.IsLocalPlayer)
                             if (scatterMap.Results[i][6].TryGetResult<int>(out var hp))
                                 player.SetHealth(hp);
