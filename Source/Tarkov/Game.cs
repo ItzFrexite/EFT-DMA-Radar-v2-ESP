@@ -562,7 +562,10 @@ namespace eft_dma_radar
                             Program.Log($"ERROR loading PlayerManager: {ex}");
                         }
                     }
+                }
 
+                if (this._config.MasterSwitch && Memory.GameStatus == Game.GameStatus.InGame)
+                {
                     if (this._toolbox is null)
                     {
                         try

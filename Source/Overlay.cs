@@ -178,7 +178,7 @@ private void DirectXThread(object sender)
                                 if (baseCoords.X > 0 || baseCoords.Y > 0 || baseCoords.Z > 0)
                                 {
                                     #region PMC
-                                    if (player.Type is PlayerType.PMC && isPMCOn && dist <= playerLimit)
+                                    if ((player.Type is PlayerType.BEAR || player.Type is PlayerType.USEC) && isPMCOn && dist <= playerLimit)
                                     {
                                         if (isBoneESPOn == false || dist > boneLimit)
                                         {
