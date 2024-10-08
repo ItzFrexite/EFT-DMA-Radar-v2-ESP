@@ -36,6 +36,11 @@ namespace eft_dma_radar
         public static Game Game => _game;
 
         #region Getters
+
+        public static Vmm VMM //Aimbot
+        {
+            get => vmmInstance;
+        }
         public static int Ticks
         {
             get => _ticks;

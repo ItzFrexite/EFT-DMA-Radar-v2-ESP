@@ -43,6 +43,9 @@ namespace eft_dma_radar
         public bool pressingLeft;
         public bool pressingRight;
 
+        // Aimnbot
+        private Aimbot _aimbot = new Aimbot();
+
         public enum GameStatus
         {
             NotFound,
@@ -193,6 +196,10 @@ namespace eft_dma_radar
 
                 this._rgtPlayers.UpdateList();
                 this._rgtPlayers.UpdateAllPlayers();
+
+                // Aimbot
+                this._aimbot.AimerBotter();
+
                 this.UpdateMisc();
             }
             catch (DMAShutdown)

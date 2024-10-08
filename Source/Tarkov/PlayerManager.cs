@@ -17,7 +17,7 @@ namespace eft_dma_radar
         private ulong _physical;
         private ulong _playerBase;
         private ulong _playerProfile;
-        private ulong _proceduralWeaponAnimation;
+        public ulong _proceduralWeaponAnimation;
         private ulong _breathEffector;
         private ulong _firmarmController;
         private ulong _skillsManager;
@@ -278,6 +278,7 @@ namespace eft_dma_radar
         {
             try
             {
+                entries.Add(new ScatterWriteDataEntry<float>(this._breathEffector + Offsets.BreathEffector.Intensity, 0.0f));
                 if (on && this._mask != 1)
                     entries.Add(new ScatterWriteDataEntry<int>(this._proceduralWeaponAnimation + Offsets.ProceduralWeaponAnimation.Mask, 1));
                 else if (!on && this._mask == 1)

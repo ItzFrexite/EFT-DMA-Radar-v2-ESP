@@ -300,6 +300,7 @@
     public struct FirearmController
     {
         public const uint WeaponLn = 0x174; //[174] WeaponLn : Single
+        public const uint Fireport = 0xD0; //[D0] Fireport : EFT.BifacialTransform // Aimbot
     }
 
     public struct HandsController
@@ -461,7 +462,7 @@
         public const uint PhysicalCondition = 0x300; // [300] _physicalCondition : System.Int32
         public const uint StateSpeedLimit = 0x308; // [308] <StateSpeedLimit>k__BackingField : Single
         public const uint StateSprintSpeedLimit = 0x30C; // [30C] <StateSprintSpeedLimit>k__BackingField : Single
-        public const uint Rotation = 0x408; // [408] _myRotation : UnityEngine.Vector2
+        public const uint Rotation = 0x27C; // [27C] _rotation : UnityEngine.Vector2
     }
 
     public struct Physical
@@ -609,5 +610,10 @@
     public struct CameraShit
     {
         public static uint[] viewmatrix = new uint[] { 0x30, 0x18 };
+    }
+
+    public struct Fireport
+    {
+        public static readonly uint[] To_TransfromInternal = new uint[] { 0x10, 0x10 };
     }
 }
