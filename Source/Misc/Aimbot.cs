@@ -675,18 +675,6 @@ namespace eft_dma_radar
         {
             get => Memory.LocalPlayer;
         }
-        public Vector3 GetFireportPos()
-        {
-            if (!this.InGame || Memory.InHideout)
-            {
-                MessageBox.Show("Not in game");
-                return new Vector3();
-            }
-            ulong handscontainer = Memory.ReadPtrChain(playamanaga._proceduralWeaponAnimation, new uint[] { ProceduralWeaponAnimation.FirearmContoller, FirearmController.Fireport, Fireport.To_TransfromInternal[0], Fireport.To_TransfromInternal[1] });
-            Transform tranny = new Transform(handscontainer);
-            Vector3 goofy = tranny.GetPosition();
-            return new Vector3(goofy.X, goofy.Z, goofy.Y);
-        }
 
         private float D3DXVec3Dot(Vector3 a, Vector3 b)
         {
@@ -722,6 +710,8 @@ namespace eft_dma_radar
 
             return true;
         }
+        
+
 
         public bool GetHeadScr(Player player, out Vector2 screen, out Vector3 pos)
         {
@@ -785,6 +775,10 @@ namespace eft_dma_radar
         }
 
 
+        ulong handsContainer;
+        private Transform cachedHandsContainer = null;
+        private Vector3 cameraPos = new Vector3(0, 0, 0);
+
         // Updated AimerBotter to use GetBoneScr for targeting multiple bones
         public void AimerBotter()
         {
@@ -814,7 +808,17 @@ namespace eft_dma_radar
                     if (players != null && players.Any())
                     {
                         this._cameraManager.GetViewmatrixAsync();
-                        Vector3 cameraPos = GetFireportPos();
+
+                        // Different method instead of using Vector3 cameraPos = GetFireportPos(); which is an unnecessary call to loop through as handsContainer doesnt seem to change during the game
+                        // This alone increases the mem/s performance by around 70-100 Mem/s
+                        if (handsContainer == 0)
+                        {
+                            handsContainer = Memory.ReadPtrChain(playamanaga._proceduralWeaponAnimation, new uint[] { ProceduralWeaponAnimation.FirearmContoller, FirearmController.Fireport, Fireport.To_TransfromInternal[0], Fireport.To_TransfromInternal[1] });
+                            cachedHandsContainer = new Transform(handsContainer);
+                            Vector3 cam = cachedHandsContainer.GetPosition();
+                            cameraPos = new Vector3(cam.X, cam.Z, cam.Y);
+                        }
+
 
                         if (bHeld && bHeld == bLastHeld && udPlayer != null && udPlayer.IsAlive && udPlayer.IsActive)
                         {
