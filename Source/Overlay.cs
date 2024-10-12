@@ -263,8 +263,7 @@ private void DirectXThread(object sender)
                                         }
 
                                         // Display text information
-                                        WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                  baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
+                                        WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                     }
                                     #endregion
                                     #region Scav
@@ -349,18 +348,10 @@ private void DirectXThread(object sender)
 
                                         }
 
-                                        if (player.Name is "Partisan")
-                                        {
-                                            // Display text information
-                                            WriteText("Partisan" + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                      baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
-                                        }
-                                        else
-                                        {
-                                            // Display text information
-                                            WriteText("Scav" + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                      baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
-                                        }
+                                        // Display text information
+                                        //WriteText("Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
+
+                                        WriteText("Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
 
                                     }
                                     #endregion
@@ -447,8 +438,8 @@ private void DirectXThread(object sender)
                                         }
 
                                         // Display text information
-                                        WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                  baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
+                                        WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
+
 
                                     }
                                     #endregion
@@ -535,8 +526,7 @@ private void DirectXThread(object sender)
                                         }
 
                                         // Display text information
-                                        WriteText("Follower" + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                  baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
+                                        WriteText("Follower" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
 
                                     }
                                     #endregion
@@ -623,8 +613,7 @@ private void DirectXThread(object sender)
                                         }
 
                                         // Display text information
-                                        WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                  baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
+                                        WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                     }
                                     #endregion
                                     #region Cultist
@@ -710,8 +699,7 @@ private void DirectXThread(object sender)
                                         }
 
                                         // Display text information
-                                        WriteText("Cultist" + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                  baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
+                                        WriteText("Cultist" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                     }
                                     #endregion
                                     #region PlayerScav
@@ -797,8 +785,7 @@ private void DirectXThread(object sender)
                                         }
 
                                         // Display text information
-                                        WriteText("Player Scav" + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                  baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
+                                        WriteText("Player Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                     }
                                     #endregion
                                     #region Raider
@@ -884,8 +871,7 @@ private void DirectXThread(object sender)
                                         }
 
                                         // Display text information
-                                        WriteText("Raider" + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                  baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
+                                        WriteText("Raider" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                     }
                                     #endregion
                                     #region SniperScav
@@ -970,8 +956,7 @@ private void DirectXThread(object sender)
 
                                         }
                                         // Display text information
-                                        WriteText("Sniper Scav" + Environment.NewLine + Math.Round(dist, 0) + "m",
-                                                  baseCoords.X + 5, baseCoords.Y - 25, Brushes.WHITE);
+                                        WriteText("Sniper Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                     }
                                     #endregion
 

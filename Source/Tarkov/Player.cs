@@ -1079,7 +1079,6 @@ namespace eft_dma_radar
                         {
                             boneTransforms[bones[i]] = new Transform(p5Value, false); // Add the transform
                             Console.WriteLine("Bone Transform created for bone " + bones[i] + " for player " + player.Name);
-                            Console.WriteLine(player.Name + " is player type " + player.Type);
                         }
 
                         if (dist > BoneLimit && bones[i] == PlayerBones.HumanHead)
