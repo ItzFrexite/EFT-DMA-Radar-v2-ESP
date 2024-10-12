@@ -1026,7 +1026,6 @@ private void DirectXThread(object sender)
                     _device.Flush();
                     _device.EndDraw();
                 }
-                Console.WriteLine("Local player is " + LocalPlayer);
             }
             catch (SharpDXException e)
             {

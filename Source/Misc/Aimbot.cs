@@ -815,8 +815,6 @@ namespace eft_dma_radar
                         .Where(x => x.IsActive && x.IsAlive && Vector3.Distance(x.Position, LocalPlayer.Position) < _config.AimbotMaxDistance)
                         .ToList();
 
-                    Console.WriteLine(screenHeight + " " + screenWidth);
-
                     if (players != null && players.Any())
                     {
                         this._cameraManager.GetViewmatrixAsync();
