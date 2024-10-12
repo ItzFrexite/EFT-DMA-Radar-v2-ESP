@@ -19,7 +19,7 @@ namespace eft_dma_radar
         public ulong boneMatrix;
         public Dictionary<PlayerBones, Transform> boneTransforms = new Dictionary<PlayerBones, Transform>();
         private int frameCounter = 0; // Track frames to throttle updates
-        private int updateInterval = 20; // Update skeleton every x frames;
+        private int updateInterval = 6; // Update skeleton every x frames;
         private Player LocalPlayer => Memory.Players?.FirstOrDefault(x => x.Value.Type is PlayerType.LocalPlayer).Value;
 
         private bool boneCache = false;
@@ -1079,6 +1079,7 @@ namespace eft_dma_radar
                         {
                             boneTransforms[bones[i]] = new Transform(p5Value, false); // Add the transform
                             Console.WriteLine("Bone Transform created for bone " + bones[i] + " for player " + player.Name);
+                            Console.WriteLine(player.Name + " is player type " + player.Type);
                         }
 
                         if (dist > BoneLimit && bones[i] == PlayerBones.HumanHead)
