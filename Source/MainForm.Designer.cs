@@ -279,10 +279,6 @@
             colFactionName = new ColumnHeader();
             lblSettingsAIFactionsFactions = new MaterialSkin.Controls.MaterialLabel();
             tabSettingsColors = new TabPage();
-            picTransitIcon = new PictureBox();
-            lblSettingsColorsTransitIcon = new MaterialSkin.Controls.MaterialLabel();
-            picTransitText = new PictureBox();
-            lblSettingsColorsTransitText = new MaterialSkin.Controls.MaterialLabel();
             mcSettingsColorsGameWorld = new MaterialSkin.Controls.MaterialCard();
             picTripwires = new PictureBox();
             lblSettingsColorsGameWorldTripwire = new MaterialSkin.Controls.MaterialLabel();
@@ -324,8 +320,12 @@
             lblSettingsColorsLootRegular = new MaterialSkin.Controls.MaterialLabel();
             lblSettingsColorsLootQuests = new MaterialSkin.Controls.MaterialLabel();
             mcSettingsColorsExfiltration = new MaterialSkin.Controls.MaterialCard();
+            picTransitIcon = new PictureBox();
             picExfilClosedIcon = new PictureBox();
+            lblSettingsColorsTransitIcon = new MaterialSkin.Controls.MaterialLabel();
             lblSettingsColorsExfilClosedIcon = new MaterialSkin.Controls.MaterialLabel();
+            picTransitText = new PictureBox();
+            lblSettingsColorsTransitText = new MaterialSkin.Controls.MaterialLabel();
             picExfilClosedText = new PictureBox();
             lblSettingsColorsExfilClosedText = new MaterialSkin.Controls.MaterialLabel();
             picExfilPendingIcon = new PictureBox();
@@ -411,6 +411,24 @@
             colLootFilterItemName = new ColumnHeader();
             colLootFilterItemValue = new ColumnHeader();
             iconList = new ImageList(components);
+            tabSettingsAim = new TabPage();
+            materialCard1 = new MaterialSkin.Controls.MaterialCard();
+            swAimClosest = new MaterialSkin.Controls.MaterialSwitch();
+            lblAimKeybind = new MaterialSkin.Controls.MaterialLabel();
+            sldrAimDistance = new MaterialSkin.Controls.MaterialSlider();
+            swAimLLeg = new MaterialSkin.Controls.MaterialSwitch();
+            swEnableAimBot = new MaterialSkin.Controls.MaterialSwitch();
+            swAimRLeg = new MaterialSkin.Controls.MaterialSwitch();
+            swAimPelvis = new MaterialSkin.Controls.MaterialSwitch();
+            swAimChest = new MaterialSkin.Controls.MaterialSwitch();
+            swAimNeck = new MaterialSkin.Controls.MaterialSwitch();
+            swHeadAim = new MaterialSkin.Controls.MaterialSwitch();
+            sldrAimbotFOV = new MaterialSkin.Controls.MaterialSlider();
+            swEnableTargetScavs = new MaterialSkin.Controls.MaterialSwitch();
+            lblAimBotSettings = new MaterialSkin.Controls.MaterialLabel();
+            sldrAimbotSmoothness = new MaterialSkin.Controls.MaterialSlider();
+            swEnablePMC = new MaterialSkin.Controls.MaterialSwitch();
+            lblKeybind = new MaterialSkin.Controls.MaterialLabel();
             tabControlMain.SuspendLayout();
             tabRadar.SuspendLayout();
             mcRadarLootItemViewer.SuspendLayout();
@@ -441,8 +459,6 @@
             mcSettingsAIFactionsEntryManagement.SuspendLayout();
             mcSettingsAIFactionsFactions.SuspendLayout();
             tabSettingsColors.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)picTransitIcon).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)picTransitText).BeginInit();
             mcSettingsColorsGameWorld.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picTripwires).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picGrenades).BeginInit();
@@ -464,7 +480,9 @@
             ((System.ComponentModel.ISupportInitialize)picLootImportant).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picLootRegular).BeginInit();
             mcSettingsColorsExfiltration.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)picTransitIcon).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picExfilClosedIcon).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)picTransitText).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picExfilClosedText).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picExfilPendingIcon).BeginInit();
             ((System.ComponentModel.ISupportInitialize)picExfilPendingText).BeginInit();
@@ -499,6 +517,8 @@
             mcLootFilterFilters.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picLootFilterColor).BeginInit();
             mcLootFilterItemManagement.SuspendLayout();
+            tabSettingsAim.SuspendLayout();
+            materialCard1.SuspendLayout();
             SuspendLayout();
             // 
             // colDialog
@@ -4213,6 +4233,7 @@
             tabControlSettings.Controls.Add(tabSettingsLoot);
             tabControlSettings.Controls.Add(tabSettingsAIFactions);
             tabControlSettings.Controls.Add(tabSettingsColors);
+            tabControlSettings.Controls.Add(tabSettingsAim);
             tabControlSettings.Depth = 0;
             tabControlSettings.Font = new Font("Segoe UI", 9F);
             tabControlSettings.Location = new Point(0, 36);
@@ -5040,54 +5061,6 @@
             tabSettingsColors.TabIndex = 4;
             tabSettingsColors.Text = "Colors";
             // 
-            // picTransitIcon
-            // 
-            picTransitIcon.BackColor = Color.Transparent;
-            picTransitIcon.BorderStyle = BorderStyle.FixedSingle;
-            picTransitIcon.Location = new Point(106, 255);
-            picTransitIcon.Name = "picTransitIcon";
-            picTransitIcon.Size = new Size(70, 23);
-            picTransitIcon.TabIndex = 48;
-            picTransitIcon.TabStop = false;
-            picTransitIcon.Click += picTransitIcon_Click;
-            // 
-            // lblSettingsColorsTransitIcon
-            // 
-            lblSettingsColorsTransitIcon.AutoSize = true;
-            lblSettingsColorsTransitIcon.Depth = 0;
-            lblSettingsColorsTransitIcon.Font = new Font("Roboto", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblSettingsColorsTransitIcon.FontType = MaterialSkin.MaterialSkinManager.fontType.Body2;
-            lblSettingsColorsTransitIcon.Location = new Point(22, 255);
-            lblSettingsColorsTransitIcon.MouseState = MaterialSkin.MouseState.HOVER;
-            lblSettingsColorsTransitIcon.Name = "lblSettingsColorsTransitIcon";
-            lblSettingsColorsTransitIcon.Size = new Size(78, 17);
-            lblSettingsColorsTransitIcon.TabIndex = 47;
-            lblSettingsColorsTransitIcon.Text = "Transit Icon:";
-            // 
-            // picTransitText
-            // 
-            picTransitText.BackColor = Color.Transparent;
-            picTransitText.BorderStyle = BorderStyle.FixedSingle;
-            picTransitText.Location = new Point(106, 225);
-            picTransitText.Name = "picTransitText";
-            picTransitText.Size = new Size(70, 23);
-            picTransitText.TabIndex = 46;
-            picTransitText.TabStop = false;
-            picTransitText.Click += picTransitText_Click;
-            // 
-            // lblSettingsColorsTransitText
-            // 
-            lblSettingsColorsTransitText.AutoSize = true;
-            lblSettingsColorsTransitText.Depth = 0;
-            lblSettingsColorsTransitText.Font = new Font("Roboto", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
-            lblSettingsColorsTransitText.FontType = MaterialSkin.MaterialSkinManager.fontType.Body2;
-            lblSettingsColorsTransitText.Location = new Point(22, 225);
-            lblSettingsColorsTransitText.MouseState = MaterialSkin.MouseState.HOVER;
-            lblSettingsColorsTransitText.Name = "lblSettingsColorsTransitText";
-            lblSettingsColorsTransitText.Size = new Size(78, 17);
-            lblSettingsColorsTransitText.TabIndex = 44;
-            lblSettingsColorsTransitText.Text = "Transit Text:";
-            // 
             // mcSettingsColorsGameWorld
             // 
             mcSettingsColorsGameWorld.BackColor = Color.FromArgb(255, 255, 255);
@@ -5651,6 +5624,17 @@
             mcSettingsColorsExfiltration.Size = new Size(183, 322);
             mcSettingsColorsExfiltration.TabIndex = 41;
             // 
+            // picTransitIcon
+            // 
+            picTransitIcon.BackColor = Color.Transparent;
+            picTransitIcon.BorderStyle = BorderStyle.FixedSingle;
+            picTransitIcon.Location = new Point(106, 255);
+            picTransitIcon.Name = "picTransitIcon";
+            picTransitIcon.Size = new Size(70, 23);
+            picTransitIcon.TabIndex = 48;
+            picTransitIcon.TabStop = false;
+            picTransitIcon.Click += picTransitIcon_Click;
+            // 
             // picExfilClosedIcon
             // 
             picExfilClosedIcon.BackColor = Color.Transparent;
@@ -5661,6 +5645,19 @@
             picExfilClosedIcon.TabIndex = 56;
             picExfilClosedIcon.TabStop = false;
             picExfilClosedIcon.Click += picExfilClosedIcon_Click;
+            // 
+            // lblSettingsColorsTransitIcon
+            // 
+            lblSettingsColorsTransitIcon.AutoSize = true;
+            lblSettingsColorsTransitIcon.Depth = 0;
+            lblSettingsColorsTransitIcon.Font = new Font("Roboto", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblSettingsColorsTransitIcon.FontType = MaterialSkin.MaterialSkinManager.fontType.Body2;
+            lblSettingsColorsTransitIcon.Location = new Point(22, 255);
+            lblSettingsColorsTransitIcon.MouseState = MaterialSkin.MouseState.HOVER;
+            lblSettingsColorsTransitIcon.Name = "lblSettingsColorsTransitIcon";
+            lblSettingsColorsTransitIcon.Size = new Size(78, 17);
+            lblSettingsColorsTransitIcon.TabIndex = 47;
+            lblSettingsColorsTransitIcon.Text = "Transit Icon:";
             // 
             // lblSettingsColorsExfilClosedIcon
             // 
@@ -5674,6 +5671,30 @@
             lblSettingsColorsExfilClosedIcon.Size = new Size(76, 17);
             lblSettingsColorsExfilClosedIcon.TabIndex = 55;
             lblSettingsColorsExfilClosedIcon.Text = "Closed Icon:";
+            // 
+            // picTransitText
+            // 
+            picTransitText.BackColor = Color.Transparent;
+            picTransitText.BorderStyle = BorderStyle.FixedSingle;
+            picTransitText.Location = new Point(106, 225);
+            picTransitText.Name = "picTransitText";
+            picTransitText.Size = new Size(70, 23);
+            picTransitText.TabIndex = 46;
+            picTransitText.TabStop = false;
+            picTransitText.Click += picTransitText_Click;
+            // 
+            // lblSettingsColorsTransitText
+            // 
+            lblSettingsColorsTransitText.AutoSize = true;
+            lblSettingsColorsTransitText.Depth = 0;
+            lblSettingsColorsTransitText.Font = new Font("Roboto", 12F, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblSettingsColorsTransitText.FontType = MaterialSkin.MaterialSkinManager.fontType.Body2;
+            lblSettingsColorsTransitText.Location = new Point(22, 225);
+            lblSettingsColorsTransitText.MouseState = MaterialSkin.MouseState.HOVER;
+            lblSettingsColorsTransitText.Name = "lblSettingsColorsTransitText";
+            lblSettingsColorsTransitText.Size = new Size(78, 17);
+            lblSettingsColorsTransitText.TabIndex = 44;
+            lblSettingsColorsTransitText.Text = "Transit Text:";
             // 
             // picExfilClosedText
             // 
@@ -6824,6 +6845,311 @@
             iconList.Images.SetKeyName(3, "watchlist.png");
             iconList.Images.SetKeyName(4, "loot.png");
             // 
+            // tabSettingsAim
+            // 
+            tabSettingsAim.BackColor = Color.White;
+            tabSettingsAim.Controls.Add(materialCard1);
+            tabSettingsAim.Location = new Point(4, 24);
+            tabSettingsAim.Name = "tabSettingsAim";
+            tabSettingsAim.Size = new Size(1384, 640);
+            tabSettingsAim.TabIndex = 6;
+            tabSettingsAim.Text = "Aim";
+            // 
+            // materialCard1
+            // 
+            materialCard1.BackColor = Color.FromArgb(255, 255, 255);
+            materialCard1.Controls.Add(swAimClosest);
+            materialCard1.Controls.Add(lblAimKeybind);
+            materialCard1.Controls.Add(sldrAimDistance);
+            materialCard1.Controls.Add(swAimLLeg);
+            materialCard1.Controls.Add(swEnableAimBot);
+            materialCard1.Controls.Add(swAimRLeg);
+            materialCard1.Controls.Add(swAimPelvis);
+            materialCard1.Controls.Add(swAimChest);
+            materialCard1.Controls.Add(swAimNeck);
+            materialCard1.Controls.Add(swHeadAim);
+            materialCard1.Controls.Add(sldrAimbotFOV);
+            materialCard1.Controls.Add(swEnableTargetScavs);
+            materialCard1.Controls.Add(lblAimBotSettings);
+            materialCard1.Controls.Add(sldrAimbotSmoothness);
+            materialCard1.Controls.Add(swEnablePMC);
+            materialCard1.Controls.Add(lblKeybind);
+            materialCard1.Depth = 0;
+            materialCard1.ForeColor = Color.FromArgb(222, 0, 0, 0);
+            materialCard1.Location = new Point(14, 14);
+            materialCard1.Margin = new Padding(14);
+            materialCard1.MouseState = MaterialSkin.MouseState.HOVER;
+            materialCard1.Name = "materialCard1";
+            materialCard1.Padding = new Padding(14);
+            materialCard1.Size = new Size(906, 327);
+            materialCard1.TabIndex = 0;
+            // 
+            // swAimClosest
+            // 
+            swAimClosest.Depth = 0;
+            swAimClosest.Font = new Font("Segoe UI", 9F);
+            swAimClosest.Location = new Point(738, 47);
+            swAimClosest.Margin = new Padding(0);
+            swAimClosest.MouseLocation = new Point(-1, -1);
+            swAimClosest.MouseState = MaterialSkin.MouseState.HOVER;
+            swAimClosest.Name = "swAimClosest";
+            swAimClosest.Ripple = true;
+            swAimClosest.Size = new Size(149, 28);
+            swAimClosest.TabIndex = 73;
+            swAimClosest.Text = "Closest";
+            toolTip.SetToolTip(swAimClosest, "Targets Pelvis");
+            swAimClosest.UseVisualStyleBackColor = true;
+            swAimClosest.CheckedChanged += swAimClosest_CheckedChanged;
+            // 
+            // lblAimKeybind
+            // 
+            lblAimKeybind.BackColor = Color.Red;
+            lblAimKeybind.Depth = 0;
+            lblAimKeybind.Font = new Font("Roboto", 14F, FontStyle.Regular, GraphicsUnit.Pixel);
+            lblAimKeybind.Location = new Point(382, 198);
+            lblAimKeybind.MouseState = MaterialSkin.MouseState.HOVER;
+            lblAimKeybind.Name = "lblAimKeybind";
+            lblAimKeybind.Size = new Size(172, 23);
+            lblAimKeybind.TabIndex = 59;
+            lblAimKeybind.Text = "Click to set keybind";
+            lblAimKeybind.TextAlign = ContentAlignment.MiddleCenter;
+            // 
+            // sldrAimDistance
+            // 
+            sldrAimDistance.Depth = 0;
+            sldrAimDistance.ForeColor = Color.Black;
+            sldrAimDistance.Location = new Point(17, 272);
+            sldrAimDistance.MouseState = MaterialSkin.MouseState.HOVER;
+            sldrAimDistance.Name = "sldrAimDistance";
+            sldrAimDistance.RangeMax = 1000;
+            sldrAimDistance.RangeMin = 1;
+            sldrAimDistance.Size = new Size(238, 40);
+            sldrAimDistance.TabIndex = 72;
+            sldrAimDistance.Text = "Distance";
+            toolTip.SetToolTip(sldrAimDistance, "Aimbot Smoothness");
+            sldrAimDistance.UseAccentColor = true;
+            sldrAimDistance.Value = 300;
+            sldrAimDistance.ValueMax = 1000;
+            sldrAimDistance.onValueChanged += sldrAimDistance_onValueChanged;
+            // 
+            // swAimLLeg
+            // 
+            swAimLLeg.Depth = 0;
+            swAimLLeg.Font = new Font("Segoe UI", 9F);
+            swAimLLeg.Location = new Point(517, 126);
+            swAimLLeg.Margin = new Padding(0);
+            swAimLLeg.MouseLocation = new Point(-1, -1);
+            swAimLLeg.MouseState = MaterialSkin.MouseState.HOVER;
+            swAimLLeg.Name = "swAimLLeg";
+            swAimLLeg.Ripple = true;
+            swAimLLeg.Size = new Size(149, 28);
+            swAimLLeg.TabIndex = 70;
+            swAimLLeg.Text = "Left Leg";
+            toolTip.SetToolTip(swAimLLeg, "Targets Left Leg");
+            swAimLLeg.UseVisualStyleBackColor = true;
+            swAimLLeg.CheckedChanged += swAimLLeg_CheckedChanged;
+            // 
+            // swEnableAimBot
+            // 
+            swEnableAimBot.Depth = 0;
+            swEnableAimBot.Font = new Font("Segoe UI", 9F);
+            swEnableAimBot.Location = new Point(18, 47);
+            swEnableAimBot.Margin = new Padding(0);
+            swEnableAimBot.MouseLocation = new Point(-1, -1);
+            swEnableAimBot.MouseState = MaterialSkin.MouseState.HOVER;
+            swEnableAimBot.Name = "swEnableAimBot";
+            swEnableAimBot.Ripple = true;
+            swEnableAimBot.Size = new Size(178, 28);
+            swEnableAimBot.TabIndex = 63;
+            swEnableAimBot.Text = "Enable";
+            toolTip.SetToolTip(swEnableAimBot, "Enables Aimbot");
+            swEnableAimBot.UseVisualStyleBackColor = true;
+            swEnableAimBot.CheckedChanged += swEnableAimBot_CheckedChanged;
+            // 
+            // swAimRLeg
+            // 
+            swAimRLeg.Depth = 0;
+            swAimRLeg.Font = new Font("Segoe UI", 9F);
+            swAimRLeg.Location = new Point(517, 87);
+            swAimRLeg.Margin = new Padding(0);
+            swAimRLeg.MouseLocation = new Point(-1, -1);
+            swAimRLeg.MouseState = MaterialSkin.MouseState.HOVER;
+            swAimRLeg.Name = "swAimRLeg";
+            swAimRLeg.Ripple = true;
+            swAimRLeg.Size = new Size(149, 28);
+            swAimRLeg.TabIndex = 69;
+            swAimRLeg.Text = "Right Leg";
+            toolTip.SetToolTip(swAimRLeg, "Targets Right Leg");
+            swAimRLeg.UseVisualStyleBackColor = true;
+            swAimRLeg.CheckedChanged += swAimRLeg_CheckedChanged;
+            // 
+            // swAimPelvis
+            // 
+            swAimPelvis.Depth = 0;
+            swAimPelvis.Font = new Font("Segoe UI", 9F);
+            swAimPelvis.Location = new Point(517, 47);
+            swAimPelvis.Margin = new Padding(0);
+            swAimPelvis.MouseLocation = new Point(-1, -1);
+            swAimPelvis.MouseState = MaterialSkin.MouseState.HOVER;
+            swAimPelvis.Name = "swAimPelvis";
+            swAimPelvis.Ripple = true;
+            swAimPelvis.Size = new Size(149, 28);
+            swAimPelvis.TabIndex = 68;
+            swAimPelvis.Text = "Pelvis";
+            toolTip.SetToolTip(swAimPelvis, "Targets Pelvis");
+            swAimPelvis.UseVisualStyleBackColor = true;
+            swAimPelvis.CheckedChanged += swAimPelvis_CheckedChanged;
+            // 
+            // swAimChest
+            // 
+            swAimChest.Depth = 0;
+            swAimChest.Font = new Font("Segoe UI", 9F);
+            swAimChest.Location = new Point(286, 126);
+            swAimChest.Margin = new Padding(0);
+            swAimChest.MouseLocation = new Point(-1, -1);
+            swAimChest.MouseState = MaterialSkin.MouseState.HOVER;
+            swAimChest.Name = "swAimChest";
+            swAimChest.Ripple = true;
+            swAimChest.Size = new Size(149, 28);
+            swAimChest.TabIndex = 67;
+            swAimChest.Text = "Chest";
+            toolTip.SetToolTip(swAimChest, "Targets Chest");
+            swAimChest.UseVisualStyleBackColor = true;
+            swAimChest.CheckedChanged += swAimChest_CheckedChanged;
+            // 
+            // swAimNeck
+            // 
+            swAimNeck.Depth = 0;
+            swAimNeck.Font = new Font("Segoe UI", 9F);
+            swAimNeck.Location = new Point(286, 87);
+            swAimNeck.Margin = new Padding(0);
+            swAimNeck.MouseLocation = new Point(-1, -1);
+            swAimNeck.MouseState = MaterialSkin.MouseState.HOVER;
+            swAimNeck.Name = "swAimNeck";
+            swAimNeck.Ripple = true;
+            swAimNeck.Size = new Size(149, 28);
+            swAimNeck.TabIndex = 66;
+            swAimNeck.Text = "Neck";
+            swAimNeck.TextAlign = ContentAlignment.TopLeft;
+            toolTip.SetToolTip(swAimNeck, "Targets Neck");
+            swAimNeck.UseVisualStyleBackColor = true;
+            swAimNeck.CheckedChanged += swAimNeck_CheckedChanged;
+            // 
+            // swHeadAim
+            // 
+            swHeadAim.Depth = 0;
+            swHeadAim.Font = new Font("Segoe UI", 9F);
+            swHeadAim.Location = new Point(286, 47);
+            swHeadAim.Margin = new Padding(0);
+            swHeadAim.MouseLocation = new Point(-1, -1);
+            swHeadAim.MouseState = MaterialSkin.MouseState.HOVER;
+            swHeadAim.Name = "swHeadAim";
+            swHeadAim.Ripple = true;
+            swHeadAim.Size = new Size(149, 28);
+            swHeadAim.TabIndex = 65;
+            swHeadAim.Text = "Head";
+            toolTip.SetToolTip(swHeadAim, "Targets Head");
+            swHeadAim.UseVisualStyleBackColor = true;
+            swHeadAim.CheckedChanged += swHeadAim_CheckedChanged;
+            // 
+            // sldrAimbotFOV
+            // 
+            sldrAimbotFOV.Depth = 0;
+            sldrAimbotFOV.ForeColor = Color.Black;
+            sldrAimbotFOV.Location = new Point(18, 170);
+            sldrAimbotFOV.MouseState = MaterialSkin.MouseState.HOVER;
+            sldrAimbotFOV.Name = "sldrAimbotFOV";
+            sldrAimbotFOV.RangeMax = 120;
+            sldrAimbotFOV.RangeMin = 1;
+            sldrAimbotFOV.Size = new Size(238, 40);
+            sldrAimbotFOV.TabIndex = 64;
+            sldrAimbotFOV.Text = "FOV";
+            toolTip.SetToolTip(sldrAimbotFOV, "Aimbot FOV");
+            sldrAimbotFOV.UseAccentColor = true;
+            sldrAimbotFOV.Value = 30;
+            sldrAimbotFOV.ValueMax = 120;
+            sldrAimbotFOV.onValueChanged += sldrAimbotFOV_onValueChanged;
+            // 
+            // swEnableTargetScavs
+            // 
+            swEnableTargetScavs.Depth = 0;
+            swEnableTargetScavs.Location = new Point(18, 126);
+            swEnableTargetScavs.Margin = new Padding(0);
+            swEnableTargetScavs.MouseLocation = new Point(-1, -1);
+            swEnableTargetScavs.MouseState = MaterialSkin.MouseState.HOVER;
+            swEnableTargetScavs.Name = "swEnableTargetScavs";
+            swEnableTargetScavs.Ripple = true;
+            swEnableTargetScavs.Size = new Size(169, 28);
+            swEnableTargetScavs.TabIndex = 74;
+            swEnableTargetScavs.Text = "Enable SCAVs";
+            swEnableTargetScavs.CheckedChanged += swEnableTargetScavs_CheckedChanged;
+            // 
+            // lblAimBotSettings
+            // 
+            lblAimBotSettings.AutoSize = true;
+            lblAimBotSettings.Depth = 0;
+            lblAimBotSettings.Font = new Font("Roboto Medium", 20F, FontStyle.Bold, GraphicsUnit.Pixel);
+            lblAimBotSettings.FontType = MaterialSkin.MaterialSkinManager.fontType.H6;
+            lblAimBotSettings.HighEmphasis = true;
+            lblAimBotSettings.Location = new Point(17, 14);
+            lblAimBotSettings.MouseState = MaterialSkin.MouseState.HOVER;
+            lblAimBotSettings.Name = "lblAimBotSettings";
+            lblAimBotSettings.Size = new Size(67, 24);
+            lblAimBotSettings.TabIndex = 62;
+            lblAimBotSettings.Text = "AimBot";
+            lblAimBotSettings.UseAccent = true;
+            // 
+            // sldrAimbotSmoothness
+            // 
+            sldrAimbotSmoothness.Depth = 0;
+            sldrAimbotSmoothness.ForeColor = Color.Black;
+            sldrAimbotSmoothness.Location = new Point(17, 221);
+            sldrAimbotSmoothness.MouseState = MaterialSkin.MouseState.HOVER;
+            sldrAimbotSmoothness.Name = "sldrAimbotSmoothness";
+            sldrAimbotSmoothness.RangeMin = 1;
+            sldrAimbotSmoothness.Size = new Size(238, 40);
+            sldrAimbotSmoothness.TabIndex = 61;
+            sldrAimbotSmoothness.Text = "Smoothness";
+            toolTip.SetToolTip(sldrAimbotSmoothness, "Aimbot Smoothness");
+            sldrAimbotSmoothness.UseAccentColor = true;
+            sldrAimbotSmoothness.Value = 24;
+            sldrAimbotSmoothness.ValueMax = 100;
+            sldrAimbotSmoothness.onValueChanged += sldrAimbotSmoothness_onValueChanged;
+            // 
+            // swEnablePMC
+            // 
+            swEnablePMC.Depth = 0;
+            swEnablePMC.Font = new Font("Segoe UI", 9F);
+            swEnablePMC.Location = new Point(18, 87);
+            swEnablePMC.Margin = new Padding(0);
+            swEnablePMC.MouseLocation = new Point(-1, -1);
+            swEnablePMC.MouseState = MaterialSkin.MouseState.HOVER;
+            swEnablePMC.Name = "swEnablePMC";
+            swEnablePMC.Ripple = true;
+            swEnablePMC.Size = new Size(152, 28);
+            swEnablePMC.TabIndex = 60;
+            swEnablePMC.Text = "Enable PMC";
+            toolTip.SetToolTip(swEnablePMC, "Enables Aimbot to target Real Players");
+            swEnablePMC.UseVisualStyleBackColor = true;
+            swEnablePMC.CheckedChanged += swEnablePMC_CheckedChanged;
+            // 
+            // lblKeybind
+            // 
+            lblKeybind.AutoSize = true;
+            lblKeybind.BorderStyle = BorderStyle.FixedSingle;
+            lblKeybind.Depth = 0;
+            lblKeybind.Font = new Font("Roboto Medium", 20F, FontStyle.Bold, GraphicsUnit.Pixel);
+            lblKeybind.FontType = MaterialSkin.MaterialSkinManager.fontType.H6;
+            lblKeybind.Location = new Point(380, 237);
+            lblKeybind.MouseState = MaterialSkin.MouseState.HOVER;
+            lblKeybind.Name = "lblKeybind";
+            lblKeybind.Padding = new Padding(5);
+            lblKeybind.Size = new Size(174, 24);
+            lblKeybind.TabIndex = 71;
+            lblKeybind.Text = "Click to set keybind";
+            lblKeybind.TextAlign = ContentAlignment.TopCenter;
+            lblKeybind.MouseClick += lblKeybind_MouseClick;
+            // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
@@ -6886,8 +7212,6 @@
             mcSettingsAIFactionsFactions.ResumeLayout(false);
             mcSettingsAIFactionsFactions.PerformLayout();
             tabSettingsColors.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)picTransitIcon).EndInit();
-            ((System.ComponentModel.ISupportInitialize)picTransitText).EndInit();
             mcSettingsColorsGameWorld.ResumeLayout(false);
             mcSettingsColorsGameWorld.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)picTripwires).EndInit();
@@ -6914,7 +7238,9 @@
             ((System.ComponentModel.ISupportInitialize)picLootRegular).EndInit();
             mcSettingsColorsExfiltration.ResumeLayout(false);
             mcSettingsColorsExfiltration.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)picTransitIcon).EndInit();
             ((System.ComponentModel.ISupportInitialize)picExfilClosedIcon).EndInit();
+            ((System.ComponentModel.ISupportInitialize)picTransitText).EndInit();
             ((System.ComponentModel.ISupportInitialize)picExfilClosedText).EndInit();
             ((System.ComponentModel.ISupportInitialize)picExfilPendingIcon).EndInit();
             ((System.ComponentModel.ISupportInitialize)picExfilPendingText).EndInit();
@@ -6959,6 +7285,9 @@
             ((System.ComponentModel.ISupportInitialize)picLootFilterColor).EndInit();
             mcLootFilterItemManagement.ResumeLayout(false);
             mcLootFilterItemManagement.PerformLayout();
+            tabSettingsAim.ResumeLayout(false);
+            materialCard1.ResumeLayout(false);
+            materialCard1.PerformLayout();
             ResumeLayout(false);
         }
 
@@ -7345,5 +7674,23 @@
         private MaterialSkin.Controls.MaterialLabel lblSettingsColorsTransitIcon;
         private PictureBox picTransitText;
         private MaterialSkin.Controls.MaterialLabel lblSettingsColorsTransitText;
+        private TabPage tabSettingsAim;
+        private MaterialSkin.Controls.MaterialCard materialCard1;
+        private MaterialSkin.Controls.MaterialSwitch swAimClosest;
+        private MaterialSkin.Controls.MaterialLabel lblAimKeybind;
+        private MaterialSkin.Controls.MaterialSlider sldrAimDistance;
+        private MaterialSkin.Controls.MaterialSwitch swAimLLeg;
+        private MaterialSkin.Controls.MaterialSwitch swEnableAimBot;
+        private MaterialSkin.Controls.MaterialSwitch swAimRLeg;
+        private MaterialSkin.Controls.MaterialSwitch swAimPelvis;
+        private MaterialSkin.Controls.MaterialSwitch swAimChest;
+        private MaterialSkin.Controls.MaterialSwitch swAimNeck;
+        private MaterialSkin.Controls.MaterialSwitch swHeadAim;
+        private MaterialSkin.Controls.MaterialSlider sldrAimbotFOV;
+        private MaterialSkin.Controls.MaterialSwitch swEnableTargetScavs;
+        private MaterialSkin.Controls.MaterialLabel lblAimBotSettings;
+        private MaterialSkin.Controls.MaterialSlider sldrAimbotSmoothness;
+        private MaterialSkin.Controls.MaterialSwitch swEnablePMC;
+        private MaterialSkin.Controls.MaterialLabel lblKeybind;
     }
 }

@@ -25,6 +25,9 @@ namespace eft_dma_radar
 
         public static ulong _staticfpsCamera;
 
+        // Aimbot
+        private Matrix _viewMatrik;
+
         public bool IsReady
         {
             get => this._opticCamera != 0 && this._fpsCamera != 0;
@@ -55,6 +58,34 @@ namespace eft_dma_radar
             this._unityBase = unityBase;
             this.GetCamera();
         }
+
+        #region Aimbot
+
+        //paskakoodi
+        public Matrix ViewMatrix
+        {
+            get => this._viewMatrik;
+        }
+        //paskakoodi
+        public async void GetViewmatrixAsync()
+        {
+            await Task.Run(() =>
+            {
+                this.GetViewMatrix();
+                Thread.Sleep(1); //Sleep for 1 ms to prevent CPU rape
+            });
+        }
+        //Paskakoodi
+        public void GetViewMatrix()
+        {
+            if (!IsReady)
+                return;
+            ulong tempMatrixPtr = Memory.ReadPtrChain(_fpsCamera, Offsets.CameraShit.viewmatrix);
+            ulong viewMatrixAddr = tempMatrixPtr + 0xDC;
+            this._viewMatrik = Memory.ReadValue<Matrix>(viewMatrixAddr);
+        }
+
+        #endregion
 
         public bool GetCamera()
         {
