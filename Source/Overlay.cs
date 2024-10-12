@@ -21,6 +21,7 @@ using System.Xml.Linq;
 using System.Drawing;
 using System.Diagnostics;
 using static eft_dma_radar.Watchlist;
+using System.Windows.Forms;
 
 namespace eft_dma_radar;
 
@@ -54,7 +55,6 @@ public partial class Overlay : Form
     {
         get => CameraManager._staticfpsCamera;  // Access static field directly
     }
-
 
     // Loot ESP
     private readonly Config _config;
@@ -105,6 +105,12 @@ private void DirectXThread(object sender)
                 {
                     WriteTopLeftText("IN RAID", Brushes.GREEN, 13, "Arial Unicode MS", 10, 30);
                     var allPlayers = AllPlayers?.Select(x => x.Value);
+
+                    while (FPSCamera == 0)
+                    {
+                        Thread.Sleep(5);
+                    }
+
                     if (allPlayers is not null)
                     {
                         foreach (var player in allPlayers)
@@ -148,824 +154,823 @@ private void DirectXThread(object sender)
                                     playerLCalfPos
                                 };
 
-                                List<Vector3> coords = new List<Vector3>();
-                                WorldToScreenCombined(player, enemyPositions, coords);
+                                    List<Vector3> coords = new List<Vector3>();
+                                    WorldToScreenCombined(player, enemyPositions, coords);
 
-                                Vector3 baseCoords = coords[0]; // Foot position
-                                Vector3 headCoords = coords[1]; // Head position
-                                Vector3 spine3Coords = coords[2]; // Spine position
-                                Vector3 lPalmCoords = coords[3]; // Left palm position
-                                Vector3 rPalmCoords = coords[4]; // Right palm position
-                                Vector3 pelvisCoords = coords[5]; // Pelvis position
-                                Vector3 lFootCoords = coords[6]; // Left foot position
-                                Vector3 rFootCoords = coords[7]; // Right foot position
-                                Vector3 lForearm1Coords = coords[8];
-                                Vector3 rForearm1Coords = coords[9];
-                                Vector3 lCalfCoords = coords[10];
-                                Vector3 rCalfCoords = coords[11];
+                                    Vector3 baseCoords = coords[0]; // Foot position
+                                    Vector3 headCoords = coords[1]; // Head position
+                                    Vector3 spine3Coords = coords[2]; // Spine position
+                                    Vector3 lPalmCoords = coords[3]; // Left palm position
+                                    Vector3 rPalmCoords = coords[4]; // Right palm position
+                                    Vector3 pelvisCoords = coords[5]; // Pelvis position
+                                    Vector3 lFootCoords = coords[6]; // Left foot position
+                                    Vector3 rFootCoords = coords[7]; // Right foot position
+                                    Vector3 lForearm1Coords = coords[8];
+                                    Vector3 rForearm1Coords = coords[9];
+                                    Vector3 lCalfCoords = coords[10];
+                                    Vector3 rCalfCoords = coords[11];
 
 
-                                // Calculate the height of the bounding box
-                                float boxHeight = headCoords.Y - baseCoords.Y; // Height from foot to head
-                                float boxWidth = boxHeight * 0.6f; // Width is now 60% of the height
+                                    // Calculate the height of the bounding box
+                                    float boxHeight = headCoords.Y - baseCoords.Y; // Height from foot to head
+                                    float boxWidth = boxHeight * 0.6f; // Width is now 60% of the height
 
-                                // Calculate padding based on box dimensions
-                                float paddingHeight = boxHeight * 0.1f; // 10% of the height for height padding
-                                float paddingWidth = boxWidth * 0.05f;   // 5% of the width for width padding
+                                    // Calculate padding based on box dimensions
+                                    float paddingHeight = boxHeight * 0.1f; // 10% of the height for height padding
+                                    float paddingWidth = boxWidth * 0.05f;   // 5% of the width for width padding
 
-                                // Set the box dimensions with padding
-                                boxHeight += paddingHeight; // Add height padding
-                                boxWidth += paddingWidth;   // Add width padding
+                                    // Set the box dimensions with padding
+                                    boxHeight += paddingHeight; // Add height padding
+                                    boxWidth += paddingWidth;   // Add width padding
 
-                                // Draw the rectangle based on foot and head coordinates
-                                if (baseCoords.X > 0 || baseCoords.Y > 0 || baseCoords.Z > 0)
-                                {
-                                    #region PMC
-                                    if ((player.Type is PlayerType.BEAR || player.Type is PlayerType.USEC) && isPMCOn && dist <= playerLimit)
+                                    // Draw the rectangle based on foot and head coordinates
+                                    if (baseCoords.X > 0 || baseCoords.Y > 0 || baseCoords.Z > 0)
                                     {
-                                        if (isBoneESPOn == false || dist > boneLimit)
+                                        #region PMC
+                                        if ((player.Type is PlayerType.BEAR || player.Type is PlayerType.USEC) && isPMCOn && dist <= playerLimit)
                                         {
-                                            if (isBoxOn == true)
+                                            if (isBoneESPOn == false || dist > boneLimit)
                                             {
-                                                // Set the top and bottom coordinates for the bounding box
-                                                _device.DrawRectangle(
+                                                if (isBoxOn == true)
+                                                {
+                                                    // Set the top and bottom coordinates for the bounding box
+                                                    _device.DrawRectangle(
+                                                        new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
+                                                                          baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
+                                                        Brushes.RED);
+                                                }
+                                                if (isHeadDotOn == true)
+                                                {
+                                                    // Calculate the head dot size as 30% of the bounding box width
+                                                    float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
+                                                    _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
+                                                }
+                                            }
+                                            else if (dist <= boneLimit)
+                                            {
+                                                if (isBoxOn == true)
+                                                {
+                                                    //Console.WriteLine("Player " + player.Name);
+                                                    _device.DrawRectangle(
                                                     new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
                                                                       baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                     Brushes.RED);
+                                                }
+                                                // Head to Spine3
+                                                _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
+                                                                 new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Pelvis
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Left Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+                                                // Left Forearm1 to Left Palm
+                                                _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 new RawVector2(lPalmCoords.X, lPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Right Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Forearm1 to Right Palm
+                                                _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 new RawVector2(rPalmCoords.X, rPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Left Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Left Calf to Left Foot
+                                                _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 new RawVector2(lFootCoords.X, lFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Right Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Calf to Right Foot
+                                                _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 new RawVector2(rFootCoords.X, rFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+
                                             }
-                                            if (isHeadDotOn == true)
-                                            {
-                                                // Calculate the head dot size as 30% of the bounding box width
-                                                float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
-                                                _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
-                                            }
+
+                                            // Display text information
+                                            WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                         }
-                                        else if (dist <= boneLimit)
+                                        #endregion
+                                        #region Scav
+                                        if (player.Type is PlayerType.Scav && isScavOn && dist <= npcLimit)
                                         {
-                                            if (isBoxOn == true)
+                                            if (isBoneESPOn == false || dist > boneLimit)
                                             {
-                                                //Console.WriteLine("Player " + player.Name);
-                                                _device.DrawRectangle(
-                                                new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
-                                                                  baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
-                                                Brushes.RED);
+                                                if (isBoxOn == true)
+                                                {
+                                                    // Set the top and bottom coordinates for the bounding box
+                                                    _device.DrawRectangle(
+                                                        new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
+                                                                          baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
+                                                        Brushes.YELLOW);
+                                                }
+                                                if (isHeadDotOn == true)
+                                                {
+                                                    // Calculate the head dot size as 30% of the bounding box width
+                                                    float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
+                                                    _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
+                                                }
                                             }
-                                            // Head to Spine3
-                                            _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
-                                                             new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Pelvis
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Left Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-                                            // Left Forearm1 to Left Palm
-                                            _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             new RawVector2(lPalmCoords.X, lPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Right Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Forearm1 to Right Palm
-                                            _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             new RawVector2(rPalmCoords.X, rPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Left Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Left Calf to Left Foot
-                                            _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             new RawVector2(lFootCoords.X, lFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Right Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Calf to Right Foot
-                                            _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             new RawVector2(rFootCoords.X, rFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-
-                                        }
-
-                                        // Display text information
-                                        WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
-                                    }
-                                    #endregion
-                                    #region Scav
-                                    if (player.Type is PlayerType.Scav && isScavOn && dist <= npcLimit)
-                                    {
-                                        if (isBoneESPOn == false || dist > boneLimit)
-                                        {
-                                            if (isBoxOn == true)
+                                            else if (dist <= boneLimit)
                                             {
-                                                // Set the top and bottom coordinates for the bounding box
-                                                _device.DrawRectangle(
+                                                if (isBoxOn == true)
+                                                {
+                                                    //Console.WriteLine("Player " + player.Name);
+                                                    _device.DrawRectangle(
                                                     new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
                                                                       baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                     Brushes.YELLOW);
+                                                }
+                                                // Head to Spine3
+                                                _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
+                                                                 new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Pelvis
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Left Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+                                                // Left Forearm1 to Left Palm
+                                                _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 new RawVector2(lPalmCoords.X, lPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Right Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Forearm1 to Right Palm
+                                                _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 new RawVector2(rPalmCoords.X, rPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Left Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Left Calf to Left Foot
+                                                _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 new RawVector2(lFootCoords.X, lFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Right Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Calf to Right Foot
+                                                _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 new RawVector2(rFootCoords.X, rFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+
                                             }
-                                            if (isHeadDotOn == true)
-                                            {
-                                                // Calculate the head dot size as 30% of the bounding box width
-                                                float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
-                                                _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
-                                            }
-                                        }
-                                        else if (dist <= boneLimit)
-                                        {
-                                            if (isBoxOn == true)
-                                            {
-                                                //Console.WriteLine("Player " + player.Name);
-                                                _device.DrawRectangle(
-                                                new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
-                                                                  baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
-                                                Brushes.YELLOW);
-                                            }
-                                            // Head to Spine3
-                                            _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
-                                                             new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
 
-                                            // Spine3 to Pelvis
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
+                                            // Display text information
+                                            //WriteText("Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
 
-                                            // Spine3 to Left Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-                                            // Left Forearm1 to Left Palm
-                                            _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             new RawVector2(lPalmCoords.X, lPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Right Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Forearm1 to Right Palm
-                                            _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             new RawVector2(rPalmCoords.X, rPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Left Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Left Calf to Left Foot
-                                            _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             new RawVector2(lFootCoords.X, lFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Right Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Calf to Right Foot
-                                            _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             new RawVector2(rFootCoords.X, rFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
+                                            WriteText("Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
 
                                         }
-
-                                        // Display text information
-                                        //WriteText("Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
-
-                                        WriteText("Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
-
-                                    }
-                                    #endregion
-                                    #region Boss
-                                    if (player.Type is PlayerType.Boss && isScavOn && dist <= npcLimit)
-                                    {
-                                        if (isBoneESPOn == false || dist > boneLimit)
+                                        #endregion
+                                        #region Boss
+                                        if (player.Type is PlayerType.Boss && isScavOn && dist <= npcLimit)
                                         {
-                                            if (isBoxOn == true)
+                                            if (isBoneESPOn == false || dist > boneLimit)
                                             {
-                                                // Set the top and bottom coordinates for the bounding box
-                                                _device.DrawRectangle(
+                                                if (isBoxOn == true)
+                                                {
+                                                    // Set the top and bottom coordinates for the bounding box
+                                                    _device.DrawRectangle(
+                                                        new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
+                                                                          baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
+                                                        Brushes.MAGENTA);
+                                                }
+                                                if (isHeadDotOn == true)
+                                                {
+                                                    // Calculate the head dot size as 30% of the bounding box width
+                                                    float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
+                                                    _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
+                                                }
+                                            }
+                                            else if (dist <= boneLimit)
+                                            {
+                                                if (isBoxOn == true)
+                                                {
+                                                    //Console.WriteLine("Player " + player.Name);
+                                                    _device.DrawRectangle(
                                                     new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
                                                                       baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                     Brushes.MAGENTA);
+                                                }
+                                                // Head to Spine3
+                                                _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
+                                                                 new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Pelvis
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Left Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+                                                // Left Forearm1 to Left Palm
+                                                _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 new RawVector2(lPalmCoords.X, lPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Right Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Forearm1 to Right Palm
+                                                _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 new RawVector2(rPalmCoords.X, rPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Left Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Left Calf to Left Foot
+                                                _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 new RawVector2(lFootCoords.X, lFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Right Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Calf to Right Foot
+                                                _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 new RawVector2(rFootCoords.X, rFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+
                                             }
-                                            if (isHeadDotOn == true)
-                                            {
-                                                // Calculate the head dot size as 30% of the bounding box width
-                                                float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
-                                                _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
-                                            }
-                                        }
-                                        else if (dist <= boneLimit)
-                                        {
-                                            if (isBoxOn == true)
-                                            {
-                                                //Console.WriteLine("Player " + player.Name);
-                                                _device.DrawRectangle(
-                                                new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
-                                                                  baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
-                                                Brushes.MAGENTA);
-                                            }
-                                            // Head to Spine3
-                                            _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
-                                                             new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
 
-                                            // Spine3 to Pelvis
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Left Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-                                            // Left Forearm1 to Left Palm
-                                            _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             new RawVector2(lPalmCoords.X, lPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Right Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Forearm1 to Right Palm
-                                            _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             new RawVector2(rPalmCoords.X, rPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Left Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Left Calf to Left Foot
-                                            _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             new RawVector2(lFootCoords.X, lFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Right Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Calf to Right Foot
-                                            _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             new RawVector2(rFootCoords.X, rFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
+                                            // Display text information
+                                            WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
 
 
                                         }
-
-                                        // Display text information
-                                        WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
-
-
-                                    }
-                                    #endregion
-                                    #region BossFollower
-                                    if ((player.Type is PlayerType.BossFollower || player.Type is PlayerType.BossGuard) && isScavOn && dist <= npcLimit)
-                                    {
-                                        if (isBoneESPOn == false || dist > boneLimit)
+                                        #endregion
+                                        #region BossFollower
+                                        if ((player.Type is PlayerType.BossFollower || player.Type is PlayerType.BossGuard) && isScavOn && dist <= npcLimit)
                                         {
-                                            if (isBoxOn == true)
+                                            if (isBoneESPOn == false || dist > boneLimit)
                                             {
-                                                // Set the top and bottom coordinates for the bounding box
-                                                _device.DrawRectangle(
+                                                if (isBoxOn == true)
+                                                {
+                                                    // Set the top and bottom coordinates for the bounding box
+                                                    _device.DrawRectangle(
+                                                        new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
+                                                                          baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
+                                                        Brushes.PURPLE);
+                                                }
+                                                if (isHeadDotOn == true)
+                                                {
+                                                    // Calculate the head dot size as 30% of the bounding box width
+                                                    float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
+                                                    _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
+                                                }
+                                            }
+                                            else if (dist <= boneLimit)
+                                            {
+                                                if (isBoxOn == true)
+                                                {
+                                                    //Console.WriteLine("Player " + player.Name);
+                                                    _device.DrawRectangle(
                                                     new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
                                                                       baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                     Brushes.PURPLE);
+                                                }
+                                                // Head to Spine3
+                                                _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
+                                                                 new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Pelvis
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Left Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+                                                // Left Forearm1 to Left Palm
+                                                _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 new RawVector2(lPalmCoords.X, lPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Right Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Forearm1 to Right Palm
+                                                _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 new RawVector2(rPalmCoords.X, rPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Left Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Left Calf to Left Foot
+                                                _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 new RawVector2(lFootCoords.X, lFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Right Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Calf to Right Foot
+                                                _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 new RawVector2(rFootCoords.X, rFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+
                                             }
-                                            if (isHeadDotOn == true)
-                                            {
-                                                // Calculate the head dot size as 30% of the bounding box width
-                                                float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
-                                                _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
-                                            }
-                                        }
-                                        else if (dist <= boneLimit)
-                                        {
-                                            if (isBoxOn == true)
-                                            {
-                                                //Console.WriteLine("Player " + player.Name);
-                                                _device.DrawRectangle(
-                                                new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
-                                                                  baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
-                                                Brushes.PURPLE);
-                                            }
-                                            // Head to Spine3
-                                            _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
-                                                             new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
 
-                                            // Spine3 to Pelvis
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Left Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-                                            // Left Forearm1 to Left Palm
-                                            _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             new RawVector2(lPalmCoords.X, lPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Right Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Forearm1 to Right Palm
-                                            _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             new RawVector2(rPalmCoords.X, rPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Left Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Left Calf to Left Foot
-                                            _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             new RawVector2(lFootCoords.X, lFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Right Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Calf to Right Foot
-                                            _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             new RawVector2(rFootCoords.X, rFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
+                                            // Display text information
+                                            WriteText("Follower" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
 
                                         }
-
-                                        // Display text information
-                                        WriteText("Follower" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
-
-                                    }
-                                    #endregion
-                                    #region Teammate
-                                    if (player.Type is PlayerType.Teammate && isTeamOn && dist <= teamLimit)
-                                    {
-                                        if (isBoneESPOn == false || dist > boneLimit)
+                                        #endregion
+                                        #region Teammate
+                                        if (player.Type is PlayerType.Teammate && isTeamOn && dist <= teamLimit)
                                         {
-                                            if (isBoxOn == true)
+                                            if (isBoneESPOn == false || dist > boneLimit)
                                             {
-                                                // Set the top and bottom coordinates for the bounding box
-                                                _device.DrawRectangle(
+                                                if (isBoxOn == true)
+                                                {
+                                                    // Set the top and bottom coordinates for the bounding box
+                                                    _device.DrawRectangle(
+                                                        new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
+                                                                          baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
+                                                        Brushes.GREEN);
+                                                }
+                                                if (isHeadDotOn == true)
+                                                {
+                                                    // Calculate the head dot size as 30% of the bounding box width
+                                                    float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
+                                                    _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
+                                                }
+                                            }
+                                            else if (dist <= boneLimit)
+                                            {
+                                                if (isBoxOn == true)
+                                                {
+                                                    //Console.WriteLine("Player " + player.Name);
+                                                    _device.DrawRectangle(
                                                     new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
                                                                       baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                     Brushes.GREEN);
+                                                }
+                                                // Head to Spine3
+                                                _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
+                                                                 new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Pelvis
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Left Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+                                                // Left Forearm1 to Left Palm
+                                                _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 new RawVector2(lPalmCoords.X, lPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Right Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Forearm1 to Right Palm
+                                                _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 new RawVector2(rPalmCoords.X, rPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Left Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Left Calf to Left Foot
+                                                _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 new RawVector2(lFootCoords.X, lFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Right Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Calf to Right Foot
+                                                _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 new RawVector2(rFootCoords.X, rFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+
                                             }
-                                            if (isHeadDotOn == true)
-                                            {
-                                                // Calculate the head dot size as 30% of the bounding box width
-                                                float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
-                                                _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
-                                            }
+
+                                            // Display text information
+                                            WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                         }
-                                        else if (dist <= boneLimit)
+                                        #endregion
+                                        #region Cultist
+                                        if (player.Type is PlayerType.Cultist && isScavOn && dist <= npcLimit)
                                         {
-                                            if (isBoxOn == true)
+                                            if (isBoneESPOn == false || dist > boneLimit)
                                             {
-                                                //Console.WriteLine("Player " + player.Name);
-                                                _device.DrawRectangle(
-                                                new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
-                                                                  baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
-                                                Brushes.GREEN);
+                                                if (isBoxOn == true)
+                                                {
+                                                    // Set the top and bottom coordinates for the bounding box
+                                                    _device.DrawRectangle(
+                                                        new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
+                                                                          baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
+                                                        Brushes.ORANGE);
+                                                }
+                                                if (isHeadDotOn == true)
+                                                {
+                                                    // Calculate the head dot size as 30% of the bounding box width
+                                                    float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
+                                                    _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
+                                                }
                                             }
-                                            // Head to Spine3
-                                            _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
-                                                             new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Pelvis
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Left Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-                                            // Left Forearm1 to Left Palm
-                                            _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             new RawVector2(lPalmCoords.X, lPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Right Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Forearm1 to Right Palm
-                                            _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             new RawVector2(rPalmCoords.X, rPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Left Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Left Calf to Left Foot
-                                            _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             new RawVector2(lFootCoords.X, lFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Right Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Calf to Right Foot
-                                            _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             new RawVector2(rFootCoords.X, rFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-
-                                        }
-
-                                        // Display text information
-                                        WriteText(player.Name + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
-                                    }
-                                    #endregion
-                                    #region Cultist
-                                    if (player.Type is PlayerType.Cultist && isScavOn && dist <= npcLimit)
-                                    {
-                                        if (isBoneESPOn == false || dist > boneLimit)
-                                        {
-                                            if (isBoxOn == true)
+                                            else if (dist <= boneLimit)
                                             {
-                                                // Set the top and bottom coordinates for the bounding box
-                                                _device.DrawRectangle(
+                                                if (isBoxOn == true)
+                                                {
+                                                    //Console.WriteLine("Player " + player.Name);
+                                                    _device.DrawRectangle(
                                                     new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
                                                                       baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                     Brushes.ORANGE);
+                                                }
+                                                // Head to Spine3
+                                                _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
+                                                                 new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Pelvis
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Left Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+                                                // Left Forearm1 to Left Palm
+                                                _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 new RawVector2(lPalmCoords.X, lPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Right Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Forearm1 to Right Palm
+                                                _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 new RawVector2(rPalmCoords.X, rPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Left Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Left Calf to Left Foot
+                                                _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 new RawVector2(lFootCoords.X, lFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Right Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Calf to Right Foot
+                                                _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 new RawVector2(rFootCoords.X, rFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+
                                             }
-                                            if (isHeadDotOn == true)
-                                            {
-                                                // Calculate the head dot size as 30% of the bounding box width
-                                                float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
-                                                _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
-                                            }
+
+                                            // Display text information
+                                            WriteText("Cultist" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                         }
-                                        else if (dist <= boneLimit)
+                                        #endregion
+                                        #region PlayerScav
+                                        if (player.Type is PlayerType.PlayerScav && isPMCOn && dist <= playerLimit)
                                         {
-                                            if (isBoxOn == true)
+                                            if (isBoneESPOn == false || dist > boneLimit)
                                             {
-                                                //Console.WriteLine("Player " + player.Name);
-                                                _device.DrawRectangle(
-                                                new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
-                                                                  baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
-                                                Brushes.ORANGE);
+                                                if (isBoxOn == true)
+                                                {
+                                                    // Set the top and bottom coordinates for the bounding box
+                                                    _device.DrawRectangle(
+                                                        new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
+                                                                          baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
+                                                        Brushes.BLUE);
+                                                }
+                                                if (isHeadDotOn == true)
+                                                {
+                                                    // Calculate the head dot size as 30% of the bounding box width
+                                                    float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
+                                                    _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
+                                                }
                                             }
-                                            // Head to Spine3
-                                            _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
-                                                             new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Pelvis
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Left Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-                                            // Left Forearm1 to Left Palm
-                                            _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             new RawVector2(lPalmCoords.X, lPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Right Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Forearm1 to Right Palm
-                                            _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             new RawVector2(rPalmCoords.X, rPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Left Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Left Calf to Left Foot
-                                            _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             new RawVector2(lFootCoords.X, lFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Right Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Calf to Right Foot
-                                            _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             new RawVector2(rFootCoords.X, rFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-
-                                        }
-
-                                        // Display text information
-                                        WriteText("Cultist" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
-                                    }
-                                    #endregion
-                                    #region PlayerScav
-                                    if (player.Type is PlayerType.PlayerScav && isPMCOn && dist <= playerLimit)
-                                    {
-                                        if (isBoneESPOn == false || dist > boneLimit)
-                                        {
-                                            if (isBoxOn == true)
+                                            else if (dist <= boneLimit)
                                             {
-                                                // Set the top and bottom coordinates for the bounding box
-                                                _device.DrawRectangle(
+                                                if (isBoxOn == true)
+                                                {
+                                                    //Console.WriteLine("Player " + player.Name);
+                                                    _device.DrawRectangle(
                                                     new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
                                                                       baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                     Brushes.BLUE);
+                                                }
+                                                // Head to Spine3
+                                                _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
+                                                                 new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Pelvis
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Left Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+                                                // Left Forearm1 to Left Palm
+                                                _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 new RawVector2(lPalmCoords.X, lPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Right Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Forearm1 to Right Palm
+                                                _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 new RawVector2(rPalmCoords.X, rPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Left Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Left Calf to Left Foot
+                                                _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 new RawVector2(lFootCoords.X, lFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Right Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Calf to Right Foot
+                                                _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 new RawVector2(rFootCoords.X, rFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+
                                             }
-                                            if (isHeadDotOn == true)
-                                            {
-                                                // Calculate the head dot size as 30% of the bounding box width
-                                                float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
-                                                _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
-                                            }
+
+                                            // Display text information
+                                            WriteText("Player Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                         }
-                                        else if (dist <= boneLimit)
+                                        #endregion
+                                        #region Raider
+                                        if (player.Type is PlayerType.Raider && isScavOn && dist <= npcLimit)
                                         {
-                                            if (isBoxOn == true)
+                                            if (isBoneESPOn == false || dist > boneLimit)
                                             {
-                                                //Console.WriteLine("Player " + player.Name);
-                                                _device.DrawRectangle(
-                                                new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
-                                                                  baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
-                                                Brushes.BLUE);
+                                                if (isBoxOn == true)
+                                                {
+                                                    // Set the top and bottom coordinates for the bounding box
+                                                    _device.DrawRectangle(
+                                                        new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
+                                                                          baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
+                                                        Brushes.ORANGE);
+                                                }
+                                                if (isHeadDotOn == true)
+                                                {
+                                                    // Calculate the head dot size as 30% of the bounding box width
+                                                    float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
+                                                    _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
+                                                }
                                             }
-                                            // Head to Spine3
-                                            _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
-                                                             new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Pelvis
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Left Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-                                            // Left Forearm1 to Left Palm
-                                            _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             new RawVector2(lPalmCoords.X, lPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Right Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Forearm1 to Right Palm
-                                            _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             new RawVector2(rPalmCoords.X, rPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Left Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Left Calf to Left Foot
-                                            _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             new RawVector2(lFootCoords.X, lFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Right Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Calf to Right Foot
-                                            _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             new RawVector2(rFootCoords.X, rFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-
-                                        }
-
-                                        // Display text information
-                                        WriteText("Player Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
-                                    }
-                                    #endregion
-                                    #region Raider
-                                    if (player.Type is PlayerType.Raider && isScavOn && dist <= npcLimit)
-                                    {
-                                        if (isBoneESPOn == false || dist > boneLimit)
-                                        {
-                                            if (isBoxOn == true)
+                                            else if (dist <= boneLimit)
                                             {
-                                                // Set the top and bottom coordinates for the bounding box
-                                                _device.DrawRectangle(
+                                                if (isBoxOn == true)
+                                                {
+                                                    //Console.WriteLine("Player " + player.Name);
+                                                    _device.DrawRectangle(
                                                     new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
                                                                       baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                     Brushes.ORANGE);
+                                                }
+                                                // Head to Spine3
+                                                _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
+                                                                 new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Pelvis
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Left Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+                                                // Left Forearm1 to Left Palm
+                                                _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 new RawVector2(lPalmCoords.X, lPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Right Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Forearm1 to Right Palm
+                                                _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 new RawVector2(rPalmCoords.X, rPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Left Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Left Calf to Left Foot
+                                                _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 new RawVector2(lFootCoords.X, lFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Right Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Calf to Right Foot
+                                                _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 new RawVector2(rFootCoords.X, rFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+
                                             }
-                                            if (isHeadDotOn == true)
-                                            {
-                                                // Calculate the head dot size as 30% of the bounding box width
-                                                float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
-                                                _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
-                                            }
+
+                                            // Display text information
+                                            WriteText("Raider" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                         }
-                                        else if (dist <= boneLimit)
+                                        #endregion
+                                        #region SniperScav
+                                        if (player.Type is PlayerType.SniperScav && isScavOn && dist <= npcLimit)
                                         {
-                                            if (isBoxOn == true)
+                                            if (isBoneESPOn == false || dist > boneLimit)
                                             {
-                                                //Console.WriteLine("Player " + player.Name);
-                                                _device.DrawRectangle(
-                                                new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
-                                                                  baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
-                                                Brushes.ORANGE);
+                                                if (isBoxOn == true)
+                                                {
+                                                    // Set the top and bottom coordinates for the bounding box
+                                                    _device.DrawRectangle(
+                                                        new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
+                                                                          baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
+                                                        Brushes.YELLOW);
+                                                }
+                                                if (isHeadDotOn == true)
+                                                {
+                                                    // Calculate the head dot size as 30% of the bounding box width
+                                                    float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
+                                                    _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
+                                                }
                                             }
-                                            // Head to Spine3
-                                            _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
-                                                             new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Pelvis
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Left Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-                                            // Left Forearm1 to Left Palm
-                                            _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             new RawVector2(lPalmCoords.X, lPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Right Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Forearm1 to Right Palm
-                                            _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             new RawVector2(rPalmCoords.X, rPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Left Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Left Calf to Left Foot
-                                            _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             new RawVector2(lFootCoords.X, lFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Right Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Calf to Right Foot
-                                            _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             new RawVector2(rFootCoords.X, rFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-
-                                        }
-
-                                        // Display text information
-                                        WriteText("Raider" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
-                                    }
-                                    #endregion
-                                    #region SniperScav
-                                    if (player.Type is PlayerType.SniperScav && isScavOn && dist <= npcLimit)
-                                    {
-                                        if (isBoneESPOn == false || dist > boneLimit)
-                                        {
-                                            if (isBoxOn == true)
+                                            else if (dist <= boneLimit)
                                             {
-                                                // Set the top and bottom coordinates for the bounding box
-                                                _device.DrawRectangle(
+                                                if (isBoxOn == true)
+                                                {
+                                                    //Console.WriteLine("Player " + player.Name);
+                                                    _device.DrawRectangle(
                                                     new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
                                                                       baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                     Brushes.YELLOW);
+                                                }
+                                                // Head to Spine3
+                                                _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
+                                                                 new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Pelvis
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Left Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+                                                // Left Forearm1 to Left Palm
+                                                _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
+                                                                 new RawVector2(lPalmCoords.X, lPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Spine3 to Right Forearm1
+                                                _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
+                                                                 new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Forearm1 to Right Palm
+                                                _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
+                                                                 new RawVector2(rPalmCoords.X, rPalmCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Left Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Left Calf to Left Foot
+                                                _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
+                                                                 new RawVector2(lFootCoords.X, lFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Pelvis to Right Calf
+                                                _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
+                                                                 new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+                                                // Right Calf to Right Foot
+                                                _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
+                                                                 new RawVector2(rFootCoords.X, rFootCoords.Y),
+                                                                 Brushes.WHITE, 2.0f);
+
+
                                             }
-                                            if (isHeadDotOn == true)
-                                            {
-                                                // Calculate the head dot size as 30% of the bounding box width
-                                                float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
-                                                _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
-                                            }
+                                            // Display text information
+                                            WriteText("Sniper Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                         }
-                                        else if (dist <= boneLimit)
-                                        {
-                                            if (isBoxOn == true)
-                                            {
-                                                //Console.WriteLine("Player " + player.Name);
-                                                _device.DrawRectangle(
-                                                new RawRectangleF(baseCoords.X - (boxWidth / 2), headCoords.Y + paddingHeight, // Top line at head position + padding
-                                                                  baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
-                                                Brushes.YELLOW);
-                                            }
-                                            // Head to Spine3
-                                            _device.DrawLine(new RawVector2(headCoords.X, headCoords.Y),
-                                                             new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
+                                        #endregion
 
-                                            // Spine3 to Pelvis
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Left Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-                                            // Left Forearm1 to Left Palm
-                                            _device.DrawLine(new RawVector2(lForearm1Coords.X, lForearm1Coords.Y),
-                                                             new RawVector2(lPalmCoords.X, lPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Spine3 to Right Forearm1
-                                            _device.DrawLine(new RawVector2(spine3Coords.X, spine3Coords.Y),
-                                                             new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Forearm1 to Right Palm
-                                            _device.DrawLine(new RawVector2(rForearm1Coords.X, rForearm1Coords.Y),
-                                                             new RawVector2(rPalmCoords.X, rPalmCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Left Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Left Calf to Left Foot
-                                            _device.DrawLine(new RawVector2(lCalfCoords.X, lCalfCoords.Y),
-                                                             new RawVector2(lFootCoords.X, lFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Pelvis to Right Calf
-                                            _device.DrawLine(new RawVector2(pelvisCoords.X, pelvisCoords.Y),
-                                                             new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-                                            // Right Calf to Right Foot
-                                            _device.DrawLine(new RawVector2(rCalfCoords.X, rCalfCoords.Y),
-                                                             new RawVector2(rFootCoords.X, rFootCoords.Y),
-                                                             Brushes.WHITE, 2.0f);
-
-
-                                        }
-                                        // Display text information
-                                        WriteText("Sniper Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                     }
-                                    #endregion
-
-                                }
                             }
                         }
 
                         // THIS LOOT FILTER IS USING AN OLD BUGGY METHOD OF SCALING. IT IS NOT 100% ACCURATE
-
                         #region Item ESP
                         var loot = this.Loot; // cache ref
                         var lootplayer = this.LocalPlayer;
@@ -1001,8 +1006,6 @@ private void DirectXThread(object sender)
                                 }
                         }
                         #endregion
-
-                        Console.WriteLine(Width + " " + Height);
 
                         // Crosshair
                         // Draw the horizontal line
@@ -1402,7 +1405,14 @@ private void LoadOverlay(object sender, EventArgs e)
 
     private bool WorldToScreenCombined(Player player, List<Vector3> enemyPositions, List<Vector3> screenCoords)
     {
+
         screenCoords.Clear(); // Clear previous results
+
+        if (FPSCamera == 0)
+        {
+            screenCoords.Add(new Vector3(0, 0, 0));
+            return true;
+        }
 
         ulong tempMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShit.viewmatrix);
         Numerics.Matrix4x4 temp = Numerics.Matrix4x4.Transpose(Memory.ReadValue<Numerics.Matrix4x4>(tempMatrixPtr + 0xDC));
