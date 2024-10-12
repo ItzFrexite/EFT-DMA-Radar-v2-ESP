@@ -213,7 +213,7 @@ public partial class InGameMenu : Form
                     PlayerDistance += 10; // Increment
                     UpdateMenuItem("Player Distance", PlayerDistance);
                 }
-                else if (currentSelection == 11) // Team Distance
+                else if (currentSelection == 10) // Team Distance
                 {
                     TeamDistance += 10; // Increment
                     UpdateMenuItem("Team Distance", TeamDistance);
