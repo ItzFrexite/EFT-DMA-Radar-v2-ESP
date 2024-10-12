@@ -20,6 +20,7 @@ using Numerics = System.Numerics;
 using System.Xml.Linq;
 using System.Drawing;
 using System.Diagnostics;
+using static eft_dma_radar.Watchlist;
 
 namespace eft_dma_radar;
 
@@ -42,6 +43,8 @@ public partial class Overlay : Form
     public static int playerLimit = 750;
     public static int teamLimit = 750;
     public static int lootLimit = 250;
+
+    private static float crosshairLength = 4f;
 
     private CameraManager _cameraManager;
     private Game _game;
@@ -1014,8 +1017,24 @@ private void DirectXThread(object sender)
                         }
                         #endregion
 
+                        Console.WriteLine(Width + " " + Height);
+
                         // Crosshair
-                        WriteCenterText("+", Height / 2, Brushes.WHITE);
+                        // Draw the horizontal line
+                        _device.DrawLine(
+                            new RawVector2((Width /2) - crosshairLength, (Height / 2)),
+                            new RawVector2((Width /2) + crosshairLength, (Height / 2)),
+                            Brushes.WHITE, 1.0f // Set the color and thickness
+                        );
+
+                        // Draw the vertical line
+                        _device.DrawLine(
+                            new RawVector2((Width / 2), (Height / 2) - crosshairLength),
+                            new RawVector2((Width / 2), (Height / 2) + crosshairLength),
+                            Brushes.WHITE, 1.0f // Set the color and thickness
+                        );
+
+
                         _device.Flush();
                         _device.EndDraw();
                     }
@@ -1400,9 +1419,6 @@ private void LoadOverlay(object sender, EventArgs e)
     {
         screenCoords.Clear(); // Clear previous results
 
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-
         ulong tempMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShit.viewmatrix);
         Numerics.Matrix4x4 temp = Numerics.Matrix4x4.Transpose(Memory.ReadValue<Numerics.Matrix4x4>(tempMatrixPtr + 0xDC));
 
@@ -1430,9 +1446,6 @@ private void LoadOverlay(object sender, EventArgs e)
             // Add the calculated screen coordinates
             screenCoords.Add(new Vector3(screenX, screenY, w));
         }
-
-        stopwatch.Stop();
-        Console.WriteLine($"Combined Position Draw Time: {stopwatch.ElapsedMilliseconds} ms");
 
         return true;
     }
@@ -1514,14 +1527,14 @@ private void LoadOverlay(object sender, EventArgs e)
     private void CloseOverlay()
     {
         Hide();
-        //MainForm.isOverlayShown = false;
+        frmMain.isOverlayShown = false;
     }
 
     private void OverlayForm_Move(object sender, EventArgs e)
     {
-        //if (menu != null && !menu.IsDisposed)
+        if (menu != null && !menu.IsDisposed)
             // Update the position of the MenuForm to follow the OverlayForm
-            //menu.Location = new Point(Location.X + 20, Location.Y + 20); // Adjust the offsets as needed
+            menu.Location = new Point(Location.X + 20, Location.Y + 20); // Adjust the offsets as needed
     }
 
     #endregion
