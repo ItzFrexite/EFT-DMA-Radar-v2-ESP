@@ -37,6 +37,7 @@ This project builds upon the original work created by [Git link](https://github.
 
 ## Preview of Skeleton ESP
 ![IMG_5391](https://github.com/user-attachments/assets/02a6709b-aa43-446c-bf27-67556cf27e32)
+![Untitled](https://github.com/user-attachments/assets/78f65e0a-d480-4024-907f-b44d6930e319)
 
 ## Preview of Bounding Box and Head Dot ESP
 ![ezgif-1-4ce9f0b0ce](https://github.com/user-attachments/assets/97a835fe-8f6f-43ab-a025-6c1ad56ff448)
