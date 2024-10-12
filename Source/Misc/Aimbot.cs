@@ -550,7 +550,7 @@ namespace eft_dma_radar
     {
         private Config _config;  // Declare _config
 
-        private float _aimbotFOV;        // Field of View
+        public static float _aimbotFOV;        // Field of View
         private float _aimbotMaxDistance; // Max Distance
         private int _aimbotKeybind;      // Keybind
         private float screenWidth;

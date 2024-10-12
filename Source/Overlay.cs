@@ -28,6 +28,7 @@ namespace eft_dma_radar;
 public partial class Overlay : Form
 {
     private frmMain _frmMain;
+    private Config _config = new Config();
 
     public static bool isMenuShown = false;
 
@@ -44,20 +45,22 @@ public partial class Overlay : Form
     public static int playerLimit = 750;
     public static int teamLimit = 750;
     public static int lootLimit = 250;
-
     private static float crosshairLength = 4f;
+
+    private float AimFOV
+    {
+        get => Aimbot._aimbotFOV;
+        set => Aimbot._aimbotFOV = value;
+    }
 
     private CameraManager _cameraManager;
     private Game _game;
-
 
     public static ulong FPSCamera
     {
         get => CameraManager._staticfpsCamera;  // Access static field directly
     }
 
-    // Loot ESP
-    private readonly Config _config;
     private LootManager Loot
     {
         get => Memory.Loot;
@@ -1021,6 +1024,12 @@ private void DirectXThread(object sender)
                             new RawVector2((Width / 2), (Height / 2) + crosshairLength),
                             Brushes.WHITE, 1.0f // Set the color and thickness
                         );
+
+                        // Draw the FOV circle centered on the crosshair
+                        _device.DrawEllipse(
+                            new Ellipse(new RawVector2((Width / 2), (Height / 2)), AimFOV, AimFOV), // Center and radius
+                            Brushes.WHITE,  // The color of the circle
+                            2.0f);          // Thickness of the circle border
 
 
                         _device.Flush();
