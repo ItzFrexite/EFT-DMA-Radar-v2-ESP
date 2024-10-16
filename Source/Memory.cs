@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text;
 using Vmmsharp;
+using static Vmmsharp.LeechCore;
 
 namespace eft_dma_radar
 {
@@ -30,6 +31,8 @@ namespace eft_dma_radar
         private static volatile int _ticks = 0;
         private static readonly Stopwatch _tickSw = new();
         public static InputManager _inputManager;
+
+        public static InputHandler inputHandler = new InputHandler();
 
         public static Game.GameStatus GameStatus = Game.GameStatus.NotFound;
 
@@ -186,71 +189,7 @@ namespace eft_dma_radar
         }
         #endregion
 
-        #region GameInputThread
 
-        /// <summary>
-        ///     Main worker thread to perform DMA Reads on.
-        /// </summary>
-        private static void GameInputWorkerThread(CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                try
-                {
-                    while (true) // Game is running
-                        try
-                        {
-                            while (_game is not null && frmMain.isOverlayShown)
-                            {
-                                if (_inputManager is null) _inputManager = new InputManager(_unityBase + ModuleBase.ManagerContext);
-                                //MessageBox.Show("InputWorker Running");
-                                _game.MenuLoop();
-                                Thread.SpinWait(LOOP_DELAY * 1000); // rate-limit, high performance
-                            }
-                        }
-                        catch (GameNotRunningException)
-                        {
-                            break;
-                        }
-                        catch (ThreadInterruptedException)
-                        {
-                            throw;
-                        }
-                        catch (DMAShutdown)
-                        {
-                            throw;
-                        }
-                        catch (Exception)
-                        {
-                            //Program.Log($"CRITICAL ERROR in Game Loop: {ex}");
-                        }
-                        finally
-                        {
-                            Thread.Sleep(100);
-                        }
-                }
-                catch (ThreadInterruptedException)
-                {
-                } // Do nothing
-                catch (DMAShutdown)
-                {
-                } // Do nothing
-                catch (Exception ex)
-                {
-                    Environment.FailFast($"FATAL ERROR on Loot Thread: {ex}"); // Force shutdown asap
-                }
-                finally
-                {
-                    //Program.Log("Uninitializing DMA Device...");
-                    vmmInstance.Close(); // Un-init DMA
-                                         //Program.Log("Memory Thread closing down gracefully...");
-                }
-
-            }
-            Program.Log("[Memory] Refresh thread stopped.");
-        }
-
-        #endregion
 
         #region Startup
         /// <summary>
@@ -304,6 +243,14 @@ namespace eft_dma_radar
 
             InputManager.SetVmmInstance(Memory.vmmInstance);
             InputManager.InitInputManager();
+
+            if (!InputHandler._doneInitialization)
+            {
+                if (inputHandler.Init())
+                    Program.Log("Keyboard hook initialized");
+            }
+
+
         }
 
         private static void GenerateMMap()
@@ -432,14 +379,8 @@ namespace eft_dma_radar
                 Priority = ThreadPriority.BelowNormal,
                 IsBackground = true
             };
-            Memory._gameInputThread = new Thread(() => Memory.GameInputWorkerThread(cancellationToken))
-            {
-                Priority = ThreadPriority.BelowNormal,
-                IsBackground = true
-            };
             Memory._running = true;
             Memory._workerThread.Start();
-            //Memory._gameInputThread.Start();
         }
 
         public static async void StopMemoryWorker()

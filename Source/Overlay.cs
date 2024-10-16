@@ -22,30 +22,17 @@ using System.Drawing;
 using System.Diagnostics;
 using static eft_dma_radar.Watchlist;
 using System.Windows.Forms;
+using Offsets;
+using System.Globalization;
 
 namespace eft_dma_radar;
 
 public partial class Overlay : Form
 {
     private frmMain _frmMain;
-    private Config _config = new Config();
+    private Config _config { get => Program.Config; }
 
     public static bool isMenuShown = false;
-
-    public static bool isESPOn = true;
-    public static bool isBoneESPOn = true;
-    public static bool isBoxOn = true;
-    public static bool isHeadDotOn = true;
-    public static bool isPMCOn = true;
-    public static bool isTeamOn = true;
-    public static bool isScavOn = true;
-    public static bool isLootOn = true;
-    public static int boneLimit = 300;
-    public static int npcLimit = 350;
-    public static int playerLimit = 750;
-    public static int teamLimit = 750;
-    public static int lootLimit = 250;
-    private static float crosshairLength = 4f;
 
     private float AimFOV
     {
@@ -66,14 +53,11 @@ public partial class Overlay : Form
         get => Memory.Loot;
     }
 
-    private InGameMenu menu;
 
     private void CreateMenu()
     {
-        var menu = InGameMenu.Instance;
-        menu.Show();
-        menu.BringToFront();
-        menu.Focus();
+        frmMain.guiInstance.Show();
+        frmMain.guiInstance.Owner = this;
     }
 
 private void DirectXThread(object sender)
@@ -87,6 +71,12 @@ private void DirectXThread(object sender)
         while (_running && !token.IsCancellationRequested)
             try
             {
+                if (frmMain.guiInstance.Visible)
+                {
+                    frmMain.guiInstance.TopMost = true;
+                    frmMain.guiInstance.BringToFront();
+                    frmMain.guiInstance.Focus();
+                }
                 _device.BeginDraw();
                 _device.Clear(SharpDX.Color.Transparent);
                 _device.TextAntialiasMode = TextAntialiasMode.Aliased;
@@ -137,9 +127,9 @@ private void DirectXThread(object sender)
                             var dist = Vector3.Distance(localPlayerPos, player.Position);
 
                             // Check if player is valid for ESP drawing
-                            if ((player.IsAlive && player.Type is not PlayerType.LocalPlayer && dist <= playerLimit && isESPOn)
-                                || (player.Type is not PlayerType.LocalPlayer && !player.IsHuman && player.IsAlive && dist <= npcLimit && isESPOn)
-                                || (player.Type is not PlayerType.LocalPlayer && player.Type is PlayerType.Teammate && player.IsAlive && dist <= teamLimit && isESPOn))
+                            if ((player.IsAlive && player.Type is not PlayerType.LocalPlayer && dist <= _config.PlayerDist && _config.ToggleESP)
+                                || (player.Type is not PlayerType.LocalPlayer && !player.IsHuman && player.IsAlive && dist <= _config.ScavDist && _config.ToggleESP)
+                                || (player.Type is not PlayerType.LocalPlayer && player.Type is PlayerType.Teammate && player.IsAlive && dist <= _config.TeamDist && _config.ToggleESP))
                             {
                                 List<Vector3> enemyPositions = new List<Vector3>
                                 {
@@ -190,11 +180,11 @@ private void DirectXThread(object sender)
                                     if (baseCoords.X > 0 || baseCoords.Y > 0 || baseCoords.Z > 0)
                                     {
                                         #region PMC
-                                        if ((player.Type is PlayerType.BEAR || player.Type is PlayerType.USEC) && isPMCOn && dist <= playerLimit)
+                                        if ((player.Type is PlayerType.BEAR || player.Type is PlayerType.USEC) && _config.PlayerESP && dist <= _config.PlayerDist)
                                         {
-                                            if (isBoneESPOn == false || dist > boneLimit)
+                                            if (_config.BoneESP == false || dist > _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     // Set the top and bottom coordinates for the bounding box
                                                     _device.DrawRectangle(
@@ -202,16 +192,16 @@ private void DirectXThread(object sender)
                                                                           baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                         Brushes.RED);
                                                 }
-                                                if (isHeadDotOn == true)
+                                                if (_config.HeadDotESP == true)
                                                 {
                                                     // Calculate the head dot size as 30% of the bounding box width
                                                     float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
                                                     _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
                                                 }
                                             }
-                                            else if (dist <= boneLimit)
+                                            else if (dist <= _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     //Console.WriteLine("Player " + player.Name);
                                                     _device.DrawRectangle(
@@ -276,11 +266,11 @@ private void DirectXThread(object sender)
                                         }
                                         #endregion
                                         #region Scav
-                                        if (player.Type is PlayerType.Scav && isScavOn && dist <= npcLimit)
+                                        if (player.Type is PlayerType.Scav && _config.ScavESP && dist <= _config.ScavDist)
                                         {
-                                            if (isBoneESPOn == false || dist > boneLimit)
+                                            if (_config.BoneESP == false || dist > _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     // Set the top and bottom coordinates for the bounding box
                                                     _device.DrawRectangle(
@@ -288,16 +278,16 @@ private void DirectXThread(object sender)
                                                                           baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                         Brushes.YELLOW);
                                                 }
-                                                if (isHeadDotOn == true)
+                                                if (_config.HeadDotESP == true)
                                                 {
                                                     // Calculate the head dot size as 30% of the bounding box width
                                                     float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
                                                     _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
                                                 }
                                             }
-                                            else if (dist <= boneLimit)
+                                            else if (dist <= _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     //Console.WriteLine("Player " + player.Name);
                                                     _device.DrawRectangle(
@@ -365,11 +355,11 @@ private void DirectXThread(object sender)
                                         }
                                         #endregion
                                         #region Boss
-                                        if (player.Type is PlayerType.Boss && isScavOn && dist <= npcLimit)
+                                        if (player.Type is PlayerType.Boss && _config.BossESP && dist <= _config.ScavDist)
                                         {
-                                            if (isBoneESPOn == false || dist > boneLimit)
+                                            if (_config.BoneESP == false || dist > _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     // Set the top and bottom coordinates for the bounding box
                                                     _device.DrawRectangle(
@@ -377,16 +367,16 @@ private void DirectXThread(object sender)
                                                                           baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                         Brushes.MAGENTA);
                                                 }
-                                                if (isHeadDotOn == true)
+                                                if (_config.HeadDotESP == true)
                                                 {
                                                     // Calculate the head dot size as 30% of the bounding box width
                                                     float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
                                                     _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
                                                 }
                                             }
-                                            else if (dist <= boneLimit)
+                                            else if (dist <= _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     //Console.WriteLine("Player " + player.Name);
                                                     _device.DrawRectangle(
@@ -453,11 +443,11 @@ private void DirectXThread(object sender)
                                         }
                                         #endregion
                                         #region BossFollower
-                                        if ((player.Type is PlayerType.BossFollower || player.Type is PlayerType.BossGuard) && isScavOn && dist <= npcLimit)
+                                        if ((player.Type is PlayerType.BossFollower || player.Type is PlayerType.BossGuard) && _config.ScavESP && dist <= _config.ScavDist)
                                         {
-                                            if (isBoneESPOn == false || dist > boneLimit)
+                                            if (_config.BoneESP == false || dist > _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     // Set the top and bottom coordinates for the bounding box
                                                     _device.DrawRectangle(
@@ -465,16 +455,16 @@ private void DirectXThread(object sender)
                                                                           baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                         Brushes.PURPLE);
                                                 }
-                                                if (isHeadDotOn == true)
+                                                if (_config.HeadDotESP == true)
                                                 {
                                                     // Calculate the head dot size as 30% of the bounding box width
                                                     float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
                                                     _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
                                                 }
                                             }
-                                            else if (dist <= boneLimit)
+                                            else if (dist <= _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     //Console.WriteLine("Player " + player.Name);
                                                     _device.DrawRectangle(
@@ -540,11 +530,11 @@ private void DirectXThread(object sender)
                                         }
                                         #endregion
                                         #region Teammate
-                                        if (player.Type is PlayerType.Teammate && isTeamOn && dist <= teamLimit)
+                                        if (player.Type is PlayerType.Teammate && _config.TeamESP && dist <= _config.TeamDist)
                                         {
-                                            if (isBoneESPOn == false || dist > boneLimit)
+                                            if (_config.BoneESP == false || dist > _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     // Set the top and bottom coordinates for the bounding box
                                                     _device.DrawRectangle(
@@ -552,16 +542,16 @@ private void DirectXThread(object sender)
                                                                           baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                         Brushes.GREEN);
                                                 }
-                                                if (isHeadDotOn == true)
+                                                if (_config.HeadDotESP == true)
                                                 {
                                                     // Calculate the head dot size as 30% of the bounding box width
                                                     float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
                                                     _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
                                                 }
                                             }
-                                            else if (dist <= boneLimit)
+                                            else if (dist <= _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     //Console.WriteLine("Player " + player.Name);
                                                     _device.DrawRectangle(
@@ -626,11 +616,11 @@ private void DirectXThread(object sender)
                                         }
                                         #endregion
                                         #region Cultist
-                                        if (player.Type is PlayerType.Cultist && isScavOn && dist <= npcLimit)
+                                        if (player.Type is PlayerType.Cultist && _config.ScavESP && dist <= _config.ScavDist)
                                         {
-                                            if (isBoneESPOn == false || dist > boneLimit)
+                                            if (_config.BoneESP == false || dist > _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     // Set the top and bottom coordinates for the bounding box
                                                     _device.DrawRectangle(
@@ -638,16 +628,16 @@ private void DirectXThread(object sender)
                                                                           baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                         Brushes.ORANGE);
                                                 }
-                                                if (isHeadDotOn == true)
+                                                if (_config.HeadDotESP == true)
                                                 {
                                                     // Calculate the head dot size as 30% of the bounding box width
                                                     float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
                                                     _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
                                                 }
                                             }
-                                            else if (dist <= boneLimit)
+                                            else if (dist <= _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     //Console.WriteLine("Player " + player.Name);
                                                     _device.DrawRectangle(
@@ -712,11 +702,11 @@ private void DirectXThread(object sender)
                                         }
                                         #endregion
                                         #region PlayerScav
-                                        if (player.Type is PlayerType.PlayerScav && isPMCOn && dist <= playerLimit)
+                                        if (player.Type is PlayerType.PlayerScav && _config.PlayerESP && dist <= _config.PlayerDist)
                                         {
-                                            if (isBoneESPOn == false || dist > boneLimit)
+                                            if (_config.BoneESP == false || dist > _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     // Set the top and bottom coordinates for the bounding box
                                                     _device.DrawRectangle(
@@ -724,16 +714,16 @@ private void DirectXThread(object sender)
                                                                           baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                         Brushes.BLUE);
                                                 }
-                                                if (isHeadDotOn == true)
+                                                if (_config.HeadDotESP == true)
                                                 {
                                                     // Calculate the head dot size as 30% of the bounding box width
                                                     float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
                                                     _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
                                                 }
                                             }
-                                            else if (dist <= boneLimit)
+                                            else if (dist <= _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     //Console.WriteLine("Player " + player.Name);
                                                     _device.DrawRectangle(
@@ -798,11 +788,11 @@ private void DirectXThread(object sender)
                                         }
                                         #endregion
                                         #region Raider
-                                        if (player.Type is PlayerType.Raider && isScavOn && dist <= npcLimit)
+                                        if (player.Type is PlayerType.Raider && _config.ScavESP && dist <= _config.ScavDist)
                                         {
-                                            if (isBoneESPOn == false || dist > boneLimit)
+                                            if (_config.BoneESP == false || dist > _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     // Set the top and bottom coordinates for the bounding box
                                                     _device.DrawRectangle(
@@ -810,16 +800,16 @@ private void DirectXThread(object sender)
                                                                           baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                         Brushes.ORANGE);
                                                 }
-                                                if (isHeadDotOn == true)
+                                                if (_config.HeadDotESP == true)
                                                 {
                                                     // Calculate the head dot size as 30% of the bounding box width
                                                     float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
                                                     _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
                                                 }
                                             }
-                                            else if (dist <= boneLimit)
+                                            else if (dist <= _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     //Console.WriteLine("Player " + player.Name);
                                                     _device.DrawRectangle(
@@ -884,11 +874,11 @@ private void DirectXThread(object sender)
                                         }
                                         #endregion
                                         #region SniperScav
-                                        if (player.Type is PlayerType.SniperScav && isScavOn && dist <= npcLimit)
+                                        if (player.Type is PlayerType.SniperScav && _config.ScavESP && dist <= _config.ScavDist)
                                         {
-                                            if (isBoneESPOn == false || dist > boneLimit)
+                                            if (_config.BoneESP == false || dist > _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     // Set the top and bottom coordinates for the bounding box
                                                     _device.DrawRectangle(
@@ -896,16 +886,16 @@ private void DirectXThread(object sender)
                                                                           baseCoords.X + (boxWidth / 2), baseCoords.Y - paddingHeight), // Bottom line at foot position - padding
                                                         Brushes.YELLOW);
                                                 }
-                                                if (isHeadDotOn == true)
+                                                if (_config.HeadDotESP == true)
                                                 {
                                                     // Calculate the head dot size as 30% of the bounding box width
                                                     float headDotSize = boxWidth * 0.2f; // Set head ellipse size to 20% of the bounding box width
                                                     _device.DrawEllipse(new Ellipse(new RawVector2(headCoords.X - (headDotSize / 2), headCoords.Y - (headDotSize / 2)), headDotSize, headDotSize), Brushes.WHITE); // Head ellipse outline
                                                 }
                                             }
-                                            else if (dist <= boneLimit)
+                                            else if (dist <= _config.BoneLimit)
                                             {
-                                                if (isBoxOn == true)
+                                                if (_config.BoxESP == true)
                                                 {
                                                     //Console.WriteLine("Player " + player.Name);
                                                     _device.DrawRectangle(
@@ -993,13 +983,13 @@ private void DirectXThread(object sender)
                                     lootheight = lootheight / lootdist * distfact; // Height of box = pheight / distance to local player * distance factor
                                     lootwidth = lootwidth / lootdist * distfact; // Width of box = pheight / distance to local player * distance factor                                        
 
-                                    if (isESPOn == true && isLootOn == true)
+                                    if (_config.ToggleESP == true && _config.ItemESP == true)
                                     {
                                         // Loot ESP
                                         WorldToScreenLootTest(lootplayer, lootPos, out var lootcoords);
                                         if (lootcoords.X > 0 || lootcoords.Y > 0 || lootcoords.Z > 0)
                                         {
-                                            if (lootdist <= lootLimit)
+                                            if (lootdist <= _config.ItemDist)
                                             {
                                                 _device.DrawRectangle(new RawRectangleF(lootcoords.X - lootwidth, lootcoords.Y + (lootheight / 4), lootcoords.X + lootwidth, lootcoords.Y - lootheight), Brushes.WHITE);
                                                 WriteText(item.Name + Environment.NewLine + Math.Round(lootdist, 0) + "m", lootcoords.X + 5, lootcoords.Y - 25, Brushes.WHITE);
@@ -1013,24 +1003,31 @@ private void DirectXThread(object sender)
                         // Crosshair
                         // Draw the horizontal line
                         _device.DrawLine(
-                            new RawVector2((Width /2) - crosshairLength, (Height / 2)),
-                            new RawVector2((Width /2) + crosshairLength, (Height / 2)),
+                            new RawVector2((Width /2) - _config.CrosshairLength, (Height / 2)),
+                            new RawVector2((Width /2) + _config.CrosshairLength, (Height / 2)),
                             Brushes.WHITE, 1.0f // Set the color and thickness
                         );
 
                         // Draw the vertical line
                         _device.DrawLine(
-                            new RawVector2((Width / 2), (Height / 2) - crosshairLength),
-                            new RawVector2((Width / 2), (Height / 2) + crosshairLength),
+                            new RawVector2((Width / 2), (Height / 2) - _config.CrosshairLength),
+                            new RawVector2((Width / 2), (Height / 2) + _config.CrosshairLength),
                             Brushes.WHITE, 1.0f // Set the color and thickness
                         );
 
-                        // Draw the FOV circle centered on the crosshair
-                        _device.DrawEllipse(
+                        if (_config.ShowFOV)
+                        {
+                            // Draw the FOV circle centered on the crosshair
+                            _device.DrawEllipse(
                             new Ellipse(new RawVector2((Width / 2), (Height / 2)), AimFOV, AimFOV), // Center and radius
                             Brushes.WHITE,  // The color of the circle
                             2.0f);          // Thickness of the circle border
+                        }
 
+                        if (LocalPlayer != null && LocalPlayer.ItemInHands.Item != null)
+                        {
+                            WriteBottomRightText("Ammo: " + LocalPlayer.ItemInHands.Item.GearInfo.AmmoCount, Brushes.WHITE, 20, "Arial Unicode MS");
+                        }
 
                         _device.Flush();
                         _device.EndDraw();
@@ -1207,7 +1204,15 @@ private void DirectXThread(object sender)
 
         if (keyData == Keys.Insert)
         {
-            MenuManager.ToggleMenu();
+            if (frmMain.guiInstance.Visible)
+            {
+                frmMain.guiInstance.Hide();
+            }
+            else
+            {
+                frmMain.guiInstance.Show();
+                frmMain.guiInstance.TopMost = true;
+            }
             return true;
         }
 
@@ -1322,6 +1327,32 @@ private void LoadOverlay(object sender, EventArgs e)
         // Write text at the calculated position
         WriteText(msg, x, y, color, fontSize, fontFamily);
     }
+
+    private void WriteBottomRightText(string msg, SolidColorBrush color, float fontSize = 20,
+        string fontFamily = "Arial Unicode MS")
+    {
+        // Calculate the width and height of the drawing area
+        float width = this.Width; // Get the width of the control
+        float height = this.Height; // Get the height of the control
+
+        // Measure the size of the text
+        using (var graphics = this.CreateGraphics())
+        {
+            var textSize = graphics.MeasureString(msg, new Font(fontFamily, fontSize));
+
+            // Calculate x and y positions for bottom right placement, adjusted to 1/16th of the screen size
+            var x = width - textSize.Width - (width / 16); // x position
+            var y = height - textSize.Height - (height / 16); // y position
+
+            // Write text at the calculated position
+            WriteText(msg, x, y, color, fontSize, fontFamily);
+        }
+    }
+
+
+
+
+
 
     private void WriteBottomText(string msg, float x, SolidColorBrush color, float fontSize = 13,
         string fontFamily = "Arial Unicode MS")
@@ -1536,9 +1567,11 @@ private void LoadOverlay(object sender, EventArgs e)
 
     private void OverlayForm_Move(object sender, EventArgs e)
     {
-        if (menu != null && !menu.IsDisposed)
+        if (GUI.Instance != null && GUI.Instance.Visible)
+        {
             // Update the position of the MenuForm to follow the OverlayForm
-            menu.Location = new Point(Location.X + 20, Location.Y + 20); // Adjust the offsets as needed
+            frmMain.guiInstance.Location = new Point(Location.X + 20, Location.Y + 20); // Adjust the offsets as needed
+        }
     }
 
     #endregion

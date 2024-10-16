@@ -388,6 +388,7 @@ namespace eft_dma_radar
 
         public bool Init()
         {
+            Console.WriteLine("InputHandler Initializing");
             if (_doneInitialization) return true;
 
             if (try_count > 3)
@@ -459,7 +460,7 @@ namespace eft_dma_radar
                 }
                 if (gafAsyncKeyStateExport > 0x7FFFFFFFFFFF)
                 {
-                    Program.Log("InputHandler success");
+                    Console.WriteLine("InputHandler success");
                     _doneInitialization = true;
                     return true;
                 }
@@ -562,7 +563,7 @@ namespace eft_dma_radar
         }
         private Player _player;
         bool bLastHeld;
-        private static InputHandler keyboard = new InputHandler();
+        //private static InputHandler keyboard = new InputHandler();
 
         public KeyChecker _keyChecker = new KeyChecker();
         public static float Rad2Deg(float rad)
@@ -797,14 +798,14 @@ namespace eft_dma_radar
             screenWidth = Screen.PrimaryScreen.Bounds.Width;
             screenHeight = Screen.PrimaryScreen.Bounds.Height;
 
-            if (!InputHandler._doneInitialization)
-            {
-                if (keyboard.Init())
-                    Program.Log("Keyboard hook initialized");
-            }
+            //if (!InputHandler._doneInitialization)
+            //{
+            //if (keyboard.Init())
+            //Program.Log("Keyboard hook initialized");
+            //}
 
             // Check if the aimbot key is held down
-            bool bHeld = keyboard.IsKeyDown(_aimbotKeybind);
+            bool bHeld = Memory.inputHandler.IsKeyDown(_aimbotKeybind);
 
             try
             {
@@ -822,6 +823,8 @@ namespace eft_dma_radar
 
                         if (bHeld && bHeld == bLastHeld && _player != null && _player.IsAlive && _player.IsActive)
                         {
+                            Console.WriteLine("AimerBotter initialized");
+
                             // Existing target lock logic
                             Vector3 targetPos = GetClosestBoneScr(_player, out Vector2 screenPos);
                             Vector2 rel = new Vector2(screenPos.X - (screenWidth / 2f), screenPos.Y - (screenHeight / 2f));

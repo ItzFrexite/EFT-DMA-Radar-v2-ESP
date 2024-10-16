@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Numerics;
+using static Vmmsharp.LeechCore;
 
 namespace eft_dma_radar
 {
@@ -13,6 +14,7 @@ namespace eft_dma_radar
         private readonly object _posLock = new(); // sync access to this.Position (non-atomic)
         private GearManager _gearManager;
         private Transform _transform;
+        private Config _config = new Config();
 
         #region Bones
 
@@ -38,17 +40,6 @@ namespace eft_dma_radar
         private Vector3 _rForearm1Pos;
         private Vector3 _lCalfPos;
         private Vector3 _rCalfPos;
-
-
-        private int BoneLimit
-        {
-            get => Overlay.boneLimit;
-        }
-
-        private bool ESPOn
-        {
-            get => Overlay.isESPOn;
-        }
 
         public static ulong FPSCamera
         {
@@ -1081,12 +1072,12 @@ namespace eft_dma_radar
                             Console.WriteLine("Bone Transform created for bone " + bones[i] + " for player " + player.Name);
                         }
 
-                        if (dist > BoneLimit && bones[i] == PlayerBones.HumanHead)
+                        if (dist > _config.BoneLimit && bones[i] == PlayerBones.HumanHead)
                         {
                             Vector3 bonePosition = boneTransforms[bones[i]].GetPosition();
                             this.HeadPosition = bonePosition;
                         }
-                        else if (dist <= BoneLimit)
+                        else if (dist <= _config.BoneLimit)
                         {
                             Vector3 bonePosition = boneTransforms[bones[i]].GetPosition();
 

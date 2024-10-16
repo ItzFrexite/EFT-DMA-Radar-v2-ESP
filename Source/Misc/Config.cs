@@ -8,7 +8,7 @@ namespace eft_dma_radar
         #region Json Properties
 
         #region Aimbot
-        // New properties for WEb+Aimbot
+        // New properties for Aimbot
         [JsonPropertyName("aimbotFOV")]
         public int AimbotFOV { get; set; }
         [JsonPropertyName("aimbotMaxDistance")]
@@ -258,82 +258,58 @@ namespace eft_dma_radar
         [JsonPropertyName("zoomSensitivity")]
         public int ZoomSensitivity { get; set; }
 
-        /*[JsonPropertyName("toggleESP")]
-        public bool ToggleESP
-        {
-            get => Overlay.isESPOn;
-            set => Overlay.isESPOn = value;
-        }
+        #region Overlay
+        [JsonPropertyName("toggleESP")]
+        public bool ToggleESP { get; set; }
 
         [JsonPropertyName("boneESP")]
-        public bool BoneESP
-        {
-            get => Overlay.isBoneESPOn;
-            set => Overlay.isBoneESPOn = value;
-        }
+        public bool BoneESP { get; set; }
+
+        [JsonPropertyName("boxESP")]
+        public bool BoxESP { get; set; }
+
+        [JsonPropertyName("headDotESP")]
+        public bool HeadDotESP { get; set; }
 
         [JsonPropertyName("playerESP")]
-        public bool PlayerESP
-        {
-            get => Overlay.isPMCOn;
-            set => Overlay.isPMCOn = value;
-        }
+        public bool PlayerESP { get; set; }
 
         [JsonPropertyName("teamESP")]
-        public bool TeamESP
-        {
-            get => Overlay.isTeamOn;
-            set => Overlay.isTeamOn = value;
-        }
+        public bool TeamESP { get; set; }
 
         [JsonPropertyName("scavESP")]
-        public bool ScavESP
-        {
-            get => Overlay.isScavOn;
-            set => Overlay.isScavOn = value;
-        }
+        public bool ScavESP { get; set; }
+
+        [JsonPropertyName("bossESP")]
+        public bool BossESP { get; set; }
 
         [JsonPropertyName("itemESP")]
-        public bool ItemESP
-        {
-            get => Overlay.isLootOn;
-            set => Overlay.isLootOn = value;
-        }
+        public bool ItemESP { get; set; }
+
+        [JsonPropertyName("showFOV")]
+        public bool ShowFOV { get; set; }
 
         [JsonPropertyName("boneDist")]
-        public int BoneLimit
-        {
-            get => Overlay.boneLimit;
-            set => Overlay.boneLimit = value;
-        }
+        public int BoneLimit { get; set; }
 
         [JsonPropertyName("playerDist")]
-        public int PlayerDist
-        {
-            get => Overlay.playerLimit;
-            set => Overlay.playerLimit = value;
-        }
+        public int PlayerDist { get; set; }
 
         [JsonPropertyName("teamDist")]
-        public int TeamDist
-        {
-            get => Overlay.teamLimit;
-            set => Overlay.teamLimit = value;
-        }
+        public int TeamDist { get; set; }
 
         [JsonPropertyName("scavDist")]
-        public int ScavDist
-        {
-            get => Overlay.npcLimit;
-            set => Overlay.npcLimit = value;
-        }
+        public int ScavDist { get; set; }
+
+        [JsonPropertyName("bossDist")]
+        public int BossDist { get; set; }
 
         [JsonPropertyName("itemDist")]
-        public int ItemDist
-        {
-            get => Overlay.lootLimit;
-            set => Overlay.lootLimit = value;
-        }*/
+        public int ItemDist { get; set; }
+
+        [JsonPropertyName("crosshairLength")]
+        public float CrosshairLength { get; set; }
+        #endregion
 
         #endregion
 
@@ -624,8 +600,30 @@ namespace eft_dma_radar
             UnknownQuestItems = false;
             VSync = true;
             ZoomSensitivity = 25;
+
+            #region Overlay
+            ToggleESP = true;
+            BoneESP = true;
+            BoxESP = true;
+            HeadDotESP = true;
+            PlayerESP = true;
+            TeamESP = true;
+            ScavESP = true;
+            BossESP = true;
+            ItemESP = true;
+            ShowFOV = true;
+            BoneLimit = 300;
+            PlayerDist = 750;
+            TeamDist = 750;
+            ScavDist = 350;
+            BossDist = 350;
+            ItemDist = 250;
+
+            CrosshairLength = 4f;
+            #endregion
+
             #region Aimbot
-            //Web+Aimbot
+            //Aimbot
             AimbotFOV = 30;
             AimbotMaxDistance = 200;
             AimbotKeybind = 0x05; // Example: Mouse button 5

@@ -20,7 +20,9 @@ namespace eft_dma_radar
         private Overlay overlay;
         public static bool isOverlayShown;
 
-        private readonly Config config;
+        public static GUI guiInstance;
+
+        public readonly Config config;
         private readonly Watchlist watchlist;
         private readonly LootFilterManager lootFilterManager;
         private readonly AIFactionManager aiFactions;
@@ -227,6 +229,7 @@ namespace eft_dma_radar
         }
         #endregion
 
+
         #region Constructor
         /// <summary>
         /// GUI Constructor.
@@ -246,6 +249,10 @@ namespace eft_dma_radar
             materialSkinManager.Theme = MaterialSkinManager.Themes.DARK;
             materialSkinManager.ColorScheme = new ColorScheme(Primary.Grey800, Primary.Grey800, Primary.Indigo100, Accent.Orange400, TextShade.WHITE);
 
+            PopulateKeybindComboBox();
+            LoadCurrentKeybind();
+            cbKeyBinds.SelectedIndexChanged += cmbKeybind_SelectedIndexChanged;
+
             this.LoadConfig();
             this.LoadMaps();
 
@@ -259,6 +266,10 @@ namespace eft_dma_radar
 
             this.InitializeInputCheckTimer();
             this.InitializeDoubleBuffering();
+
+            guiInstance = new GUI(config);
+
+            //guiInstance.Show();
         }
         #endregion
 
@@ -730,7 +741,7 @@ namespace eft_dma_radar
             swHoverArmor.Checked = config.HoverArmor;
             txtTeammateID.Text = config.PrimaryTeammateId;
             sldrZoomSensitivity.Value = config.ZoomSensitivity;
-            lblKeybind.Text = ((Keys)config.AimbotKeybind).ToString();
+            cbKeyBinds.SelectedItem = ((Keys)config.AimbotKeybind).ToString();
             sldrUIScale.Value = config.UIScale;
             cboGlobalFont.SelectedIndex = config.GlobalFont;
             sldrFontSize.Value = config.GlobalFontSize;
@@ -744,6 +755,7 @@ namespace eft_dma_radar
             swAimPelvis.Checked = config.AimbotPelvis;
             swAimRLeg.Checked = config.AimbotRightLeg;
             swAimLLeg.Checked = config.AimbotLeftLeg;
+            swShowFOV.Checked = config.ShowFOV;
             sldrAimbotFOV.Value = (int)config.AimbotFOV;
             sldrAimbotSmoothness.Value = (int)config.AimbotSmoothness;
             sldrAimDistance.Value = (int)config.AimbotMaxDistance;
@@ -829,18 +841,20 @@ namespace eft_dma_radar
             swChamsRevert.Checked = this.config.Chams["RevertOnClose"];
 
             // ESP Features
-            /*mcSettingsESP.Enabled = this.config.MasterSwitch;
             swToggleESP.Checked = this.config.ToggleESP;
-            swBoneESP.Checked = this.config.BoneESP;
-            swPlayerESP.Checked = this.config.PlayerESP;
-            swTeamESP.Checked = this.config.TeamESP;
-            swScavESP.Checked = this.config.ScavESP;
-            swItemESP.Checked = this.config.ItemESP;
+            swToggleBones.Checked = this.config.BoneESP;
+            swTogglePlayers.Checked = this.config.PlayerESP;
+            swToggleTeam.Checked = this.config.TeamESP;
+            swToggleScavs.Checked = this.config.ScavESP;
+            swToggleBosses.Checked = this.config.BossESP;
+            swToggleItems.Checked = this.config.ItemESP;
+            swBox.Checked = this.config.BoxESP;
+            swHeadDot.Checked = this.config.HeadDotESP;
             sldrBoneDist.Value = this.config.BoneLimit;
             sldrPlayerDist.Value = this.config.PlayerDist;
             sldrTeamDist.Value = this.config.TeamDist;
             sldrScavDist.Value = this.config.ScavDist;
-            sldrItemDist.Value = this.config.ItemDist;*/
+            sldrItemDist.Value = this.config.ItemDist;
 
             this.ToggleChamsControls();
             #endregion
@@ -923,104 +937,269 @@ namespace eft_dma_radar
         private void swEnableAimBot_CheckedChanged(object sender, EventArgs e)
         {
             config.EnableAimbot = swEnableAimBot.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbAim != null)
+                {
+                    guiInstance.cbAim.Checked = swEnableAimBot.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void swAimClosest_CheckedChanged(object sender, EventArgs e)
         {
             config.AimbotClosest = swAimClosest.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbClosest != null)
+                {
+                    guiInstance.cbClosest.Checked = swAimClosest.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void swEnablePMC_CheckedChanged(object sender, EventArgs e)
         {
             config.EnablePMC = swEnablePMC.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbPMC != null)
+                {
+                    guiInstance.cbPMC.Checked = swEnablePMC.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void swEnableTargetScavs_CheckedChanged(object sender, EventArgs e)
         {
             config.EnableTargetScavs = swEnableTargetScavs.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbScav != null)
+                {
+                    guiInstance.cbScav.Checked = swEnableTargetScavs.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void swHeadAim_CheckedChanged(object sender, EventArgs e)
         {
             config.AimbotHead = swHeadAim.Checked;
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbHead != null)
+                {
+                    guiInstance.cbHead.Checked = swHeadAim.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void swAimNeck_CheckedChanged(object sender, EventArgs e)
         {
             config.AimbotNeck = swAimNeck.Checked;
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbNeck != null)
+                {
+                    guiInstance.cbNeck.Checked = swAimNeck.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void swAimChest_CheckedChanged(object sender, EventArgs e)
         {
             config.AimbotChest = swAimChest.Checked;
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbChest != null)
+                {
+                    guiInstance.cbChest.Checked = swAimChest.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void swAimPelvis_CheckedChanged(object sender, EventArgs e)
         {
             config.AimbotPelvis = swAimPelvis.Checked;
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbPelvis != null)
+                {
+                    guiInstance.cbPelvis.Checked = swAimPelvis.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void swAimRLeg_CheckedChanged(object sender, EventArgs e)
         {
             config.AimbotRightLeg = swAimRLeg.Checked;
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbRightLeg != null)
+                {
+                    guiInstance.cbRightLeg.Checked = swAimRLeg.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void swAimLLeg_CheckedChanged(object sender, EventArgs e)
         {
             config.AimbotLeftLeg = swAimLLeg.Checked;
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbLeftLeg != null)
+                {
+                    guiInstance.cbLeftLeg.Checked = swAimLLeg.Checked; // Synchronize with GUI
+                }
+            }
+            Config.SaveConfig(config);
+        }
+
+        private void swShowFOV_CheckedChanged(object sender, EventArgs e)
+        {
+            config.ShowFOV = swShowFOV.Checked;
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbShowFOV != null)
+                {
+                    guiInstance.cbShowFOV.Checked = swShowFOV.Checked; // Synchronize with GUI
+                }
+            }
             Config.SaveConfig(config);
         }
         private void sldrAimbotFOV_onValueChanged(object sender, int newValue)
         {
             config.AimbotFOV = sldrAimbotFOV.Value;
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbAimFOV.Value = newValue;
+            }
             Config.SaveConfig(config);
         }
         private void sldrAimbotSmoothness_onValueChanged(object sender, int newValue)
         {
             config.AimbotSmoothness = sldrAimbotSmoothness.Value;
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbAimSmoothness.Value = newValue;
+            }
             Config.SaveConfig(config);
         }
         private void sldrAimDistance_onValueChanged(object sender, int newValue)
         {
             config.AimbotMaxDistance = sldrAimDistance.Value;
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbAimDistance.Value = newValue;
+            }
             Config.SaveConfig(config);
         }
-        private void lblKeybind_MouseClick(object sender, MouseEventArgs e)
+
+        #region ComboBox Keys
+        private void PopulateKeybindComboBox()
         {
-            lblKeybind.Text = "Press any key or mouse button...";
-            this.KeyPreview = true;
-            this.KeyDown += MainForm_KeyDown;
-            this.MouseDown += MainForm_MouseDown; // Subscribe to MouseDown event
+            // Create an array of commonly used keys to include, excluding unwanted ones
+            var allowedKeys = Enum.GetValues(typeof(Keys)).Cast<Keys>()
+                .Where(k => k != Keys.None &&
+                            !k.ToString().StartsWith("Oem") &&            // Remove OEM keys
+                            !k.ToString().StartsWith("D") &&              // Remove D1, D2, etc., to handle separately
+                            !k.ToString().StartsWith("IME") &&            // Remove IME keys
+                            !k.ToString().Contains("KanaMode") &&         // Remove KanaMode
+                            !k.ToString().Contains("JunjaMode") &&        // Remove JunjaMode
+                            !k.ToString().Contains("FinalMode") &&        // Remove FinalMode
+                            !k.ToString().Contains("KanjiMode") &&        // Remove KanjiMode
+                            !k.ToString().Contains("Browser") &&          // Remove Browser keys
+                            !k.ToString().Contains("Volume") &&           // Remove Volume keys
+                            !k.ToString().Contains("Media") &&            // Remove Media keys
+                            !k.ToString().Contains("Launch") &&           // Remove Launch keys (mail, applications)
+                            !k.ToString().Contains("ProcessKey") &&       // Remove ProcessKey
+                            !k.ToString().Contains("Packet") &&           // Remove Packet
+                            !k.ToString().Contains("Attn") &&             // Remove Attn
+                            !k.ToString().Contains("Crsel") &&            // Remove Crsel
+                            !k.ToString().Contains("Exsel") &&            // Remove Exsel
+                            !k.ToString().Contains("EraseEof") &&         // Remove EraseEof
+                            !k.ToString().Contains("Play") &&             // Remove Play
+                            !k.ToString().Contains("Zoom") &&             // Remove Zoom
+                            !k.ToString().Contains("NoName") &&           // Remove NoName
+                            !k.ToString().Contains("Pa1") &&              // Remove Pa1
+                            !k.ToString().Contains("KeyCode") &&          // Remove KeyCode
+                            !k.ToString().Contains("Modifiers")           // Remove Modifiers (Shift, Control, Alt, etc.)
+                            )
+                .Select(k => k.ToString())
+                .ToArray();
+
+            // Handle renaming D1, D2, ... D0 to 1, 2, ... 0
+            string[] numberKeys = { "1", "2", "3", "4", "5", "6", "7", "8", "9", "0" };
+
+            string[] mouseButtons = { "Mouse4", "Mouse5" };
+
+            // Add mouse buttons first
+            cbKeyBinds.Items.AddRange(mouseButtons);
+
+            // Add the number keys (1, 2, ... 0)
+            cbKeyBinds.Items.AddRange(numberKeys);
+
+            // Add the filtered allowed keys
+            cbKeyBinds.Items.AddRange(allowedKeys);
+
+            // Optionally, select a default item
+            cbKeyBinds.SelectedIndex = 0;
         }
-        private void MainForm_KeyDown(object sender, KeyEventArgs e)
+
+        private void cmbKeybind_SelectedIndexChanged(object sender, EventArgs e)
         {
-            lblKeybind.Text = e.KeyCode.ToString();
-            config.AimbotKeybind = (int)e.KeyCode; // Save the keycode in your config
-            this.KeyDown -= MainForm_KeyDown; // Unsubscribe from the event
-            this.MouseDown -= MainForm_MouseDown; // Unsubscribe from MouseDown event
-        }
-        private void MainForm_MouseDown(object sender, MouseEventArgs e)
-        {
-            string mouseButton;
-            int mouseButtonCode;
-            switch (e.Button)
+            string selectedKey = cbKeyBinds.SelectedItem.ToString();
+
+            // Map mouse buttons to their virtual key codes
+            if (selectedKey == "Mouse4")
             {
-                case MouseButtons.XButton1:
-                    mouseButton = "Mouse4";
-                    mouseButtonCode = 0x05; // Virtual key code for Mouse4
-                    break;
-                case MouseButtons.XButton2:
-                    mouseButton = "Mouse5";
-                    mouseButtonCode = 0x06; // Virtual key code for Mouse5
-                    break;
-                default:
-                    return;
+                config.AimbotKeybind = 0x05; // Virtual key code for Mouse4
             }
-            lblKeybind.Text = mouseButton;
-            config.AimbotKeybind = mouseButtonCode; // Save the mouse button code in your config
-            this.KeyDown -= MainForm_KeyDown; // Unsubscribe from the event
-            this.MouseDown -= MainForm_MouseDown; // Unsubscribe from MouseDown event
+            else if (selectedKey == "Mouse5")
+            {
+                config.AimbotKeybind = 0x06; // Virtual key code for Mouse5
+            }
+            else
+            {
+                // Map other keys (assuming they are part of the Keys enum)
+                if (Enum.TryParse(selectedKey, out Keys key))
+                {
+                    config.AimbotKeybind = (int)key;
+                }
+            }
         }
+
+        private void LoadCurrentKeybind()
+        {
+            int currentKeybind = config.AimbotKeybind;
+
+            if (currentKeybind == 0x05)
+            {
+                cbKeyBinds.SelectedItem = "Mouse4";
+            }
+            else if (currentKeybind == 0x06)
+            {
+                cbKeyBinds.SelectedItem = "Mouse5";
+            }
+            else
+            {
+                cbKeyBinds.SelectedItem = ((Keys)currentKeybind).ToString();
+            }
+        }
+        #endregion
         #endregion
         private async void frmMain_Shown(object sender, EventArgs e)
         {
@@ -1206,14 +1385,15 @@ namespace eft_dma_radar
                 if (overlay is null || overlay.IsDisposed) overlay = new Overlay();
 
                 overlay.Show();
+                //guiInstance.Show();
+                //guiInstance.TopMost = true;
+                //guiInstance.BringToFront();
                 isOverlayShown = true;
             }
             else
             {
                 isOverlayShown = false;
             }
-
-            return true;
 
             return true;
         }
@@ -1240,6 +1420,7 @@ namespace eft_dma_radar
             swAimPelvis.Checked = config.AimbotPelvis;
             swAimRLeg.Checked = config.AimbotRightLeg;
             swAimLLeg.Checked = config.AimbotLeftLeg;
+            swShowFOV.Checked = config.ShowFOV;
             // If any settings require a visual update, apply those here
             UpdateAimbotVisuals();
         }
@@ -1255,6 +1436,7 @@ namespace eft_dma_radar
             swAimPelvis.Enabled = isAimbotEnabled;
             swAimRLeg.Enabled = isAimbotEnabled;
             swAimLLeg.Enabled = isAimbotEnabled;
+            swShowFOV.Enabled = isAimbotEnabled;
             sldrAimbotFOV.Enabled = isAimbotEnabled;
             sldrAimbotSmoothness.Enabled = isAimbotEnabled;
             sldrAimDistance.Enabled = isAimbotEnabled;
@@ -1271,6 +1453,7 @@ namespace eft_dma_radar
             swAimPelvis.CheckedChanged += (sender, e) => config.AimbotPelvis = swAimPelvis.Checked;
             swAimRLeg.CheckedChanged += (sender, e) => config.AimbotRightLeg = swAimRLeg.Checked;
             swAimLLeg.CheckedChanged += (sender, e) => config.AimbotLeftLeg = swAimLLeg.Checked;
+            swShowFOV.CheckedChanged += (sender, e) => config.ShowFOV = swShowFOV.Checked;
             sldrAimbotFOV.onValueChanged += (sender, e) => config.AimbotFOV = sldrAimbotFOV.Value;
             sldrAimbotSmoothness.onValueChanged += (sender, e) => config.AimbotSmoothness = sldrAimbotSmoothness.Value;
             sldrAimDistance.onValueChanged += (sender, e) => config.AimbotMaxDistance = sldrAimDistance.Value;
@@ -3666,6 +3849,14 @@ namespace eft_dma_radar
         private void swThirdperson_CheckedChanged(object sender, EventArgs e)
         {
             this.config.Thirdperson = swThirdperson.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbThirdPerson != null)
+                {
+                    guiInstance.cbThirdPerson.Checked = swThirdperson.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void swJuggernaut_CheckedChanged(object sender, EventArgs e)
@@ -3679,11 +3870,27 @@ namespace eft_dma_radar
             this.config.FreezeTimeOfDay = enabled;
 
             sldrTimeOfDay.Enabled = enabled;
+
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbFreezeTime != null)
+                {
+                    guiInstance.cbFreezeTime.Checked = swFreezeTime.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void sldrTimeOfDay_onValueChanged(object sender, int newValue)
         {
             this.config.TimeOfDay = (float)sldrTimeOfDay.Value;
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbTimeOfDay.Value = newValue;
+            }
         }
 
         private void swTimeScale_CheckedChanged(object sender, EventArgs e)
@@ -3693,6 +3900,15 @@ namespace eft_dma_radar
             sldrTimeScaleFactor.Enabled = enabled;
 
             lblSettingsMemoryWritingTimeScaleFactor.Enabled = enabled;
+
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbTimeScale != null)
+                {
+                    guiInstance.cbTimeScale.Checked = swTimeScale.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void sldrTimeScaleFactor_onValueChanged(object sender, int newValue)
@@ -3704,6 +3920,15 @@ namespace eft_dma_radar
 
             this.config.TimeScaleFactor = (float)newValue / 10;
             lblSettingsMemoryWritingTimeScaleFactor.Text = $"x{(this.config.TimeScaleFactor)}";
+
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbTimeFactor.Value = newValue;
+                guiInstance.lblTimeScaleFactorX.Text = $"x{(this.config.TimeScaleFactor)}"; ;
+            }
         }
 
         private void swLootThroughWalls_CheckedChanged(object sender, EventArgs e)
@@ -3713,6 +3938,15 @@ namespace eft_dma_radar
 
             sldrLootThroughWallsDistance.Enabled = enabled;
             lblSettingsMemoryWritingLootThroughWallsDistance.Enabled = enabled;
+
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbLootThroughWalls != null)
+                {
+                    guiInstance.cbLootThroughWalls.Checked = swLootThroughWalls.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void sldrLootThroughWallsDistance_onValueChanged(object sender, int newValue)
@@ -3732,6 +3966,15 @@ namespace eft_dma_radar
 
             lblSettingsMemoryWritingLootThroughWallsDistance.Text = $"x{distance}";
 
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbLootThroughWallsDistance.Value = newValue;
+                guiInstance.lblLootThroughWallsX.Text = $"x{(distance)}"; ;
+            }
+
             if (Memory.LocalPlayer is not null)
                 Memory.PlayerManager.UpdateLootThroughWallsDistance = true;
         }
@@ -3743,6 +3986,15 @@ namespace eft_dma_radar
 
             sldrExtendedReachDistance.Enabled = enabled;
             lblSettingsMemoryWritingExtendedReachDistance.Enabled = enabled;
+
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbExtendedReach != null)
+                {
+                    guiInstance.cbExtendedReach.Checked = swExtendedReach.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void sldrExtendedReachDistance_onValueChanged(object sender, int newValue)
@@ -3762,6 +4014,15 @@ namespace eft_dma_radar
 
             lblSettingsMemoryWritingExtendedReachDistance.Text = $"x{distance}";
 
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbReachDistance.Value = newValue;
+                guiInstance.lblReachX.Text = $"x{(distance)}"; ;
+            }
+
             if (Memory.LocalPlayer is not null)
                 Memory.Toolbox.UpdateExtendedReachDistance = true;
         }
@@ -3774,6 +4035,14 @@ namespace eft_dma_radar
         private void swInventoryBlur_CheckedChanged(object sender, EventArgs e)
         {
             this.config.InventoryBlur = swInventoryBlur.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbInventoryBlur != null)
+                {
+                    guiInstance.cbInventoryBlur.Checked = swInventoryBlur.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void swMedPanel_CheckedChanged(object sender, EventArgs e)
@@ -3784,21 +4053,53 @@ namespace eft_dma_radar
         private void swNoRecoil_CheckedChanged(object sender, EventArgs e)
         {
             this.config.NoRecoil = swNoRecoil.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbNoRecoil != null)
+                {
+                    guiInstance.cbNoRecoil.Checked = swNoRecoil.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void swNoSway_CheckedChanged(object sender, EventArgs e)
         {
             this.config.NoSway = swNoRecoil.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbNoVisor != null)
+                {
+                    guiInstance.cbNoSway.Checked = swNoSway.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void swInstantADS_CheckedChanged(object sender, EventArgs e)
         {
             this.config.InstantADS = swInstantADS.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbInstantADS != null)
+                {
+                    guiInstance.cbInstantADS.Checked = swInstantADS.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void swNoVisor_CheckedChanged(object sender, EventArgs e)
         {
             this.config.NoVisor = swNoVisor.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbNoVisor != null)
+                {
+                    guiInstance.cbNoVisor.Checked = swNoVisor.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void swThermalVision_CheckedChanged(object sender, EventArgs e)
@@ -3807,6 +4108,15 @@ namespace eft_dma_radar
             this.config.ThermalVision = enabled;
 
             mcSettingsMemoryWritingThermal.Enabled = enabled || this.config.OpticThermalVision;
+
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbThermalVision != null)
+                {
+                    guiInstance.cbThermalVision.Checked = swThermalVision.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void swOpticalThermal_CheckedChanged(object sender, EventArgs e)
@@ -3815,16 +4125,40 @@ namespace eft_dma_radar
             this.config.OpticThermalVision = enabled;
 
             mcSettingsMemoryWritingThermal.Enabled = enabled || this.config.ThermalVision;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbOpticalThermal != null)
+                {
+                    guiInstance.cbOpticalThermal.Checked = swOpticalThermal.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void swNightVision_CheckedChanged(object sender, EventArgs e)
         {
             this.config.NightVision = swNightVision.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbNightVision != null)
+                {
+                    guiInstance.cbNightVision.Checked = swNightVision.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void swNoWeaponMalfunctions_CheckedChanged(object sender, EventArgs e)
         {
             this.config.NoWeaponMalfunctions = swNoWeaponMalfunctions.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbNoWeaponMalfunctions != null)
+                {
+                    guiInstance.cbNoWeaponMalfunctions.Checked = swNoWeaponMalfunctions.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void sldrMagDrillsSpeed_onValueChanged(object sender, int newValue)
@@ -3847,6 +4181,14 @@ namespace eft_dma_radar
         private void swInfiniteStamina_CheckedChanged(object sender, EventArgs e)
         {
             this.config.InfiniteStamina = swInfiniteStamina.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbInfiniteStamina != null)
+                {
+                    guiInstance.cbInfiniteStamina.Checked = swInfiniteStamina.Checked; // Synchronize with GUI
+                }
+            }
         }
 
         private void sldrThrowStrength_onValueChanged(object sender, int newValue)
@@ -3925,6 +4267,20 @@ namespace eft_dma_radar
             mcSettingsMemoryWritingThermal.Enabled = isChecked;
             mcSettingsMemoryWritingSkillBuffs.Enabled = isChecked;
             mcSettingsMemoryWritingChams.Enabled = isChecked;
+
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                // Null check for GUI and cbMemoryWrites
+                if (guiInstance.cbMemoryWrites != null)
+                {
+                    guiInstance.cbMemoryWrites.Checked = isChecked; // Synchronize with GUI
+                }
+                else
+                {
+                    Program.Log("GUI or cbMemoryWrites is not initialized.");
+                }
+            }
 
             if (isChecked)
                 Memory.Toolbox?.StartToolbox();
@@ -5725,5 +6081,185 @@ namespace eft_dma_radar
         #endregion
         #endregion
         #endregion
+
+        #region ESP Methods
+        private void swToggleESP_CheckedChanged(object sender, EventArgs e)
+        {
+            this.config.ToggleESP = swToggleESP.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbESP != null)
+                {
+                    guiInstance.cbESP.Checked = swToggleESP.Checked; // Synchronize with GUI
+                }
+            }
+        }
+
+        private void swTogglePlayers_CheckedChanged(object sender, EventArgs e)
+        {
+            this.config.PlayerESP = swTogglePlayers.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbPlayers != null)
+                {
+                    guiInstance.cbPlayers.Checked = swTogglePlayers.Checked; // Synchronize with GUI
+                }
+            }
+        }
+
+        private void swToggleTeam_CheckedChanged(object sender, EventArgs e)
+        {
+            this.config.TeamESP = swToggleTeam.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbTeam != null)
+                {
+                    guiInstance.cbTeam.Checked = swToggleTeam.Checked; // Synchronize with GUI
+                }
+            }
+        }
+
+        private void swToggleScavs_CheckedChanged(object sender, EventArgs e)
+        {
+            this.config.ScavESP = swToggleScavs.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbScav != null)
+                {
+                    guiInstance.cbScav.Checked = swToggleScavs.Checked; // Synchronize with GUI
+                }
+            }
+        }
+
+        private void swToggleBosses_CheckedChanged(object sender, EventArgs e)
+        {
+            this.config.BossESP = swToggleBosses.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbBosses != null)
+                {
+                    guiInstance.cbBosses.Checked = swToggleBosses.Checked; // Synchronize with GUI
+                }
+            }
+        }
+
+        private void swToggleItems_CheckedChanged(object sender, EventArgs e)
+        {
+            this.config.ItemESP = swToggleItems.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbItems != null)
+                {
+                    guiInstance.cbItems.Checked = swToggleItems.Checked; // Synchronize with GUI
+                }
+            }
+        }
+
+        private void swToggleBones_CheckedChanged(object sender, EventArgs e)
+        {
+            this.config.BoneESP = swToggleBones.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbSkeletons != null)
+                {
+                    guiInstance.cbSkeletons.Checked = swToggleBones.Checked; // Synchronize with GUI
+                }
+            }
+        }
+
+        private void swBox_CheckedChanged(object sender, EventArgs e)
+        {
+            this.config.BoxESP = swBox.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbBoundingBox != null)
+                {
+                    guiInstance.cbBoundingBox.Checked = swBox.Checked; // Synchronize with GUI
+                }
+            }
+        }
+
+        private void swHeadDot_CheckedChanged(object sender, EventArgs e)
+        {
+            this.config.HeadDotESP = swHeadDot.Checked;
+            Thread.Sleep(10);
+            if (guiInstance != null)
+            {
+                if (guiInstance.cbHead != null)
+                {
+                    guiInstance.cbHead.Checked = swHeadDot.Checked; // Synchronize with GUI
+                }
+            }
+        }
+
+        private void sldrPlayerDist_onValueChanged(object sender, int newValue)
+        {
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbPlayerDist.Value = newValue;
+            }
+        }
+
+        private void sldrTeamDist_onValueChanged(object sender, int newValue)
+        {
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbTeamDist.Value = newValue;
+            }
+        }
+
+        private void sldrScavDist_onValueChanged(object sender, int newValue)
+        {
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbScavDist.Value = newValue;
+            }
+        }
+
+        private void sldrItemDist_onValueChanged(object sender, int newValue)
+        {
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbItemDist.Value = newValue;
+            }
+        }
+
+        private void sldrBoneDist_onValueChanged(object sender, int newValue)
+        {
+            Thread.Sleep(10);
+            // Update the GUI trackbar
+            if (guiInstance != null)
+            {
+                // Directly set the value without needing to adjust the highlighted control
+                guiInstance.tbBoneDist.Value = newValue;
+            }
+        }
+
+        #endregion
+
+        private void btnReloadBones_Click(object sender, EventArgs e)
+        {
+            Memory.Restart();
+        }
     }
 }
