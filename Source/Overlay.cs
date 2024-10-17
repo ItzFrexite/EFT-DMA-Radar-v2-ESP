@@ -24,13 +24,67 @@ using static eft_dma_radar.Watchlist;
 using System.Windows.Forms;
 using Offsets;
 using System.Globalization;
+using System.Collections.Generic;
 
 namespace eft_dma_radar;
 
 public partial class Overlay : Form
 {
+
+    #region Declaration
+
+    internal struct Margins
+    {
+        public int Left, Right, Top, Bottom;
+    }
+
+    private Margins marg;
+
+    private ReadOnlyDictionary<string, Player> AllPlayers => Memory.Players;
+
+    /// <summary>
+    ///     Radar has found Escape From Tarkov process and is ready.
+    /// </summary>
+    private bool Ready => Memory.Ready;
+
+    /// <summary>
+    ///     Radar has found Local Game World.
+    /// </summary>
+    private bool InGame => Memory.InGame;
+
+    /// <summary>
+    ///     LocalPlayer (who is running Radar) 'Player' object.
+    /// </summary>
+    private Player LocalPlayer => Memory.Players?.FirstOrDefault(x => x.Value.Type is PlayerType.LocalPlayer).Value;
+
+    [DllImport("dwmapi.dll")]
+    private static extern void DwmExtendFrameIntoClientArea(IntPtr hWnd, ref Margins pMargins);
+
+    private static WindowRenderTarget _device;
+    private HwndRenderTargetProperties _renderProperties;
+    private Factory _factory;
+
+    public static bool ingame = false;
+
+    // Fonts
+    private readonly FontFactory _fontFactory = new();
+
+    private IntPtr _handle;
+    private Thread _threadDx;
+
+    private readonly float[] _viewMatrix = new float[16];
+    private Vector3 _worldToScreenPos;
+    private CancellationTokenSource _tokenSource;
+    private CancellationToken token;
+
+    private bool _running;
+
+
+
     private frmMain _frmMain;
     private Config _config { get => Program.Config; }
+
+    private ExfilManager exfilManager;
 
     public static bool isMenuShown = false;
 
@@ -53,6 +107,194 @@ public partial class Overlay : Form
         get => Memory.Loot;
     }
 
+    private List<Exfil> Exfils
+    {
+        get => Memory.Exfils;
+    }
+
+    private List<Grenade> Grenades
+    {
+        get => Memory.Grenades;
+    }
+
+    private List<Tripwire> Tripwires
+    {
+        get => Memory.Tripwires;
+    }
+
+
+
+    public static class Colors
+    {
+        public static RawColor4 WHITE = new(Color.White.R, Color.White.G, Color.White.B, Color.White.A);
+        public static RawColor4 BLACK = new(Color.Black.R, Color.Black.G, Color.Black.B, Color.Black.A);
+        public static RawColor4 RED = new(Color.Red.R, Color.Red.G, Color.Red.B, Color.Red.A);
+        public static RawColor4 GREEN = new(Color.Green.R, Color.Green.G, Color.Green.B, Color.Green.A);
+        public static RawColor4 BLUE = new(Color.Blue.R, Color.Blue.G, Color.Blue.B, Color.Blue.A);
+        public static RawColor4 TRANSPARENCY = new(Color.Black.R, Color.Black.G, Color.Black.B, 255);
+
+        // Add more colors
+        public static RawColor4 YELLOW = new(255, 255, 0, 255); // Yellow
+        public static RawColor4 CYAN = new(0, 255, 255, 255); // Cyan
+        public static RawColor4 MAGENTA = new(255, 0, 255, 255); // Magenta
+        public static RawColor4 ORANGE = new(255, 165, 0, 255); // Orange
+        public static RawColor4 PURPLE = new(128, 0, 128, 255); // Purple
+        public static RawColor4 GRAY = new(128, 128, 128, 255); // Gray
+        public static RawColor4 LIGHT_GRAY = new(211, 211, 211, 255); // Light Gray
+
+        // Additional colors
+        public static RawColor4 LIGHT_BLUE = new(173, 216, 230, 255); // Light Blue
+        public static RawColor4 DARK_BLUE = new(0, 0, 139, 255); // Dark Blue
+        public static RawColor4 LIGHT_GREEN = new(144, 238, 144, 255); // Light Green
+        public static RawColor4 DARK_GREEN = new(0, 100, 0, 255); // Dark Green
+        public static RawColor4 BROWN = new(165, 42, 42, 255); // Brown
+        public static RawColor4 TEAL = new(0, 128, 128, 255); // Teal
+        public static RawColor4 OLIVE = new(128, 128, 0, 255); // Olive
+        public static RawColor4 MAROON = new(128, 0, 0, 255); // Maroon
+        public static RawColor4 NAVY = new(0, 0, 128, 255); // Navy
+        public static RawColor4 SILVER = new(192, 192, 192, 255); // Silver
+        public static RawColor4 GOLD = new(255, 215, 0, 255); // Gold
+
+        // Custom Colors using RGBA values
+        public static RawColor4 CUSTOM_COLOR_1 = new(255, 128, 0, 128); // Custom Purple
+        public static RawColor4 CUSTOM_COLOR_2 = new(255, 255, 165, 0); // Custom Orange
+        public static RawColor4 CUSTOM_COLOR_3 = new(255, 0, 255, 255); // Custom Aqua
+    }
+
+
+    public class Brushes
+    {
+        public static SolidColorBrush WHITE = new(_device, Colors.WHITE);
+        public static SolidColorBrush BLACK = new(_device, Colors.BLACK);
+        public static SolidColorBrush RED = new(_device, Colors.RED);
+        public static SolidColorBrush GREEN = new(_device, Colors.GREEN);
+        public static SolidColorBrush BLUE = new(_device, Colors.BLUE);
+        public static SolidColorBrush TRANSPARENCY = new(_device, Colors.TRANSPARENCY);
+
+        // New colors from the Colors class
+        public static SolidColorBrush YELLOW = new(_device, Colors.YELLOW);
+        public static SolidColorBrush CYAN = new(_device, Colors.CYAN);
+        public static SolidColorBrush MAGENTA = new(_device, Colors.MAGENTA);
+        public static SolidColorBrush ORANGE = new(_device, Colors.ORANGE);
+        public static SolidColorBrush PURPLE = new(_device, Colors.PURPLE);
+        public static SolidColorBrush GRAY = new(_device, Colors.GRAY);
+        public static SolidColorBrush LIGHT_GRAY = new(_device, Colors.LIGHT_GRAY);
+        public static SolidColorBrush LIGHT_BLUE = new(_device, Colors.LIGHT_BLUE);
+        public static SolidColorBrush DARK_BLUE = new(_device, Colors.DARK_BLUE);
+        public static SolidColorBrush LIGHT_GREEN = new(_device, Colors.LIGHT_GREEN);
+        public static SolidColorBrush DARK_GREEN = new(_device, Colors.DARK_GREEN);
+        public static SolidColorBrush BROWN = new(_device, Colors.BROWN);
+        public static SolidColorBrush TEAL = new(_device, Colors.TEAL);
+        public static SolidColorBrush OLIVE = new(_device, Colors.OLIVE);
+        public static SolidColorBrush MAROON = new(_device, Colors.MAROON);
+        public static SolidColorBrush NAVY = new(_device, Colors.NAVY);
+        public static SolidColorBrush SILVER = new(_device, Colors.SILVER);
+        public static SolidColorBrush GOLD = new(_device, Colors.GOLD);
+        public static SolidColorBrush CUSTOM_COLOR_1 = new(_device, Colors.CUSTOM_COLOR_1);
+        public static SolidColorBrush CUSTOM_COLOR_2 = new(_device, Colors.CUSTOM_COLOR_2);
+        public static SolidColorBrush CUSTOM_COLOR_3 = new(_device, Colors.CUSTOM_COLOR_3);
+    }
+
+
+    #endregion
+
+    #region Start
+
+    public Overlay()
+    {
+        _handle = Handle;
+        InitializeComponent();
+        ApplicationManager.CloseOverlayRequested += CloseOverlay;
+        Move += OverlayForm_Move;
+    }
+
+    private Factory factory = new();
+
+    protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+    {
+        if (keyData == Keys.F7)
+        {
+            Hide();
+            return true;
+        }
+
+        if (keyData == Keys.Insert)
+        {
+            if (frmMain.guiInstance.Visible)
+            {
+                frmMain.guiInstance.Hide();
+            }
+            else
+            {
+                frmMain.guiInstance.Show();
+                frmMain.guiInstance.TopMost = true;
+            }
+            return true;
+        }
+
+        return base.ProcessCmdKey(ref msg, keyData);
+    }
+
+    private void LoadOverlay(object sender, EventArgs e)
+    {
+        // Dispose of the existing overlay if it is already running
+        if (_threadDx != null && _threadDx.IsAlive)
+        {
+            _running = false; // Stop the thread
+            _tokenSource.Cancel(); // Signal cancellation
+
+            // Wait for the thread to finish
+            _threadDx.Join();
+
+            // Dispose of the DirectX device and factory
+            _device?.Dispose();
+            _factory?.Dispose();
+
+            _device = null;
+            _factory = null;
+        }
+
+        DoubleBuffered = true;
+        SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint |
+                 ControlStyles.Opaque | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
+
+        _factory = new Factory();
+        _renderProperties = new HwndRenderTargetProperties
+        {
+            Hwnd = Handle,
+            PixelSize = new Size2(Size.Width, Size.Height),
+            PresentOptions = PresentOptions.None
+        };
+
+        marg.Left = 0;
+        marg.Top = 0;
+        marg.Right = Width;
+        marg.Bottom = Height;
+
+        // Initialize DirectX
+        _device = new WindowRenderTarget(_factory,
+            new RenderTargetProperties(new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied)),
+            _renderProperties);
+
+        _tokenSource = new CancellationTokenSource();
+        token = _tokenSource.Token;
+
+        // Start the DirectX thread
+        _threadDx = new Thread(DirectXThread)
+        {
+            Priority = ThreadPriority.Highest,
+            IsBackground = true
+        };
+
+        _running = true;
+        TopMost = true;
+        _threadDx.Start(token);
+
+        CreateMenu();
+    }
+
+
+    #endregion
 
     private void CreateMenu()
     {
@@ -60,8 +302,8 @@ public partial class Overlay : Form
         frmMain.guiInstance.Owner = this;
     }
 
-private void DirectXThread(object sender)
-    {
+    private void DirectXThread(object sender)
+        {
         var isReady = Ready; // cache bool
         var inGame = InGame; // cache bool
         var localPlayer = LocalPlayer; // cache ref to current player
@@ -73,9 +315,22 @@ private void DirectXThread(object sender)
             {
                 if (frmMain.guiInstance.Visible)
                 {
-                    frmMain.guiInstance.TopMost = true;
-                    frmMain.guiInstance.BringToFront();
-                    frmMain.guiInstance.Focus();
+                    if (frmMain.guiInstance.InvokeRequired)
+                    {
+                        frmMain.guiInstance.Invoke((MethodInvoker)delegate
+                        {
+                            frmMain.guiInstance.TopMost = true;
+                            frmMain.guiInstance.BringToFront();
+                            frmMain.guiInstance.Focus();
+                        });
+                    }
+                    else
+                    {
+                        // This block runs if we're already on the UI thread
+                        frmMain.guiInstance.TopMost = true;
+                        frmMain.guiInstance.BringToFront();
+                        frmMain.guiInstance.Focus();
+                    }
                 }
                 _device.BeginDraw();
                 _device.Clear(SharpDX.Color.Transparent);
@@ -106,46 +361,47 @@ private void DirectXThread(object sender)
 
                     if (allPlayers is not null)
                     {
+                        var localplayer = this.LocalPlayer;
+                        var localPlayerPos = localPlayer.Position;
+
+                        #region Player ESP
                         foreach (var player in allPlayers)
-                        {
-                            var playerHeadPos = new Vector3(player.HeadPosition.X, player.HeadPosition.Z, player.HeadPosition.Y);
-                            var playerSpine3Pos = new Vector3(player.Spine3Position.X, player.Spine3Position.Z, player.Spine3Position.Y);
-                            var playerLPalmPos = new Vector3(player.LPalmPosition.X, player.LPalmPosition.Z, player.LPalmPosition.Y);
-                            var playerRPalmPos = new Vector3(player.RPalmPosition.X, player.RPalmPosition.Z, player.RPalmPosition.Y);
-                            var playerPelvisPos = new Vector3(player.PelvisPosition.X, player.PelvisPosition.Z, player.PelvisPosition.Y);
-                            var playerLFootPos = new Vector3(player.LFootPosition.X, player.LFootPosition.Z, player.LFootPosition.Y);
-                            var playerRFootPos = new Vector3(player.RFootPosition.X, player.RFootPosition.Z, player.RFootPosition.Y);
-                            var playerBasePos = new Vector3(player.Position.X, player.Position.Z, player.Position.Y);
-                            var playerLForearm1Pos = new Vector3(player.LForearm1Position.X, player.LForearm1Position.Z, player.LForearm1Position.Y);
-                            var playerRForearm1Pos = new Vector3(player.RForearm1Position.X, player.RForearm1Position.Z, player.RForearm1Position.Y);
-                            var playerLCalfPos = new Vector3(player.LCalfPosition.X, player.LCalfPosition.Z, player.LCalfPosition.Y);
-                            var playerRCalfPos = new Vector3(player.RCalfPosition.X, player.RCalfPosition.Z, player.RCalfPosition.Y);
-
-
-
-                            var localPlayerPos = localPlayer.Position;
-                            var dist = Vector3.Distance(localPlayerPos, player.Position);
-
-                            // Check if player is valid for ESP drawing
-                            if ((player.IsAlive && player.Type is not PlayerType.LocalPlayer && dist <= _config.PlayerDist && _config.ToggleESP)
-                                || (player.Type is not PlayerType.LocalPlayer && !player.IsHuman && player.IsAlive && dist <= _config.ScavDist && _config.ToggleESP)
-                                || (player.Type is not PlayerType.LocalPlayer && player.Type is PlayerType.Teammate && player.IsAlive && dist <= _config.TeamDist && _config.ToggleESP))
                             {
-                                List<Vector3> enemyPositions = new List<Vector3>
+                                var playerHeadPos = new Vector3(player.HeadPosition.X, player.HeadPosition.Z, player.HeadPosition.Y);
+                                var playerSpine3Pos = new Vector3(player.Spine3Position.X, player.Spine3Position.Z, player.Spine3Position.Y);
+                                var playerLPalmPos = new Vector3(player.LPalmPosition.X, player.LPalmPosition.Z, player.LPalmPosition.Y);
+                                var playerRPalmPos = new Vector3(player.RPalmPosition.X, player.RPalmPosition.Z, player.RPalmPosition.Y);
+                                var playerPelvisPos = new Vector3(player.PelvisPosition.X, player.PelvisPosition.Z, player.PelvisPosition.Y);
+                                var playerLFootPos = new Vector3(player.LFootPosition.X, player.LFootPosition.Z, player.LFootPosition.Y);
+                                var playerRFootPos = new Vector3(player.RFootPosition.X, player.RFootPosition.Z, player.RFootPosition.Y);
+                                var playerBasePos = new Vector3(player.Position.X, player.Position.Z, player.Position.Y);
+                                var playerLForearm1Pos = new Vector3(player.LForearm1Position.X, player.LForearm1Position.Z, player.LForearm1Position.Y);
+                                var playerRForearm1Pos = new Vector3(player.RForearm1Position.X, player.RForearm1Position.Z, player.RForearm1Position.Y);
+                                var playerLCalfPos = new Vector3(player.LCalfPosition.X, player.LCalfPosition.Z, player.LCalfPosition.Y);
+                                var playerRCalfPos = new Vector3(player.RCalfPosition.X, player.RCalfPosition.Z, player.RCalfPosition.Y);
+
+                                var dist = Vector3.Distance(localPlayerPos, player.Position);
+
+                                // Check if player is valid for ESP drawing
+                                if ((player.IsAlive && player.Type is not PlayerType.LocalPlayer && dist <= _config.PlayerDist && _config.ToggleESP)
+                                    || (player.Type is not PlayerType.LocalPlayer && !player.IsHuman && player.IsAlive && dist <= _config.ScavDist && _config.ToggleESP)
+                                    || (player.Type is not PlayerType.LocalPlayer && player.Type is PlayerType.Teammate && player.IsAlive && dist <= _config.TeamDist && _config.ToggleESP))
                                 {
-                                    playerBasePos, // Base position (foot)
-                                    playerHeadPos, // Head position
-                                    playerSpine3Pos, // Spine position
-                                    playerLPalmPos, // Left palm position
-                                    playerRPalmPos, // Right palm position
-                                    playerPelvisPos, // Pelvis position
-                                    playerLFootPos, // Left foot position
-                                    playerRFootPos,
-                                    playerLForearm1Pos,
-                                    playerRForearm1Pos,
-                                    playerLCalfPos,
-                                    playerLCalfPos
-                                };
+                                    List<Vector3> enemyPositions = new List<Vector3>
+                                    {
+                                        playerBasePos, // Base position (foot)
+                                        playerHeadPos, // Head position
+                                        playerSpine3Pos, // Spine position
+                                        playerLPalmPos, // Left palm position
+                                        playerRPalmPos, // Right palm position
+                                        playerPelvisPos, // Pelvis position
+                                        playerLFootPos, // Left foot position
+                                        playerRFootPos,
+                                        playerLForearm1Pos,
+                                        playerRForearm1Pos,
+                                        playerLCalfPos,
+                                        playerLCalfPos,
+                                    };
 
                                     List<Vector3> coords = new List<Vector3>();
                                     WorldToScreenCombined(player, enemyPositions, coords);
@@ -162,7 +418,6 @@ private void DirectXThread(object sender)
                                     Vector3 rForearm1Coords = coords[9];
                                     Vector3 lCalfCoords = coords[10];
                                     Vector3 rCalfCoords = coords[11];
-
 
                                     // Calculate the height of the bounding box
                                     float boxHeight = headCoords.Y - baseCoords.Y; // Height from foot to head
@@ -958,22 +1213,20 @@ private void DirectXThread(object sender)
                                             WriteText("Sniper Scav" + Environment.NewLine + Math.Round(dist, 0) + "m", baseCoords.X - (paddingWidth * 15), headCoords.Y - 5, Brushes.WHITE);
                                         }
                                         #endregion
-
                                     }
-                            }
+                                }
                         }
+                        #endregion
 
-                        // THIS LOOT FILTER IS USING AN OLD BUGGY METHOD OF SCALING. IT IS NOT 100% ACCURATE
-                        #region Item ESP
+                        #region Old Loot, Exfil and Grenade Method
+                        /*#region Item ESP
+                        
                         var loot = this.Loot; // cache ref
-                        var lootplayer = this.LocalPlayer;
                         if (loot is not null)
                         {
                             var filter = Loot.Filter; // Get ref to collection
                             if (filter is not null) foreach (var item in filter)
                                 {
-                                    var localPlayerPos = localPlayer.Position;
-
                                     var lootPos = new System.Numerics.Vector3(item.Position.X, item.Position.Z, item.Position.Y);
                                     var lootdist = System.Numerics.Vector3.Distance(localPlayerPos, item.Position);
 
@@ -986,7 +1239,7 @@ private void DirectXThread(object sender)
                                     if (_config.ToggleESP == true && _config.ItemESP == true)
                                     {
                                         // Loot ESP
-                                        WorldToScreenLootTest(lootplayer, lootPos, out var lootcoords);
+                                        WorldToScreenObjects(localplayer, lootPos, out var lootcoords);
                                         if (lootcoords.X > 0 || lootcoords.Y > 0 || lootcoords.Z > 0)
                                         {
                                             if (lootdist <= _config.ItemDist)
@@ -1000,11 +1253,235 @@ private void DirectXThread(object sender)
                         }
                         #endregion
 
+                        #region Exfil ESP
+                        var exfils = this.Exfils; // cache ref
+                        if (exfils is not null)
+                        {
+                            foreach (var exfil in exfils)
+                            {
+                                var exfilPos = new System.Numerics.Vector3(exfil.Position.X, exfil.Position.Z, exfil.Position.Y);
+                                var exfilDist = System.Numerics.Vector3.Distance(localPlayerPos, exfil.Position);
+
+
+                                if (_config.ToggleESP == true)
+                                {
+                                    WorldToScreenObjects(localplayer, exfilPos, out var exfilcoords);
+                                    if (exfilcoords.X > 0 || exfilcoords.Y > 0 || exfilcoords.Z > 0)
+                                    {
+                                        if (exfil.Status == ExfilStatus.Open)
+                                        {
+                                            WriteText(exfil.Name, exfilcoords.X + 5, exfilcoords.Y - 25, Brushes.LIGHT_GREEN);
+                                        }
+                                        if (exfil.Status == ExfilStatus.Pending)
+                                        {
+                                            WriteText(exfil.Name, exfilcoords.X + 5, exfilcoords.Y - 25, Brushes.ORANGE);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        #endregion
+
+                        #region Grenade ESP
+                        var grenades = this.Grenades; // cache ref
+                        if (grenades is not null)
+                        {
+                            foreach (var grenade in grenades)
+                            {
+                                var grenadePos = new System.Numerics.Vector3(grenade.Position.X, grenade.Position.Z, grenade.Position.Y);
+                                var grenadeDist = System.Numerics.Vector3.Distance(localPlayerPos, grenade.Position);
+
+
+                                if (_config.ToggleESP == true)
+                                {
+                                    WorldToScreenObjects(localplayer, grenadePos, out var grenadecoords);
+                                    if (grenadecoords.X > 0 || grenadecoords.Y > 0 || grenadecoords.Z > 0)
+                                    {
+                                        // Define minimum and maximum dot sizes
+                                        float minGrenadeDotSize = 0.15f; // Minimum size
+                                        float maxGrenadeDotSize = 15.0f; // Maximum size
+
+                                        // Determine a scaling factor based on the distance
+                                        float scalingFactor = Math.Clamp(1.0f - (grenadeDist / 100.0f), 0.0f, 1.0f); // Scale between 0 and 1
+
+                                        // Calculate the grenade dot size based on distance
+                                        float grenadeDotSize = minGrenadeDotSize + (scalingFactor * (maxGrenadeDotSize - minGrenadeDotSize));
+
+                                        // Draw the grenade dot (assuming grenadeCoords are the screen coordinates for the grenade)
+                                        _device.FillEllipse(new Ellipse(new RawVector2(grenadecoords.X - (grenadeDotSize / 2), grenadecoords.Y - (grenadeDotSize / 2)), grenadeDotSize, grenadeDotSize), Brushes.RED); // Grenade ellipse
+                                        WriteText("Grenade", grenadecoords.X + 5, grenadecoords.Y - 25, Brushes.WHITE);
+                                    }
+                                }
+                            }
+                        }
+                        
+                        #endregion*/
+                        #endregion
+
+                        #region Combined Loot, Exfil, Tripwire and Grenade ESP
+
+                        // Initialize lists for storing positions and screen coordinates
+                        List<Vector3> objectPositions = new List<Vector3>();
+                        List<Vector3> screenCoords = new List<Vector3>();
+
+                        objectPositions.Clear();
+
+                        #region Gather Loot ESP Positions
+                        // Gather Loot positions
+                        var loot = this.Loot;
+                        if (loot is not null)
+                        {
+                            var filter = Loot.Filter;
+                            if (filter is not null)
+                            {
+                                foreach (var item in filter)
+                                {
+                                    objectPositions.Add(new Vector3(item.Position.X, item.Position.Z, item.Position.Y));
+                                }
+                            }
+                        }
+                        #endregion
+
+                        #region Gather Exfil ESP Positions
+                        // Gather Exfil positions
+                        var exfils = this.Exfils;
+                        if (exfils is not null)
+                        {
+                            foreach (var exfil in exfils)
+                            {
+                                objectPositions.Add(new Vector3(exfil.Position.X, exfil.Position.Z, exfil.Position.Y));
+                            }
+                        }
+                        #endregion
+
+                        #region Gather Grenade ESP Positions
+                        // Gather Grenade positions
+                        var grenades = this.Grenades;
+                        if (grenades is not null)
+                        {
+                            foreach (var grenade in grenades)
+                            {
+                                objectPositions.Add(new Vector3(grenade.Position.X, grenade.Position.Z, grenade.Position.Y));
+                            }
+                        }
+                        #endregion
+
+                        #region Gather Tripwire ESP Positions
+                        // Gather Tripwire positions
+                        var tripwires = this.Tripwires;
+                        if (tripwires is not null)
+                        {
+                            foreach (var tripwire in tripwires)
+                            {
+                                // Add both positions to the objectPositions list
+                                objectPositions.Add(new Vector3(tripwire.FromPos.X, tripwire.FromPos.Z, tripwire.FromPos.Y));
+                                objectPositions.Add(new Vector3(tripwire.ToPos.X, tripwire.ToPos.Z, tripwire.ToPos.Y));
+                            }
+                        }
+                        #endregion
+
+                        // Call WorldToScreenCombined once for all objects
+                        WorldToScreenCombined(localplayer, objectPositions, screenCoords);
+
+                        // Track index for screen coordinates
+                        int screenIndex = 0;
+
+                        #region Loot ESP
+                        // THIS LOOT FILTER IS USING AN OLD BUGGY METHOD OF SCALING. IT IS NOT 100% ACCURATE
+                        // Process Loot ESP
+                        if (loot is not null && loot.Filter is not null)
+                        {
+                            foreach (var item in loot.Filter)
+                            {
+                                var lootDist = Vector3.Distance(localPlayerPos, item.Position);
+                                var lootCoords = screenCoords[screenIndex++]; // Use the current screen coordinate
+
+                                float distFact = 0.5f;
+                                float lootHeight = 500 / lootDist * distFact;
+                                float lootWidth = 300 / lootDist * distFact;
+
+                                if (lootCoords.X > 0 || lootCoords.Y > 0 || lootCoords.Z > 0)
+                                {
+                                    if (lootDist <= _config.ItemDist)
+                                    {
+                                        _device.DrawRectangle(new RawRectangleF(lootCoords.X - lootWidth, lootCoords.Y + (lootHeight / 4), lootCoords.X + lootWidth, lootCoords.Y - lootHeight), Brushes.WHITE);
+                                        WriteText(item.Name + Environment.NewLine + Math.Round(lootDist, 0) + "m", lootCoords.X + 5, lootCoords.Y - 25, Brushes.WHITE);
+                                    }
+                                }
+                            }
+                        }
+                        #endregion
+
+                        #region Exfil ESP
+                        // Process Exfil ESP
+                        if (exfils is not null)
+                        {
+                            foreach (var exfil in exfils)
+                            {
+                                var exfilCoords = screenCoords[screenIndex++]; // Use the current screen coordinate
+                                var exfilDist = Vector3.Distance(localPlayerPos, exfil.Position);
+
+                                if (exfilCoords.X > 0 || exfilCoords.Y > 0 || exfilCoords.Z > 0)
+                                {
+                                    WriteText(exfil.Name, exfilCoords.X + 5, exfilCoords.Y - 25, Brushes.TEAL);
+                                }
+                            }
+                        }
+                        #endregion
+
+                        #region Grenade ESP
+                        // Process Grenade ESP
+                        if (grenades is not null)
+                        {
+                            foreach (var grenade in grenades)
+                            {
+                                var grenadeCoords = screenCoords[screenIndex++]; // Use the current screen coordinate
+                                var grenadeDist = Vector3.Distance(localPlayerPos, grenade.Position);
+
+                                if (grenadeCoords.X > 0 || grenadeCoords.Y > 0 || grenadeCoords.Z > 0)
+                                {
+                                    float minGrenadeDotSize = 0.15f;
+                                    float maxGrenadeDotSize = 15.0f;
+                                    float scalingFactor = Math.Clamp(1.0f - (grenadeDist / 100.0f), 0.0f, 1.0f);
+                                    float grenadeDotSize = minGrenadeDotSize + (scalingFactor * (maxGrenadeDotSize - minGrenadeDotSize));
+
+                                    _device.FillEllipse(new Ellipse(new RawVector2(grenadeCoords.X - (grenadeDotSize / 2), grenadeCoords.Y - (grenadeDotSize / 2)), grenadeDotSize, grenadeDotSize), Brushes.RED);
+                                    WriteText("Grenade", grenadeCoords.X + 5, grenadeCoords.Y - 25, Brushes.WHITE);
+                                }
+                            }
+                        }
+                        #endregion
+
+                        #region Tripwire ESP
+                        // Process Tripwire ESP
+                        if (tripwires is not null)
+                        {
+                            foreach (var tripwire in tripwires)
+                            {
+                                // Get screen coordinates for both ends of the tripwire
+                                var fromCoords = screenCoords[screenIndex++]; // First position
+                                var toCoords = screenCoords[screenIndex++];   // Second position
+
+                                if (fromCoords.X > 0 && fromCoords.Y > 0 && toCoords.X > 0 && toCoords.Y > 0)
+                                {
+                                    // Draw a line between the two points
+                                    _device.DrawLine(new RawVector2(fromCoords.X, fromCoords.Y), new RawVector2(toCoords.X, toCoords.Y), Brushes.RED);
+
+                                    // Optionally, write text or additional details near the tripwire
+                                    WriteText("Tripwire", (fromCoords.X + toCoords.X) / 2, (fromCoords.Y + toCoords.Y) / 2 - 25, Brushes.WHITE);
+                                }
+                            }
+                        }
+                        #endregion
+
+                        #endregion
+
+                        #region Crosshair
                         // Crosshair
                         // Draw the horizontal line
                         _device.DrawLine(
-                            new RawVector2((Width /2) - _config.CrosshairLength, (Height / 2)),
-                            new RawVector2((Width /2) + _config.CrosshairLength, (Height / 2)),
+                            new RawVector2((Width / 2) - _config.CrosshairLength, (Height / 2)),
+                            new RawVector2((Width / 2) + _config.CrosshairLength, (Height / 2)),
                             Brushes.WHITE, 1.0f // Set the color and thickness
                         );
 
@@ -1014,6 +1491,8 @@ private void DirectXThread(object sender)
                             new RawVector2((Width / 2), (Height / 2) + _config.CrosshairLength),
                             Brushes.WHITE, 1.0f // Set the color and thickness
                         );
+
+                        #endregion
 
                         if (_config.ShowFOV)
                         {
@@ -1026,7 +1505,7 @@ private void DirectXThread(object sender)
 
                         if (LocalPlayer != null && LocalPlayer.ItemInHands.Item != null)
                         {
-                            WriteBottomRightText("Ammo: " + LocalPlayer.ItemInHands.Item.GearInfo.AmmoCount, Brushes.WHITE, 20, "Arial Unicode MS");
+                            WriteBottomRightText("Ammo: " + LocalPlayer.ItemInHands.Item.GearInfo.AmmoCount, Brushes.WHITE, 16, "Arial Unicode MS"); // Ammo Count
                         }
 
                         _device.Flush();
@@ -1055,230 +1534,7 @@ private void DirectXThread(object sender)
 
         Thread.Sleep(10);
     }
-    #region Declaration
 
-    internal struct Margins
-    {
-        public int Left, Right, Top, Bottom;
-    }
-
-    private Margins marg;
-
-    private ReadOnlyDictionary<string, Player> AllPlayers => Memory.Players;
-
-    /// <summary>
-    ///     Radar has found Escape From Tarkov process and is ready.
-    /// </summary>
-    private bool Ready => Memory.Ready;
-
-    /// <summary>
-    ///     Radar has found Local Game World.
-    /// </summary>
-    private bool InGame => Memory.InGame;
-
-    /// <summary>
-    ///     LocalPlayer (who is running Radar) 'Player' object.
-    /// </summary>
-    private Player LocalPlayer => Memory.Players?.FirstOrDefault(x => x.Value.Type is PlayerType.LocalPlayer).Value;
-
-    [DllImport("dwmapi.dll")]
-    private static extern void DwmExtendFrameIntoClientArea(IntPtr hWnd, ref Margins pMargins);
-
-    private static WindowRenderTarget _device;
-    private HwndRenderTargetProperties _renderProperties;
-    private Factory _factory;
-
-    public static bool ingame = false;
-
-    // Fonts
-    private readonly FontFactory _fontFactory = new();
-
-    private IntPtr _handle;
-    private Thread _threadDx;
-
-    private readonly float[] _viewMatrix = new float[16];
-    private Vector3 _worldToScreenPos;
-    private CancellationTokenSource _tokenSource;
-    private CancellationToken token;
-
-    public bool toggleESP = true;
-    public bool togglePMCESP = true;
-    public bool toggleTeamESP = true;
-    public bool toggleScavESP = true;
-
-    private bool _running;
-
-    public static class Colors
-    {
-        public static RawColor4 WHITE = new(Color.White.R, Color.White.G, Color.White.B, Color.White.A);
-        public static RawColor4 BLACK = new(Color.Black.R, Color.Black.G, Color.Black.B, Color.Black.A);
-        public static RawColor4 RED = new(Color.Red.R, Color.Red.G, Color.Red.B, Color.Red.A);
-        public static RawColor4 GREEN = new(Color.Green.R, Color.Green.G, Color.Green.B, Color.Green.A);
-        public static RawColor4 BLUE = new(Color.Blue.R, Color.Blue.G, Color.Blue.B, Color.Blue.A);
-        public static RawColor4 TRANSPARENCY = new(Color.Black.R, Color.Black.G, Color.Black.B, 255);
-
-        // Add more colors
-        public static RawColor4 YELLOW = new(255, 255, 0, 255); // Yellow
-        public static RawColor4 CYAN = new(0, 255, 255, 255); // Cyan
-        public static RawColor4 MAGENTA = new(255, 0, 255, 255); // Magenta
-        public static RawColor4 ORANGE = new(255, 165, 0, 255); // Orange
-        public static RawColor4 PURPLE = new(128, 0, 128, 255); // Purple
-        public static RawColor4 GRAY = new(128, 128, 128, 255); // Gray
-        public static RawColor4 LIGHT_GRAY = new(211, 211, 211, 255); // Light Gray
-
-        // Additional colors
-        public static RawColor4 LIGHT_BLUE = new(173, 216, 230, 255); // Light Blue
-        public static RawColor4 DARK_BLUE = new(0, 0, 139, 255); // Dark Blue
-        public static RawColor4 LIGHT_GREEN = new(144, 238, 144, 255); // Light Green
-        public static RawColor4 DARK_GREEN = new(0, 100, 0, 255); // Dark Green
-        public static RawColor4 BROWN = new(165, 42, 42, 255); // Brown
-        public static RawColor4 TEAL = new(0, 128, 128, 255); // Teal
-        public static RawColor4 OLIVE = new(128, 128, 0, 255); // Olive
-        public static RawColor4 MAROON = new(128, 0, 0, 255); // Maroon
-        public static RawColor4 NAVY = new(0, 0, 128, 255); // Navy
-        public static RawColor4 SILVER = new(192, 192, 192, 255); // Silver
-        public static RawColor4 GOLD = new(255, 215, 0, 255); // Gold
-
-        // Custom Colors using RGBA values
-        public static RawColor4 CUSTOM_COLOR_1 = new(255, 128, 0, 128); // Custom Purple
-        public static RawColor4 CUSTOM_COLOR_2 = new(255, 255, 165, 0); // Custom Orange
-        public static RawColor4 CUSTOM_COLOR_3 = new(255, 0, 255, 255); // Custom Aqua
-    }
-
-
-    public class Brushes
-    {
-        public static SolidColorBrush WHITE = new(_device, Colors.WHITE);
-        public static SolidColorBrush BLACK = new(_device, Colors.BLACK);
-        public static SolidColorBrush RED = new(_device, Colors.RED);
-        public static SolidColorBrush GREEN = new(_device, Colors.GREEN);
-        public static SolidColorBrush BLUE = new(_device, Colors.BLUE);
-        public static SolidColorBrush TRANSPARENCY = new(_device, Colors.TRANSPARENCY);
-
-        // New colors from the Colors class
-        public static SolidColorBrush YELLOW = new(_device, Colors.YELLOW);
-        public static SolidColorBrush CYAN = new(_device, Colors.CYAN);
-        public static SolidColorBrush MAGENTA = new(_device, Colors.MAGENTA);
-        public static SolidColorBrush ORANGE = new(_device, Colors.ORANGE);
-        public static SolidColorBrush PURPLE = new(_device, Colors.PURPLE);
-        public static SolidColorBrush GRAY = new(_device, Colors.GRAY);
-        public static SolidColorBrush LIGHT_GRAY = new(_device, Colors.LIGHT_GRAY);
-        public static SolidColorBrush LIGHT_BLUE = new(_device, Colors.LIGHT_BLUE);
-        public static SolidColorBrush DARK_BLUE = new(_device, Colors.DARK_BLUE);
-        public static SolidColorBrush LIGHT_GREEN = new(_device, Colors.LIGHT_GREEN);
-        public static SolidColorBrush DARK_GREEN = new(_device, Colors.DARK_GREEN);
-        public static SolidColorBrush BROWN = new(_device, Colors.BROWN);
-        public static SolidColorBrush TEAL = new(_device, Colors.TEAL);
-        public static SolidColorBrush OLIVE = new(_device, Colors.OLIVE);
-        public static SolidColorBrush MAROON = new(_device, Colors.MAROON);
-        public static SolidColorBrush NAVY = new(_device, Colors.NAVY);
-        public static SolidColorBrush SILVER = new(_device, Colors.SILVER);
-        public static SolidColorBrush GOLD = new(_device, Colors.GOLD);
-        public static SolidColorBrush CUSTOM_COLOR_1 = new(_device, Colors.CUSTOM_COLOR_1);
-        public static SolidColorBrush CUSTOM_COLOR_2 = new(_device, Colors.CUSTOM_COLOR_2);
-        public static SolidColorBrush CUSTOM_COLOR_3 = new(_device, Colors.CUSTOM_COLOR_3);
-    }
-
-
-    #endregion
-
-    #region Start
-
-    public Overlay()
-    {
-        _handle = Handle;
-        InitializeComponent();
-        ApplicationManager.CloseOverlayRequested += CloseOverlay;
-        Move += OverlayForm_Move;
-    }
-
-    private Factory factory = new();
-
-    protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
-    {
-        if (keyData == Keys.F7)
-        {
-            Hide();
-            return true;
-        }
-
-        if (keyData == Keys.Insert)
-        {
-            if (frmMain.guiInstance.Visible)
-            {
-                frmMain.guiInstance.Hide();
-            }
-            else
-            {
-                frmMain.guiInstance.Show();
-                frmMain.guiInstance.TopMost = true;
-            }
-            return true;
-        }
-
-        return base.ProcessCmdKey(ref msg, keyData);
-    }
-
-private void LoadOverlay(object sender, EventArgs e)
-{
-    // Dispose of the existing overlay if it is already running
-    if (_threadDx != null && _threadDx.IsAlive)
-    {
-        _running = false; // Stop the thread
-        _tokenSource.Cancel(); // Signal cancellation
-
-        // Wait for the thread to finish
-        _threadDx.Join();
-        
-        // Dispose of the DirectX device and factory
-        _device?.Dispose();
-        _factory?.Dispose();
-
-        _device = null;
-        _factory = null;
-    }
-
-    DoubleBuffered = true;
-    SetStyle(ControlStyles.OptimizedDoubleBuffer | ControlStyles.AllPaintingInWmPaint | ControlStyles.UserPaint |
-             ControlStyles.Opaque | ControlStyles.ResizeRedraw | ControlStyles.SupportsTransparentBackColor, true);
-
-    _factory = new Factory();
-    _renderProperties = new HwndRenderTargetProperties
-    {
-        Hwnd = Handle,
-        PixelSize = new Size2(Size.Width, Size.Height),
-        PresentOptions = PresentOptions.None
-    };
-
-    marg.Left = 0;
-    marg.Top = 0;
-    marg.Right = Width;
-    marg.Bottom = Height;
-
-    // Initialize DirectX
-    _device = new WindowRenderTarget(_factory,
-        new RenderTargetProperties(new PixelFormat(Format.B8G8R8A8_UNorm, AlphaMode.Premultiplied)),
-        _renderProperties);
-    
-    _tokenSource = new CancellationTokenSource();
-    token = _tokenSource.Token;
-    
-    // Start the DirectX thread
-    _threadDx = new Thread(DirectXThread)
-    {
-        Priority = ThreadPriority.Highest,
-        IsBackground = true
-    };
-    
-    _running = true;
-    TopMost = true;
-    _threadDx.Start(token);
-
-    CreateMenu();
-}
-
-
-    #endregion
 
     #region DrawFunctions
 
@@ -1491,7 +1747,7 @@ private void LoadOverlay(object sender, EventArgs e)
         return start + (end - start) * amount;
     }
 
-    private bool WorldToScreenLootTest(Player player, System.Numerics.Vector3 _Item, out System.Numerics.Vector3 _Screen)
+    private bool WorldToScreenObjects(Player player, System.Numerics.Vector3 _Item, out System.Numerics.Vector3 _Screen)
     {
         _Screen = new System.Numerics.Vector3(0, 0, 0);
 

@@ -2209,7 +2209,7 @@ namespace eft_dma_radar
                     _config.ExtendedReachDistance = distance;
                 }
 
-                lblReachDistance.Text = $"x{(distance)}"; // Update the label text
+                lblReachX.Text = $"x{(distance)}"; // Update the label text
 
 
                 frmMain.sldrExtendedReachDistance.Value = newValue; // Synchronize the GUI with the Main Form
