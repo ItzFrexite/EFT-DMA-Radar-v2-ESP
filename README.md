@@ -14,6 +14,9 @@ EFT DMA Radar is a radar tool designed for Escape from Tarkov that provides real
 - FTD3XX.dll - https://ftdichip.com/drivers/d3xx-drivers/
 - leechcore.dll, vmm.dll, dbghelp.dll, symsrv.dll and vcruntime140.dll - https://github.com/ufrisk/MemProcFS/releases
 
+## Contact
+For any inquiries or assistance, feel free to join the Discord server: https://discord.gg/jGSnTCekdx
+
 ## Note
 Ensure all necessary files are properly included and referenced for the application to function correctly.
 
@@ -32,21 +35,10 @@ This project builds upon the original work created by [Git link](https://github.
 ![image](https://github.com/xx0m/EFT-DMA-Radar-v2/assets/63579245/0043ef34-8048-4865-bd21-32ccaf38955d)
 ![image](https://github.com/xx0m/EFT-DMA-Radar-v2/assets/63579245/60a2a04b-d123-4913-bef1-87b40f0c56f5)
 
-# Overlay Changes
-
 ## Preview of Skeleton ESP
 ![IMG_5391](https://github.com/user-attachments/assets/02a6709b-aa43-446c-bf27-67556cf27e32)
-![IMG_5416](https://github.com/user-attachments/assets/9af9cde4-f919-48a6-b3f6-3ba6946cd174)
-![IMG_5415](https://github.com/user-attachments/assets/ed4736a5-ecce-42e0-a3c4-0fdda5984e8e)
-
+![Untitled](https://github.com/user-attachments/assets/78f65e0a-d480-4024-907f-b44d6930e319)
 
 ## Preview of Bounding Box and Head Dot ESP
 ![ezgif-1-4ce9f0b0ce](https://github.com/user-attachments/assets/97a835fe-8f6f-43ab-a025-6c1ad56ff448)
 ![ezgif-1-bc6d179fe6](https://github.com/user-attachments/assets/7e4e738d-b099-4eef-b28f-b3dbc5b089d4)
-
-## Preview of In Game GUI
-![IMG_5410](https://github.com/user-attachments/assets/04320e40-6b7f-454a-918f-aed2bbe698b8)
-![IMG_5411](https://github.com/user-attachments/assets/679c2a8e-bcc4-492b-8a59-22e6473763c2)
-![IMG_5412](https://github.com/user-attachments/assets/7374247c-e6c2-41ca-844d-0066de3f4a1c)
-
-
