@@ -12,12 +12,16 @@ using System.Runtime.CompilerServices;
 using System.Globalization;
 using Offsets;
 using static Vmmsharp.LeechCore;
+using System.Drawing.Text;
+using System.Security.Principal;
+using System.Runtime.InteropServices;
 
 namespace eft_dma_radar
 {
     public partial class frmMain : MaterialForm
     {
         private Overlay overlay;
+        public static bool showOverlay = false; // This is just for development purposes
         public static bool isOverlayShown;
 
         public static GUI guiInstance;
@@ -243,6 +247,8 @@ namespace eft_dma_radar
 
             this.InitializeComponent();
 
+            CheckIfFontExists("Tarkov-Regular", "Tarkov-Bold");
+
             var materialSkinManager = MaterialSkinManager.Instance;
             materialSkinManager.AddFormToManage(this);
             materialSkinManager.EnforceBackcolorOnAllComponents = true;
@@ -267,9 +273,12 @@ namespace eft_dma_radar
             this.InitializeInputCheckTimer();
             this.InitializeDoubleBuffering();
 
-            guiInstance = new GUI(config);
+            if (showOverlay)
+            {
+                guiInstance = new GUI(config);
 
-            //guiInstance.Show();
+                //guiInstance.Show();
+            }
         }
         #endregion
 
@@ -929,6 +938,7 @@ namespace eft_dma_radar
                 }
             }
         }
+
         #endregion
 
         #region General Event Handlers
@@ -6261,5 +6271,80 @@ namespace eft_dma_radar
         {
             Memory.Restart();
         }
+
+        #region Font
+
+        [DllImport("gdi32.dll", CharSet = CharSet.Auto)]
+        public static extern int AddFontResourceEx(string lpFileName, uint fl, IntPtr pdv);
+
+        private const uint FR_PRIVATE = 0x10;
+
+        private void CheckIfFontExists(string fontName, string font2Name)
+        {
+            using (InstalledFontCollection fontCollection = new InstalledFontCollection())
+            {
+                var fontFamilies = fontCollection.Families;
+                bool fontExists = fontFamilies.Any(f => f.Name.Equals(fontName, StringComparison.OrdinalIgnoreCase));
+                bool font2Exists = fontFamilies.Any(f => f.Name.Equals(font2Name, StringComparison.OrdinalIgnoreCase));
+
+
+                if (!fontExists && !font2Exists)
+                {
+                    DialogResult result = MessageBox.Show(
+                        $"The font '{fontName}' and '{font2Name}' (Tarkov font) is not installed!\n" +
+                        "If you wish to use this font please copy\n" +
+                        "Fonts/Tarkov-Regular.otf and Fonts/Tarkov-Bold.otf\n" +
+                        "from the application's directory to Fonts.",
+                        "Font Check",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+
+
+                    if (result == DialogResult.OK)
+                    {
+
+                    }
+                }
+                else if (!fontExists)
+                {
+                    DialogResult result = MessageBox.Show(
+                        $"The font '{fontName}' (Tarkov font) is not installed!\n" +
+                        "If you wish to use this font please copy\n" +
+                        "Fonts/Tarkov-Regular.otf\n" +
+                        "from the application's directory to Fonts.",
+                        "Font Check",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+
+
+                    if (result == DialogResult.OK)
+                    {
+
+                    }
+                }
+                else if (!font2Exists)
+                {
+                    DialogResult result = MessageBox.Show(
+                        $"The font '{font2Name}' (Tarkov font) is not installed!\n" +
+                        "If you wish to use this font please copy\n" +
+                        "Fonts/Tarkov-Bold.otf\n" +
+                        "from the application's directory to Fonts.",
+                        "Font Check",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning
+                    );
+
+
+                    if (result == DialogResult.OK)
+                    {
+
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 }

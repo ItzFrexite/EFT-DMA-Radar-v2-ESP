@@ -1,8 +1,10 @@
-﻿using System.Collections.Concurrent;
+﻿using Offsets;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.Intrinsics;
+using static eft_dma_radar.GearManager;
 
 namespace eft_dma_radar
 {
@@ -14,6 +16,7 @@ namespace eft_dma_radar
         private readonly Stopwatch _healthSw = new();
         private readonly Stopwatch _posSw = new();
         private readonly Stopwatch _weaponSw = new();
+        private readonly Stopwatch _boneSW = new();
 
         private readonly ConcurrentDictionary<string, Player> _players = new(StringComparer.OrdinalIgnoreCase);
 
@@ -21,6 +24,11 @@ namespace eft_dma_radar
 
         private int _localPlayerGroup = -100;
         private readonly Vector3 DEFAULT_POSITION = new Vector3(0, 0, -9999);
+
+        private ulong lastActiveWeapon;
+        private int lastActiveWeaponAmmo;
+        private List<GearSlot> cachedGearSlots;
+
 
         #region Bones
 
@@ -88,6 +96,7 @@ namespace eft_dma_radar
             this._healthSw.Start();
             this._posSw.Start();
             this._weaponSw.Start();
+            this._boneSW.Start();
         }
 
         #region Update List/Player Functions
@@ -117,14 +126,14 @@ namespace eft_dma_radar
 
                 for (int i = 0; i < count; i++)
                 {
-                    var p1 = round1.AddEntry<ulong>(i, 0, _listBase + Offsets.UnityListBase.Start + (uint)(i * 0x8));
+                    var p1 = round1.AddEntry<ulong>(i, 0, _listBase + UnityListBase.Start + (uint)(i * 0x8));
                     var p2 = round2.AddEntry<ulong>(i, 1, p1, null, 0x0);
                     var p3 = round3.AddEntry<ulong>(i, 2, p2, null, 0x0);
                     var p4 = round4.AddEntry<ulong>(i, 3, p3, null, 0x48);
                     var p5 = round5.AddEntry<string>(i, 4, p4, 64);
 
                     var p6 = round2.AddEntry<ulong>(i, 5, p1, null, Offsets.Player.Profile);
-                    var p7 = round3.AddEntry<ulong>(i, 6, p6, null, Offsets.Profile.Id);
+                    var p7 = round3.AddEntry<ulong>(i, 6, p6, null, Profile.Id);
                 }
 
                 scatterMap.Execute();
@@ -283,7 +292,6 @@ namespace eft_dma_radar
         {
             if (this.IsAtHideout)
                 return;
-
             try
             {
                 var players = this._players
@@ -296,15 +304,16 @@ namespace eft_dma_radar
 
                 if (this._localPlayerGroup == -100)
                 {
-                    var localPlayer = this._players.FirstOrDefault(x => x.Value.Type is PlayerType.LocalPlayer).Value;
+                    var localPlayer = this._players.FirstOrDefault(x => x.Value.Type is PlayerType.Scav).Value;
 
                     if (localPlayer is not null)
                         this._localPlayerGroup = localPlayer.GroupID;
                 }
 
-                var checkHealth = this._healthSw.ElapsedMilliseconds > 500;
-                var checkWeaponInfo = this._weaponSw.ElapsedMilliseconds > 2500;
+                var checkHealth = this._healthSw.ElapsedMilliseconds > 750;
+                var checkWeaponInfo = this._weaponSw.ElapsedMilliseconds > 1500; // 2500
                 var checkPos = this._posSw.ElapsedMilliseconds > 10000 && players.Any(x => x.IsHumanActive);
+                var checkBones = this._boneSW.ElapsedMilliseconds > 16; // Update this to change the speed of bone updates // 16
 
                 var scatterMap = new ScatterReadMap(players.Length);
                 var round1 = scatterMap.AddRound();
@@ -466,37 +475,57 @@ namespace eft_dma_radar
 
                         if (FPSCamera == 0)
                         {
-                            ViewMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShit.viewmatrix);
+                            ViewMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShift.ViewMatrix);
                             ViewMatrixPtr2 = System.Numerics.Matrix4x4.Transpose(Memory.ReadValue<System.Numerics.Matrix4x4>(ViewMatrixPtr + 0xDC));
                         }
 
                         if (posOK)
                         {
                             p3 = player.SetPosition(posBufs);
-                            //player.SetBone(); // Probably not the most efficient place but for now it works
-                            player.ReadAllBonePositions(player);
+                            
+                            player.ReadPlayerInfo(player);
                         }
 
                         if (checkHealth && !player.IsLocalPlayer)
                             if (scatterMap.Results[i][6].TryGetResult<int>(out var hp))
                                 player.SetHealth(hp);
 
+                        if (checkBones && player.Type != PlayerType.LocalPlayer)
+                        {
+                            //Stopwatch stopwatch = new Stopwatch();
+                            //stopwatch.Start();
+                            player.ReadAllBonePositions(player);
+                            //stopwatch.Stop();
+                            //Console.WriteLine($"Elapsed Time: {stopwatch.ElapsedMilliseconds} ms");
+                        }
+
                         if (checkWeaponInfo)
                         {
                             try
                             {
-                                var slotsRefreshed = player.GearManager.CheckGearSlots();
-
                                 scatterMap.Results[i][9].TryGetResult<ulong>(out var activeWeaponPtr);
 
-                                if (activeWeaponPtr != 0 && !slotsRefreshed.Any(x => x.Pointer == activeWeaponPtr))
-                                    player.GearManager.RefreshActiveWeaponAmmoInfo(activeWeaponPtr);
+                                _ = Task.Run(() =>
+                                {
+                                    var slotsRefreshed = cachedGearSlots ??= player.GearManager.CheckGearSlots();
 
-                                if (player.ItemInHands.Pointer != activeWeaponPtr)
-                                    player.SetItemInHands(activeWeaponPtr);
+                                    if (activeWeaponPtr != 0 && !slotsRefreshed.Any(x => x.Pointer == activeWeaponPtr))
+                                    {
+                                        player.GearManager.RefreshActiveWeaponAmmoInfo(activeWeaponPtr);
+                                    }
 
-                                player.CheckForRequiredGear();
-                            } catch { }
+                                    if (player.ItemInHands.Pointer != activeWeaponPtr)
+                                    {
+                                        player.SetItemInHands(activeWeaponPtr);
+                                    }
+
+                                    player.CheckForRequiredGear();
+                                });
+                            }
+                            catch (Exception ex)
+                            {
+                                Console.WriteLine($"checkWeaponInfo FAILED: {ex}");
+                            }
                         }
 
                         if (p2 && p3)
@@ -514,6 +543,9 @@ namespace eft_dma_radar
 
                 if (checkWeaponInfo)
                     this._weaponSw.Restart();
+
+                if (checkBones)
+                    this._boneSW.Restart();
             }
 
             catch (Exception ex)

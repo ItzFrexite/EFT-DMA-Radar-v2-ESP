@@ -1,4 +1,6 @@
-﻿using System.Diagnostics;
+﻿using Offsets;
+using System;
+using System.Diagnostics;
 using System.Numerics;
 using static Vmmsharp.LeechCore;
 
@@ -15,13 +17,16 @@ namespace eft_dma_radar
         private GearManager _gearManager;
         private Transform _transform;
         private Config _config = new Config();
+        private CameraManager CameraManager => Memory.CameraManager;
+        public float FOV;
 
         #region Bones
 
         public ulong boneMatrix;
         public Dictionary<PlayerBones, Transform> boneTransforms = new Dictionary<PlayerBones, Transform>();
-        private int frameCounter = 0; // Track frames to throttle updates
-        private int updateInterval = 6; // Update skeleton every x frames;
+
+        //private int frameCounter = 0; // Track frames to throttle updates
+        //private int updateInterval = 2; // Update skeleton every x frames; // 6 Originally (2 Makes radar perform worse but skeletons best)
         private Player LocalPlayer => Memory.Players?.FirstOrDefault(x => x.Value.Type is PlayerType.LocalPlayer).Value;
 
         private bool boneCache = false;
@@ -308,6 +313,7 @@ namespace eft_dma_radar
         #endregion
 
         #region Getters
+
         public List<PlayerBones> RequiredBones { get; } = new List<PlayerBones>
         {
             PlayerBones.HumanPelvis, PlayerBones.HumanHead, PlayerBones.HumanLForearm2,
@@ -1002,7 +1008,214 @@ namespace eft_dma_radar
         }
 
         #region Bones
+
+        #region Bones
+
+        private readonly List<PlayerBones> bones = new List<PlayerBones>
+        {
+            PlayerBones.HumanHead,
+            PlayerBones.HumanSpine3,
+            PlayerBones.HumanLPalm,
+            PlayerBones.HumanRPalm,
+            PlayerBones.HumanPelvis,
+            PlayerBones.HumanLFoot,
+            PlayerBones.HumanRFoot,
+            PlayerBones.HumanLForearm1,
+            PlayerBones.HumanRForearm1,
+            PlayerBones.HumanLCalf,
+            PlayerBones.HumanRCalf
+        };
+
+        private bool initialPositions = false;
+        private Vector3 lastPlayerPosition;
+        private const float positionThreshold = 0.04f; // Threshold distance for updating bone positions
+
+        private PlayerManager _playerManager { get => Memory.PlayerManager; }
+
+
         public void ReadAllBonePositions(Player player)
+        {
+            if (player.Name  == "???")
+            {
+                return;
+            }
+
+            var localPlayerPos = LocalPlayer.Position;
+            var dist = Vector3.Distance(localPlayerPos, player.Position);
+
+            // If the bones haven't been cached yet
+            if (!boneCache)
+            {
+                // Get the view matrix (same as in the overlay)
+                var viewMatrix = RegisteredPlayers.ViewMatrixPtr2;
+                var tempMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShift.ViewMatrix);
+                var tempCache = System.Numerics.Matrix4x4.Transpose(Memory.ReadValue<System.Numerics.Matrix4x4>(tempMatrixPtr + 0xDC));
+                temp = tempCache;
+            }
+
+            if (!boneCache)
+            {
+                var boneCountCache = bones.Count;
+                var boneScatterMapCache = new ScatterReadMap(boneCountCache);
+
+                var round1 = boneScatterMapCache.AddRound(); // First round: Read bone matrix base
+                var round2 = boneScatterMapCache.AddRound(); // Second round: Dereference bone matrix pointer
+
+                for (int i = 0; i < boneCountCache; i++)
+                {
+                    var p1 = round1.AddEntry<MemPointer>(i, 0, boneMatrix, null, 0x20 + ((uint)bones[i] * 0x8));
+                    var p2 = round2.AddEntry<MemPointer>(i, 1, p1, null, 0x10);
+                    Console.WriteLine("Caching Bone " + bones[i]);
+                }
+
+                boneScatterMapCache.Execute();
+                boneCounter = boneCountCache;
+                boneScatterMap = boneScatterMapCache;
+
+                for (int i = 0; i < boneCounter; i++)
+                {
+                    if (boneScatterMap.Results[i][1].TryGetResult<MemPointer>(out var p5Value))
+                    {
+                        this.BonePointers.Add(p5Value); // Add the bone pointer
+
+                        if (!boneTransforms.ContainsKey(bones[i]))
+                        {
+                            boneTransforms[bones[i]] = new Transform(p5Value, false); // Add the transform
+                            Console.WriteLine("Bone Transform created for bone " + bones[i] + " for player " + player.Name + " : " + player.Type + " : Side: " + player.PlayerSide);
+                        }
+                    }
+                }
+
+                boneCache = true;
+            }
+
+            for (int i = 0; i < boneCounter; i++)
+            {
+                //if (dist > _config.BoneLimit && bones[i] == PlayerBones.HumanHead && initialPositions)
+                if (bones[i] == PlayerBones.HumanHead && initialPositions)
+                {
+                    Vector3 bonePosition = boneTransforms[bones[i]].GetPosition();
+                    this.HeadPosition = bonePosition;
+                }
+
+                //else if (!initialPositions || (dist <= _config.BoneLimit && (Vector3.Distance(lastPlayerPosition, player.Position) > positionThreshold || _playerManager.IsADS)) || (dist < 100 && _config.BoneLimit >= 100))
+                if (!initialPositions || (dist <= _config.BoneLimit && Vector3.Distance(lastPlayerPosition, player.Position) > positionThreshold) || (dist < 75 && _config.BoneLimit >= 75))
+                {
+                    Vector3 bonePosition = boneTransforms[bones[i]].GetPosition();
+
+                    switch (bones[i])
+                    {
+                        //case PlayerBones.HumanHead:
+                            //this.HeadPosition = bonePosition;
+                            //break;
+                        case PlayerBones.HumanSpine3:
+                            this.Spine3Position = bonePosition;
+                            break;
+                        case PlayerBones.HumanLPalm:
+                            this.LPalmPosition = bonePosition;
+                            break;
+                        case PlayerBones.HumanRPalm:
+                            this.RPalmPosition = bonePosition;
+                            break;
+                        case PlayerBones.HumanPelvis:
+                            this.PelvisPosition = bonePosition;
+                            break;
+                        case PlayerBones.HumanLFoot:
+                            this.LFootPosition = bonePosition;
+                            break;
+                        case PlayerBones.HumanRFoot:
+                            this.RFootPosition = bonePosition;
+                            break;
+                        case PlayerBones.HumanLForearm1:
+                            this.LForearm1Position = bonePosition;
+                            break;
+                        case PlayerBones.HumanRForearm1:
+                            this.RForearm1Position = bonePosition;
+                            break;
+                        case PlayerBones.HumanLCalf:
+                            this.LCalfPosition = bonePosition;
+                            break;
+                        case PlayerBones.HumanRCalf:
+                            this.RCalfPosition = bonePosition;
+                            break;
+                    }
+                }
+            }
+            /*
+            // Check distance and update bone positions based on thresholds
+            for (int i = 0; i < boneCounter; i++)
+            {
+                if (boneScatterMap.Results[i][1].TryGetResult<MemPointer>(out var p5Value))
+                {
+                    this.BonePointers.Add(p5Value); // Add the bone pointer
+
+                    Console.WriteLine($"Player: {player.Name} : {p5Value}");
+
+                    if (!boneTransforms.ContainsKey(bones[i]))
+                    {
+                        boneTransforms[bones[i]] = new Transform(p5Value, false); // Add the transform
+                        Console.WriteLine("Bone Transform created for bone " + bones[i] + " for player " + player.Name);
+                    }
+
+                    // Update only head bone position if outside bone limit and initial positions already set
+                    if (dist > _config.BoneLimit && bones[i] == PlayerBones.HumanHead && initialPositions)
+                    {
+                        Vector3 bonePosition = boneTransforms[bones[i]].GetPosition();
+                        this.HeadPosition = bonePosition;
+                    }
+                    // Otherwise, update all positions within limits, using position threshold
+                    else if (!initialPositions || (dist <= _config.BoneLimit && (Vector3.Distance(lastPlayerPosition, player.Position) > positionThreshold || _playerManager.IsADS)) || (dist < 100 && _config.BoneLimit >= 100))
+                    {
+                        Vector3 bonePosition = boneTransforms[bones[i]].GetPosition();
+
+                        switch (bones[i])
+                        {
+                            case PlayerBones.HumanHead:
+                                this.HeadPosition = bonePosition;
+                                break;
+                            case PlayerBones.HumanSpine3:
+                                this.Spine3Position = bonePosition;
+                                break;
+                            case PlayerBones.HumanLPalm:
+                                this.LPalmPosition = bonePosition;
+                                break;
+                            case PlayerBones.HumanRPalm:
+                                this.RPalmPosition = bonePosition;
+                                break;
+                            case PlayerBones.HumanPelvis:
+                                this.PelvisPosition = bonePosition;
+                                break;
+                            case PlayerBones.HumanLFoot:
+                                this.LFootPosition = bonePosition;
+                                break;
+                            case PlayerBones.HumanRFoot:
+                                this.RFootPosition = bonePosition;
+                                break;
+                            case PlayerBones.HumanLForearm1:
+                                this.LForearm1Position = bonePosition;
+                                break;
+                            case PlayerBones.HumanRForearm1:
+                                this.RForearm1Position = bonePosition;
+                                break;
+                            case PlayerBones.HumanLCalf:
+                                this.LCalfPosition = bonePosition;
+                                break;
+                            case PlayerBones.HumanRCalf:
+                                this.RCalfPosition = bonePosition;
+                                break;
+                        }
+                    }
+                }
+            }*/
+
+            // Set initial positions and last position once initial positions are established
+            initialPositions = true;
+            lastPlayerPosition = player.Position;
+        }
+
+        #endregion
+
+        /*public void ReadAllBonePositions(Player player)
         {
             var localPlayerPos = LocalPlayer.Position;
             var dist = Vector3.Distance(localPlayerPos, player.Position);
@@ -1011,7 +1224,7 @@ namespace eft_dma_radar
             {
                 // Get the view matrix (same as in the overlay)
                 var viewMatrix = RegisteredPlayers.ViewMatrixPtr2;
-                var tempMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShit.viewmatrix);
+                var tempMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShift.ViewMatrix);
                 var tempCache = System.Numerics.Matrix4x4.Transpose(Memory.ReadValue<System.Numerics.Matrix4x4>(tempMatrixPtr + 0xDC));
                 temp = tempCache;
             }
@@ -1022,19 +1235,19 @@ namespace eft_dma_radar
             float fov = 75f;
 
             List<PlayerBones> bones = new List<PlayerBones>
-    {
-        PlayerBones.HumanHead,
-        PlayerBones.HumanSpine3,
-        PlayerBones.HumanLPalm,
-        PlayerBones.HumanRPalm,
-        PlayerBones.HumanPelvis,
-        PlayerBones.HumanLFoot,
-        PlayerBones.HumanRFoot,
-        PlayerBones.HumanLForearm1,
-        PlayerBones.HumanRForearm1,
-        PlayerBones.HumanLCalf,
-        PlayerBones.HumanRCalf
-    };
+            {
+                PlayerBones.HumanHead,
+                PlayerBones.HumanSpine3,
+                PlayerBones.HumanLPalm,
+                PlayerBones.HumanRPalm,
+                PlayerBones.HumanPelvis,
+                PlayerBones.HumanLFoot,
+                PlayerBones.HumanRFoot,
+                PlayerBones.HumanLForearm1,
+                PlayerBones.HumanRForearm1,
+                PlayerBones.HumanLCalf,
+                PlayerBones.HumanRCalf
+            };
 
             if (boneCache is false)
             {
@@ -1057,8 +1270,11 @@ namespace eft_dma_radar
                 boneCache = true;
             }
 
-            if (frameCounter++ % updateInterval == 0)
-            {
+            //bool isAiming = Memory.ReadValue<bool>(PlayerManager._playerRroceduralWeaponAnimation + Offsets.ProceduralWeaponAnimation.IsAiming);
+            //Console.WriteLine("Is Aiming: " + isAiming);
+
+            //if (frameCounter++ % updateInterval == 0)
+            //{
                 for (int i = 0; i < boneCounter; i++)
                 {
                     if (boneScatterMap.Results[i][1].TryGetResult<MemPointer>(out var p5Value))
@@ -1120,11 +1336,28 @@ namespace eft_dma_radar
                         }
                     }
                 }
+            //}
+
+        }*/
+
+        #endregion
+
+        private bool hasAddress = false;
+
+        private PlayerManager playerManager
+        {
+            get => Memory.PlayerManager;
+        }
+        public void ReadPlayerInfo(Player player)
+        {
+            if (player.Type is PlayerType.LocalPlayer)
+            {
+                FOV = Memory.ReadValue<float>(CameraManager._staticCameraPtr + Offsets.Camera.FOV);
+
+                hasAddress = true;
             }
         }
 
-        #endregion
-
-        #endregion
+            #endregion
     }
 }

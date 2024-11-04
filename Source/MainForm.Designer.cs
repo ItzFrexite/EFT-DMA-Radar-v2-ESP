@@ -4249,7 +4249,7 @@
             tabRadar.ImageKey = "radar.png";
             tabRadar.Location = new Point(4, 39);
             tabRadar.Name = "tabRadar";
-            tabRadar.Padding = new Padding(3);
+            tabRadar.Padding = new Padding(3, 3, 3, 3);
             tabRadar.Size = new Size(1392, 703);
             tabRadar.TabIndex = 0;
             tabRadar.Text = "Radar";
@@ -4264,10 +4264,10 @@
             mcRadarLootItemViewer.Depth = 0;
             mcRadarLootItemViewer.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcRadarLootItemViewer.Location = new Point(5, 493);
-            mcRadarLootItemViewer.Margin = new Padding(14);
+            mcRadarLootItemViewer.Margin = new Padding(14, 14, 14, 14);
             mcRadarLootItemViewer.MouseState = MaterialSkin.MouseState.HOVER;
             mcRadarLootItemViewer.Name = "mcRadarLootItemViewer";
-            mcRadarLootItemViewer.Padding = new Padding(14);
+            mcRadarLootItemViewer.Padding = new Padding(14, 14, 14, 14);
             mcRadarLootItemViewer.Size = new Size(474, 208);
             mcRadarLootItemViewer.TabIndex = 50;
             // 
@@ -4324,10 +4324,10 @@
             mcRadarEnemyStats.Depth = 0;
             mcRadarEnemyStats.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcRadarEnemyStats.Location = new Point(1187, 623);
-            mcRadarEnemyStats.Margin = new Padding(14);
+            mcRadarEnemyStats.Margin = new Padding(14, 14, 14, 14);
             mcRadarEnemyStats.MouseState = MaterialSkin.MouseState.HOVER;
             mcRadarEnemyStats.Name = "mcRadarEnemyStats";
-            mcRadarEnemyStats.Padding = new Padding(14);
+            mcRadarEnemyStats.Padding = new Padding(14, 14, 14, 14);
             mcRadarEnemyStats.Size = new Size(98, 76);
             mcRadarEnemyStats.TabIndex = 49;
             mcRadarEnemyStats.Visible = false;
@@ -4479,10 +4479,10 @@
             mcRadarStats.Depth = 0;
             mcRadarStats.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcRadarStats.Location = new Point(1286, 623);
-            mcRadarStats.Margin = new Padding(14);
+            mcRadarStats.Margin = new Padding(14, 14, 14, 14);
             mcRadarStats.MouseState = MaterialSkin.MouseState.HOVER;
             mcRadarStats.Name = "mcRadarStats";
-            mcRadarStats.Padding = new Padding(14);
+            mcRadarStats.Padding = new Padding(14, 14, 14, 14);
             mcRadarStats.Size = new Size(102, 76);
             mcRadarStats.TabIndex = 36;
             mcRadarStats.Visible = false;
@@ -4626,10 +4626,10 @@
             mcRadarSettings.Depth = 0;
             mcRadarSettings.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcRadarSettings.Location = new Point(1222, 4);
-            mcRadarSettings.Margin = new Padding(14);
+            mcRadarSettings.Margin = new Padding(14, 14, 14, 14);
             mcRadarSettings.MouseState = MaterialSkin.MouseState.HOVER;
             mcRadarSettings.Name = "mcRadarSettings";
-            mcRadarSettings.Padding = new Padding(14);
+            mcRadarSettings.Padding = new Padding(14, 14, 14, 14);
             mcRadarSettings.Size = new Size(166, 46);
             mcRadarSettings.TabIndex = 48;
             // 
@@ -4644,10 +4644,10 @@
             mcRadarMapSetup.Depth = 0;
             mcRadarMapSetup.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcRadarMapSetup.Location = new Point(5, 5);
-            mcRadarMapSetup.Margin = new Padding(14);
+            mcRadarMapSetup.Margin = new Padding(14, 14, 14, 14);
             mcRadarMapSetup.MouseState = MaterialSkin.MouseState.HOVER;
             mcRadarMapSetup.Name = "mcRadarMapSetup";
-            mcRadarMapSetup.Padding = new Padding(14);
+            mcRadarMapSetup.Padding = new Padding(14, 14, 14, 14);
             mcRadarMapSetup.Size = new Size(444, 95);
             mcRadarMapSetup.TabIndex = 18;
             mcRadarMapSetup.Visible = false;
@@ -4775,10 +4775,10 @@
             mcSettingsGeneralPlayerInformation.Depth = 0;
             mcSettingsGeneralPlayerInformation.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsGeneralPlayerInformation.Location = new Point(663, 14);
-            mcSettingsGeneralPlayerInformation.Margin = new Padding(14);
+            mcSettingsGeneralPlayerInformation.Margin = new Padding(14, 14, 14, 14);
             mcSettingsGeneralPlayerInformation.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsGeneralPlayerInformation.Name = "mcSettingsGeneralPlayerInformation";
-            mcSettingsGeneralPlayerInformation.Padding = new Padding(14);
+            mcSettingsGeneralPlayerInformation.Padding = new Padding(14, 14, 14, 14);
             mcSettingsGeneralPlayerInformation.Size = new Size(661, 374);
             mcSettingsGeneralPlayerInformation.TabIndex = 32;
             // 
@@ -4812,10 +4812,10 @@
             mcSettingsGeneralUI.Depth = 0;
             mcSettingsGeneralUI.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsGeneralUI.Location = new Point(14, 165);
-            mcSettingsGeneralUI.Margin = new Padding(14);
+            mcSettingsGeneralUI.Margin = new Padding(14, 14, 14, 14);
             mcSettingsGeneralUI.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsGeneralUI.Name = "mcSettingsGeneralUI";
-            mcSettingsGeneralUI.Padding = new Padding(14);
+            mcSettingsGeneralUI.Padding = new Padding(14, 14, 14, 14);
             mcSettingsGeneralUI.Size = new Size(633, 170);
             mcSettingsGeneralUI.TabIndex = 31;
             // 
@@ -4867,10 +4867,10 @@
             mcSettingsGeneralRadar.Depth = 0;
             mcSettingsGeneralRadar.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsGeneralRadar.Location = new Point(15, 14);
-            mcSettingsGeneralRadar.Margin = new Padding(14);
+            mcSettingsGeneralRadar.Margin = new Padding(14, 14, 14, 14);
             mcSettingsGeneralRadar.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsGeneralRadar.Name = "mcSettingsGeneralRadar";
-            mcSettingsGeneralRadar.Padding = new Padding(14);
+            mcSettingsGeneralRadar.Padding = new Padding(14, 14, 14, 14);
             mcSettingsGeneralRadar.Size = new Size(633, 135);
             mcSettingsGeneralRadar.TabIndex = 30;
             // 
@@ -4894,7 +4894,7 @@
             tabSettingsHotkeys.Controls.Add(mcSettingsHotkeys);
             tabSettingsHotkeys.Location = new Point(4, 24);
             tabSettingsHotkeys.Name = "tabSettingsHotkeys";
-            tabSettingsHotkeys.Padding = new Padding(3);
+            tabSettingsHotkeys.Padding = new Padding(3, 3, 3, 3);
             tabSettingsHotkeys.Size = new Size(1384, 640);
             tabSettingsHotkeys.TabIndex = 5;
             tabSettingsHotkeys.Text = "Hotkeys";
@@ -4914,10 +4914,10 @@
             mcSettingsHotkeys.Depth = 0;
             mcSettingsHotkeys.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsHotkeys.Location = new Point(15, 14);
-            mcSettingsHotkeys.Margin = new Padding(14);
+            mcSettingsHotkeys.Margin = new Padding(14, 14, 14, 14);
             mcSettingsHotkeys.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsHotkeys.Name = "mcSettingsHotkeys";
-            mcSettingsHotkeys.Padding = new Padding(14);
+            mcSettingsHotkeys.Padding = new Padding(14, 14, 14, 14);
             mcSettingsHotkeys.Size = new Size(647, 415);
             mcSettingsHotkeys.TabIndex = 43;
             // 
@@ -4982,7 +4982,7 @@
             tabSettingsMemoryWriting.Controls.Add(mcSettingsMemoryWritingGear);
             tabSettingsMemoryWriting.Location = new Point(4, 24);
             tabSettingsMemoryWriting.Name = "tabSettingsMemoryWriting";
-            tabSettingsMemoryWriting.Padding = new Padding(3);
+            tabSettingsMemoryWriting.Padding = new Padding(3, 3, 3, 3);
             tabSettingsMemoryWriting.Size = new Size(1384, 640);
             tabSettingsMemoryWriting.TabIndex = 1;
             tabSettingsMemoryWriting.Text = "Memory Writing";
@@ -5004,10 +5004,10 @@
             mcSettingsMemoryWritingChams.Depth = 0;
             mcSettingsMemoryWritingChams.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsMemoryWritingChams.Location = new Point(565, 393);
-            mcSettingsMemoryWritingChams.Margin = new Padding(14);
+            mcSettingsMemoryWritingChams.Margin = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingChams.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsMemoryWritingChams.Name = "mcSettingsMemoryWritingChams";
-            mcSettingsMemoryWritingChams.Padding = new Padding(14);
+            mcSettingsMemoryWritingChams.Padding = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingChams.Size = new Size(530, 170);
             mcSettingsMemoryWritingChams.TabIndex = 43;
             // 
@@ -5052,10 +5052,10 @@
             mcSettingsMemoryWritingSkillBuffs.Depth = 0;
             mcSettingsMemoryWritingSkillBuffs.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsMemoryWritingSkillBuffs.Location = new Point(565, 56);
-            mcSettingsMemoryWritingSkillBuffs.Margin = new Padding(14);
+            mcSettingsMemoryWritingSkillBuffs.Margin = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingSkillBuffs.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsMemoryWritingSkillBuffs.Name = "mcSettingsMemoryWritingSkillBuffs";
-            mcSettingsMemoryWritingSkillBuffs.Padding = new Padding(14);
+            mcSettingsMemoryWritingSkillBuffs.Padding = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingSkillBuffs.Size = new Size(530, 325);
             mcSettingsMemoryWritingSkillBuffs.TabIndex = 42;
             // 
@@ -5086,10 +5086,10 @@
             mcSettingsMemoryWritingThermal.Depth = 0;
             mcSettingsMemoryWritingThermal.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsMemoryWritingThermal.Location = new Point(14, 545);
-            mcSettingsMemoryWritingThermal.Margin = new Padding(14);
+            mcSettingsMemoryWritingThermal.Margin = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingThermal.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsMemoryWritingThermal.Name = "mcSettingsMemoryWritingThermal";
-            mcSettingsMemoryWritingThermal.Padding = new Padding(14);
+            mcSettingsMemoryWritingThermal.Padding = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingThermal.Size = new Size(535, 166);
             mcSettingsMemoryWritingThermal.TabIndex = 41;
             // 
@@ -5131,10 +5131,10 @@
             mcSettingsMemoryWritingGlobal.Depth = 0;
             mcSettingsMemoryWritingGlobal.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsMemoryWritingGlobal.Location = new Point(15, 56);
-            mcSettingsMemoryWritingGlobal.Margin = new Padding(14);
+            mcSettingsMemoryWritingGlobal.Margin = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingGlobal.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsMemoryWritingGlobal.Name = "mcSettingsMemoryWritingGlobal";
-            mcSettingsMemoryWritingGlobal.Padding = new Padding(14);
+            mcSettingsMemoryWritingGlobal.Padding = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingGlobal.Size = new Size(535, 288);
             mcSettingsMemoryWritingGlobal.TabIndex = 38;
             // 
@@ -5205,10 +5205,10 @@
             mcSettingsMemoryWritingGear.Depth = 0;
             mcSettingsMemoryWritingGear.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsMemoryWritingGear.Location = new Point(14, 360);
-            mcSettingsMemoryWritingGear.Margin = new Padding(14);
+            mcSettingsMemoryWritingGear.Margin = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingGear.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsMemoryWritingGear.Name = "mcSettingsMemoryWritingGear";
-            mcSettingsMemoryWritingGear.Padding = new Padding(14);
+            mcSettingsMemoryWritingGear.Padding = new Padding(14, 14, 14, 14);
             mcSettingsMemoryWritingGear.Size = new Size(535, 170);
             mcSettingsMemoryWritingGear.TabIndex = 39;
             // 
@@ -5251,10 +5251,10 @@
             mcSettingsLootContainers.Depth = 0;
             mcSettingsLootContainers.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsLootContainers.Location = new Point(646, 14);
-            mcSettingsLootContainers.Margin = new Padding(14);
+            mcSettingsLootContainers.Margin = new Padding(14, 14, 14, 14);
             mcSettingsLootContainers.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsLootContainers.Name = "mcSettingsLootContainers";
-            mcSettingsLootContainers.Padding = new Padding(14);
+            mcSettingsLootContainers.Padding = new Padding(14, 14, 14, 14);
             mcSettingsLootContainers.Size = new Size(410, 532);
             mcSettingsLootContainers.TabIndex = 39;
             // 
@@ -5297,10 +5297,10 @@
             mcSettingsLootPing.Depth = 0;
             mcSettingsLootPing.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsLootPing.Location = new Point(15, 418);
-            mcSettingsLootPing.Margin = new Padding(14);
+            mcSettingsLootPing.Margin = new Padding(14, 14, 14, 14);
             mcSettingsLootPing.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsLootPing.Name = "mcSettingsLootPing";
-            mcSettingsLootPing.Padding = new Padding(14);
+            mcSettingsLootPing.Padding = new Padding(14, 14, 14, 14);
             mcSettingsLootPing.Size = new Size(615, 128);
             mcSettingsLootPing.TabIndex = 38;
             // 
@@ -5330,10 +5330,10 @@
             mcSettingsLootMinRubleValue.Depth = 0;
             mcSettingsLootMinRubleValue.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsLootMinRubleValue.Location = new Point(15, 274);
-            mcSettingsLootMinRubleValue.Margin = new Padding(14);
+            mcSettingsLootMinRubleValue.Margin = new Padding(14, 14, 14, 14);
             mcSettingsLootMinRubleValue.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsLootMinRubleValue.Name = "mcSettingsLootMinRubleValue";
-            mcSettingsLootMinRubleValue.Padding = new Padding(14);
+            mcSettingsLootMinRubleValue.Padding = new Padding(14, 14, 14, 14);
             mcSettingsLootMinRubleValue.Size = new Size(615, 128);
             mcSettingsLootMinRubleValue.TabIndex = 37;
             // 
@@ -5377,10 +5377,10 @@
             mcSettingsLootGeneral.Depth = 0;
             mcSettingsLootGeneral.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsLootGeneral.Location = new Point(15, 14);
-            mcSettingsLootGeneral.Margin = new Padding(14);
+            mcSettingsLootGeneral.Margin = new Padding(14, 14, 14, 14);
             mcSettingsLootGeneral.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsLootGeneral.Name = "mcSettingsLootGeneral";
-            mcSettingsLootGeneral.Padding = new Padding(14);
+            mcSettingsLootGeneral.Padding = new Padding(14, 14, 14, 14);
             mcSettingsLootGeneral.Size = new Size(615, 244);
             mcSettingsLootGeneral.TabIndex = 36;
             // 
@@ -5430,7 +5430,7 @@
             lstFactionEntries.MultiSelect = false;
             lstFactionEntries.Name = "lstFactionEntries";
             lstFactionEntries.OwnerDraw = true;
-            lstFactionEntries.Size = new Size(250, 623);
+            lstFactionEntries.Size = new Size(250, 619);
             lstFactionEntries.TabIndex = 44;
             lstFactionEntries.UseCompatibleStateImageBehavior = false;
             lstFactionEntries.View = View.Details;
@@ -5450,10 +5450,10 @@
             mcSettingsAIFactionsEntryManagement.Depth = 0;
             mcSettingsAIFactionsEntryManagement.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsAIFactionsEntryManagement.Location = new Point(280, 14);
-            mcSettingsAIFactionsEntryManagement.Margin = new Padding(14);
+            mcSettingsAIFactionsEntryManagement.Margin = new Padding(14, 14, 14, 14);
             mcSettingsAIFactionsEntryManagement.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsAIFactionsEntryManagement.Name = "mcSettingsAIFactionsEntryManagement";
-            mcSettingsAIFactionsEntryManagement.Padding = new Padding(14);
+            mcSettingsAIFactionsEntryManagement.Padding = new Padding(14, 14, 14, 14);
             mcSettingsAIFactionsEntryManagement.Size = new Size(477, 97);
             mcSettingsAIFactionsEntryManagement.TabIndex = 43;
             // 
@@ -5485,10 +5485,10 @@
             mcSettingsAIFactionsFactions.Depth = 0;
             mcSettingsAIFactionsFactions.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsAIFactionsFactions.Location = new Point(280, 127);
-            mcSettingsAIFactionsFactions.Margin = new Padding(14);
+            mcSettingsAIFactionsFactions.Margin = new Padding(14, 14, 14, 14);
             mcSettingsAIFactionsFactions.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsAIFactionsFactions.Name = "mcSettingsAIFactionsFactions";
-            mcSettingsAIFactionsFactions.Padding = new Padding(14);
+            mcSettingsAIFactionsFactions.Padding = new Padding(14, 14, 14, 14);
             mcSettingsAIFactionsFactions.Size = new Size(477, 415);
             mcSettingsAIFactionsFactions.TabIndex = 42;
             // 
@@ -5562,10 +5562,10 @@
             mcSettingsColorsGameWorld.Depth = 0;
             mcSettingsColorsGameWorld.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsColorsGameWorld.Location = new Point(819, 14);
-            mcSettingsColorsGameWorld.Margin = new Padding(14);
+            mcSettingsColorsGameWorld.Margin = new Padding(14, 14, 14, 14);
             mcSettingsColorsGameWorld.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsColorsGameWorld.Name = "mcSettingsColorsGameWorld";
-            mcSettingsColorsGameWorld.Padding = new Padding(14);
+            mcSettingsColorsGameWorld.Padding = new Padding(14, 14, 14, 14);
             mcSettingsColorsGameWorld.Size = new Size(186, 322);
             mcSettingsColorsGameWorld.TabIndex = 59;
             // 
@@ -5665,10 +5665,10 @@
             mcSettingsColorsEvent.Depth = 0;
             mcSettingsColorsEvent.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsColorsEvent.Location = new Point(15, 349);
-            mcSettingsColorsEvent.Margin = new Padding(14);
+            mcSettingsColorsEvent.Margin = new Padding(14, 14, 14, 14);
             mcSettingsColorsEvent.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsColorsEvent.Name = "mcSettingsColorsEvent";
-            mcSettingsColorsEvent.Padding = new Padding(14);
+            mcSettingsColorsEvent.Padding = new Padding(14, 14, 14, 14);
             mcSettingsColorsEvent.Size = new Size(207, 322);
             mcSettingsColorsEvent.TabIndex = 44;
             // 
@@ -5731,10 +5731,10 @@
             mcSettingsColorsOther.Depth = 0;
             mcSettingsColorsOther.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsColorsOther.Location = new Point(1020, 14);
-            mcSettingsColorsOther.Margin = new Padding(14);
+            mcSettingsColorsOther.Margin = new Padding(14, 14, 14, 14);
             mcSettingsColorsOther.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsColorsOther.Name = "mcSettingsColorsOther";
-            mcSettingsColorsOther.Padding = new Padding(14);
+            mcSettingsColorsOther.Padding = new Padding(14, 14, 14, 14);
             mcSettingsColorsOther.Size = new Size(186, 322);
             mcSettingsColorsOther.TabIndex = 43;
             // 
@@ -5916,10 +5916,10 @@
             mcSettingsColorsLootAndQuests.Depth = 0;
             mcSettingsColorsLootAndQuests.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsColorsLootAndQuests.Location = new Point(606, 14);
-            mcSettingsColorsLootAndQuests.Margin = new Padding(14);
+            mcSettingsColorsLootAndQuests.Margin = new Padding(14, 14, 14, 14);
             mcSettingsColorsLootAndQuests.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsColorsLootAndQuests.Name = "mcSettingsColorsLootAndQuests";
-            mcSettingsColorsLootAndQuests.Padding = new Padding(14);
+            mcSettingsColorsLootAndQuests.Padding = new Padding(14, 14, 14, 14);
             mcSettingsColorsLootAndQuests.Size = new Size(197, 322);
             mcSettingsColorsLootAndQuests.TabIndex = 42;
             // 
@@ -6105,10 +6105,10 @@
             mcSettingsColorsExfiltration.Depth = 0;
             mcSettingsColorsExfiltration.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsColorsExfiltration.Location = new Point(408, 14);
-            mcSettingsColorsExfiltration.Margin = new Padding(14);
+            mcSettingsColorsExfiltration.Margin = new Padding(14, 14, 14, 14);
             mcSettingsColorsExfiltration.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsColorsExfiltration.Name = "mcSettingsColorsExfiltration";
-            mcSettingsColorsExfiltration.Padding = new Padding(14);
+            mcSettingsColorsExfiltration.Padding = new Padding(14, 14, 14, 14);
             mcSettingsColorsExfiltration.Size = new Size(183, 322);
             mcSettingsColorsExfiltration.TabIndex = 41;
             // 
@@ -6340,10 +6340,10 @@
             mcSettingsColorsPlayers.Depth = 0;
             mcSettingsColorsPlayers.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsColorsPlayers.Location = new Point(216, 14);
-            mcSettingsColorsPlayers.Margin = new Padding(14);
+            mcSettingsColorsPlayers.Margin = new Padding(14, 14, 14, 14);
             mcSettingsColorsPlayers.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsColorsPlayers.Name = "mcSettingsColorsPlayers";
-            mcSettingsColorsPlayers.Padding = new Padding(14);
+            mcSettingsColorsPlayers.Padding = new Padding(14, 14, 14, 14);
             mcSettingsColorsPlayers.Size = new Size(177, 322);
             mcSettingsColorsPlayers.TabIndex = 40;
             // 
@@ -6553,10 +6553,10 @@
             mcSettingsColorsAI.Depth = 0;
             mcSettingsColorsAI.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcSettingsColorsAI.Location = new Point(15, 14);
-            mcSettingsColorsAI.Margin = new Padding(14);
+            mcSettingsColorsAI.Margin = new Padding(14, 14, 14, 14);
             mcSettingsColorsAI.MouseState = MaterialSkin.MouseState.HOVER;
             mcSettingsColorsAI.Name = "mcSettingsColorsAI";
-            mcSettingsColorsAI.Padding = new Padding(14);
+            mcSettingsColorsAI.Padding = new Padding(14, 14, 14, 14);
             mcSettingsColorsAI.Size = new Size(187, 322);
             mcSettingsColorsAI.TabIndex = 39;
             // 
@@ -6800,10 +6800,10 @@
             materialCard1.Depth = 0;
             materialCard1.ForeColor = Color.FromArgb(222, 0, 0, 0);
             materialCard1.Location = new Point(14, 14);
-            materialCard1.Margin = new Padding(14);
+            materialCard1.Margin = new Padding(14, 14, 14, 14);
             materialCard1.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard1.Name = "materialCard1";
-            materialCard1.Padding = new Padding(14);
+            materialCard1.Padding = new Padding(14, 14, 14, 14);
             materialCard1.Size = new Size(906, 327);
             materialCard1.TabIndex = 0;
             // 
@@ -6904,11 +6904,11 @@
             materialCard2.Depth = 0;
             materialCard2.ForeColor = Color.FromArgb(222, 0, 0, 0);
             materialCard2.Location = new Point(15, 15);
-            materialCard2.Margin = new Padding(14);
+            materialCard2.Margin = new Padding(14, 14, 14, 14);
             materialCard2.MouseState = MaterialSkin.MouseState.HOVER;
             materialCard2.Name = "materialCard2";
-            materialCard2.Padding = new Padding(14);
-            materialCard2.Size = new Size(618, 414);
+            materialCard2.Padding = new Padding(14, 14, 14, 14);
+            materialCard2.Size = new Size(618, 441);
             materialCard2.TabIndex = 39;
             // 
             // btnReloadBones
@@ -6972,7 +6972,7 @@
             mcPlayerLoadoutsAI.MaximumSize = new Size(600, 900);
             mcPlayerLoadoutsAI.MouseState = MaterialSkin.MouseState.HOVER;
             mcPlayerLoadoutsAI.Name = "mcPlayerLoadoutsAI";
-            mcPlayerLoadoutsAI.Padding = new Padding(14);
+            mcPlayerLoadoutsAI.Padding = new Padding(14, 14, 14, 14);
             mcPlayerLoadoutsAI.Size = new Size(600, 677);
             mcPlayerLoadoutsAI.TabIndex = 4;
             // 
@@ -7016,7 +7016,7 @@
             mcPlayerLoadoutsBosses.MaximumSize = new Size(600, 900);
             mcPlayerLoadoutsBosses.MouseState = MaterialSkin.MouseState.HOVER;
             mcPlayerLoadoutsBosses.Name = "mcPlayerLoadoutsBosses";
-            mcPlayerLoadoutsBosses.Padding = new Padding(14);
+            mcPlayerLoadoutsBosses.Padding = new Padding(14, 14, 14, 14);
             mcPlayerLoadoutsBosses.Size = new Size(600, 677);
             mcPlayerLoadoutsBosses.TabIndex = 3;
             // 
@@ -7060,7 +7060,7 @@
             mcPlayerLoadoutsPlayers.MaximumSize = new Size(600, 900);
             mcPlayerLoadoutsPlayers.MouseState = MaterialSkin.MouseState.HOVER;
             mcPlayerLoadoutsPlayers.Name = "mcPlayerLoadoutsPlayers";
-            mcPlayerLoadoutsPlayers.Padding = new Padding(14);
+            mcPlayerLoadoutsPlayers.Padding = new Padding(14, 14, 14, 14);
             mcPlayerLoadoutsPlayers.Size = new Size(600, 677);
             mcPlayerLoadoutsPlayers.TabIndex = 2;
             // 
@@ -7114,10 +7114,10 @@
             mcWatchlistPlayerlist.Depth = 0;
             mcWatchlistPlayerlist.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcWatchlistPlayerlist.Location = new Point(945, 5);
-            mcWatchlistPlayerlist.Margin = new Padding(14);
+            mcWatchlistPlayerlist.Margin = new Padding(14, 14, 14, 14);
             mcWatchlistPlayerlist.MouseState = MaterialSkin.MouseState.HOVER;
             mcWatchlistPlayerlist.Name = "mcWatchlistPlayerlist";
-            mcWatchlistPlayerlist.Padding = new Padding(14);
+            mcWatchlistPlayerlist.Padding = new Padding(14, 14, 14, 14);
             mcWatchlistPlayerlist.Size = new Size(231, 632);
             mcWatchlistPlayerlist.TabIndex = 48;
             // 
@@ -7172,10 +7172,10 @@
             mcWatchlistProfiles.Depth = 0;
             mcWatchlistProfiles.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcWatchlistProfiles.Location = new Point(450, 211);
-            mcWatchlistProfiles.Margin = new Padding(14);
+            mcWatchlistProfiles.Margin = new Padding(14, 14, 14, 14);
             mcWatchlistProfiles.MouseState = MaterialSkin.MouseState.HOVER;
             mcWatchlistProfiles.Name = "mcWatchlistProfiles";
-            mcWatchlistProfiles.Padding = new Padding(14);
+            mcWatchlistProfiles.Padding = new Padding(14, 14, 14, 14);
             mcWatchlistProfiles.Size = new Size(480, 426);
             mcWatchlistProfiles.TabIndex = 47;
             // 
@@ -7233,10 +7233,10 @@
             mcWatchlistPlayerManagement.Depth = 0;
             mcWatchlistPlayerManagement.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcWatchlistPlayerManagement.Location = new Point(450, 5);
-            mcWatchlistPlayerManagement.Margin = new Padding(14);
+            mcWatchlistPlayerManagement.Margin = new Padding(14, 14, 14, 14);
             mcWatchlistPlayerManagement.MouseState = MaterialSkin.MouseState.HOVER;
             mcWatchlistPlayerManagement.Name = "mcWatchlistPlayerManagement";
-            mcWatchlistPlayerManagement.Padding = new Padding(14);
+            mcWatchlistPlayerManagement.Padding = new Padding(14, 14, 14, 14);
             mcWatchlistPlayerManagement.Size = new Size(480, 191);
             mcWatchlistPlayerManagement.TabIndex = 46;
             // 
@@ -7323,10 +7323,10 @@
             mcLootFilterFilters.Depth = 0;
             mcLootFilterFilters.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcLootFilterFilters.Location = new Point(580, 162);
-            mcLootFilterFilters.Margin = new Padding(14);
+            mcLootFilterFilters.Margin = new Padding(14, 14, 14, 14);
             mcLootFilterFilters.MouseState = MaterialSkin.MouseState.HOVER;
             mcLootFilterFilters.Name = "mcLootFilterFilters";
-            mcLootFilterFilters.Padding = new Padding(14);
+            mcLootFilterFilters.Padding = new Padding(14, 14, 14, 14);
             mcLootFilterFilters.Size = new Size(523, 475);
             mcLootFilterFilters.TabIndex = 48;
             // 
@@ -7446,10 +7446,10 @@
             mcLootFilterItemManagement.Depth = 0;
             mcLootFilterItemManagement.ForeColor = Color.FromArgb(222, 0, 0, 0);
             mcLootFilterItemManagement.Location = new Point(580, 5);
-            mcLootFilterItemManagement.Margin = new Padding(14);
+            mcLootFilterItemManagement.Margin = new Padding(14, 14, 14, 14);
             mcLootFilterItemManagement.MouseState = MaterialSkin.MouseState.HOVER;
             mcLootFilterItemManagement.Name = "mcLootFilterItemManagement";
-            mcLootFilterItemManagement.Padding = new Padding(14);
+            mcLootFilterItemManagement.Padding = new Padding(14, 14, 14, 14);
             mcLootFilterItemManagement.Size = new Size(523, 142);
             mcLootFilterItemManagement.TabIndex = 47;
             // 

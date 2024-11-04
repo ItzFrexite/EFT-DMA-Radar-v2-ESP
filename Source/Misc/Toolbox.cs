@@ -72,8 +72,8 @@ namespace eft_dma_radar
 
         public Toolbox(ulong unityBase)
         {
-            if (this._config.MasterSwitch)
-            {
+            //if (this._config.MasterSwitch)
+            //{
                 Task.Run(() =>
                 {
                     var attempts = 0;
@@ -90,7 +90,7 @@ namespace eft_dma_radar
 
                 this.InitiateTimeScale(unityBase);
                 this.StartToolbox();
-            }
+            //}
         }
 
         public void StartToolbox()
@@ -142,7 +142,7 @@ namespace eft_dma_radar
                     });
                     Thread.Sleep(250);
                 }
-            }
+             }
 
             if (this._config.Chams["RevertOnClose"])
                 this._chams?.ChamsDisable();

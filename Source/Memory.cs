@@ -474,7 +474,7 @@ namespace eft_dma_radar
                         catch (DMAShutdown) { throw; }
                         catch (Exception ex)
                         {
-                            Program.Log($"CRITICAL ERROR in Game Loop: {ex}");
+                            Console.WriteLine($"CRITICAL ERROR in Game Loop: {ex}");
                         }
                         finally
                         {
@@ -482,7 +482,7 @@ namespace eft_dma_radar
                             Thread.Sleep(100);
                         }
                     }
-                    Program.Log("Game is no longer running! Attempting to restart...");
+                    Console.WriteLine("Game is no longer running! Attempting to restart...");
                 }
             }
             catch (ThreadInterruptedException) { }

@@ -148,7 +148,7 @@
             tabESP.Controls.Add(cbESP);
             tabESP.Location = new Point(4, 44);
             tabESP.Name = "tabESP";
-            tabESP.Padding = new Padding(3);
+            tabESP.Padding = new Padding(3, 3, 3, 3);
             tabESP.Size = new Size(360, 666);
             tabESP.TabIndex = 0;
             tabESP.Text = "ESP";
@@ -500,7 +500,7 @@
             tabAim.Controls.Add(cbAim);
             tabAim.Location = new Point(4, 44);
             tabAim.Name = "tabAim";
-            tabAim.Padding = new Padding(3);
+            tabAim.Padding = new Padding(3, 3, 3, 3);
             tabAim.Size = new Size(360, 666);
             tabAim.TabIndex = 1;
             tabAim.Text = "Aim";

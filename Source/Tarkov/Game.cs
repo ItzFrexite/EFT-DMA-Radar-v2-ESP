@@ -289,7 +289,7 @@ namespace eft_dma_radar
                 Thread.Sleep(1500);
             }
             Thread.Sleep(1000);
-            Program.Log("Raid has started!!");
+            Console.WriteLine("Raid has started!!");
             this._inGame = true;
             Thread.Sleep(1500);
         }
@@ -433,7 +433,7 @@ namespace eft_dma_radar
                                 Memory.GameStatus = Game.GameStatus.InGame;
                                 found = true;
 
-                                Program.Log("Match started!!");
+                                Console.WriteLine("Match started!!");
                             }
                         }
                     }
@@ -504,10 +504,7 @@ namespace eft_dma_radar
                             Program.Log($"ERROR loading PlayerManager: {ex}");
                         }
                     }
-                }
 
-                if (this._config.MasterSwitch && Memory.GameStatus == Game.GameStatus.InGame)
-                {
                     if (this._toolbox is null)
                     {
                         try
@@ -519,7 +516,10 @@ namespace eft_dma_radar
                             Program.Log($"ERROR loading Toolbox: {ex}");
                         }
                     }
+                }
 
+                if (this._config.MasterSwitch && Memory.GameStatus == Game.GameStatus.InGame)
+                {
                     if (this._chams is null)
                     {
                         try
@@ -604,7 +604,8 @@ namespace eft_dma_radar
                     }
                 }
 
-                if (this._corpseManager is null)
+                //. NEEDS FIXING
+                /*if (this._corpseManager is null)
                 {
                     try
                     {
@@ -615,7 +616,7 @@ namespace eft_dma_radar
                         Program.Log($"ERROR loading CorpseManager: {ex}");
                     }
                 }
-                else this._corpseManager.Refresh();
+                else this._corpseManager.Refresh();*/
             }
         }
 

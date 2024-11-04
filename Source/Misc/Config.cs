@@ -612,7 +612,7 @@ namespace eft_dma_radar
             BossESP = true;
             ItemESP = true;
             ShowFOV = true;
-            BoneLimit = 300;
+            BoneLimit = 150;
             PlayerDist = 750;
             TeamDist = 750;
             ScavDist = 350;

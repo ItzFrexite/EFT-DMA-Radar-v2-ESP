@@ -91989,7 +91989,8 @@ RMB : ByRef
     [50] _keys : System.Collections.Generic.List<String>
     [58] _values : System.Collections.Generic.List<Sprite>
 [Class] -.StaticIcons.ItemTypeToSpriteDictionary : SerializableEnumDictionary`2
-    [00][C] hyNB : ByRef
+    [00][C] hy
+NB : ByRef
     [00][C] VersionName : String
     [00][C] HashSizeName : String
     [00][C] KeyValuePairsName : String
@@ -92084,7 +92085,8 @@ RMB : ByRef
     [50] _keys : System.Collections.Generic.List<String>
     [58] _values : System.Collections.Generic.List<Sprite>
 [Class] -.StaticIcons.StatGroupIdToSpriteDictionary : SerializableEnumDictionary`2
-    [00][C] 0NB : ByRef
+    [00][C] 0
+NB : ByRef
     [00][C] VersionName : String
     [00][C] HashSizeName : String
     [00][C] KeyValuePairsName : String

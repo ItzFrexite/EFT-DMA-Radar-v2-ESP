@@ -9,7 +9,6 @@ namespace eft_dma_radar
     public class PlayerManager
     {
         public bool IsADS { get; set; }
-
         private ulong _baseMovementState;
         private ulong _handsStamina;
         private ulong _movementContext;
@@ -34,6 +33,9 @@ namespace eft_dma_radar
         private float _overweight;
         private string _lastWeaponID;
         private float _breathIntensity;
+
+        public int _aimIndexValue;
+        public float _zoomAmount;
 
         private Vector3 THIRD_PERSON_ON = new Vector3(0.04f, 0.14f, -2.2f);
         private Vector3 THIRD_PERSON_OFF = new Vector3(0.04f, 0.04f, 0.05f);
@@ -219,6 +221,8 @@ namespace eft_dma_radar
             var round4 = scatterMap.AddRound();
             var round5 = scatterMap.AddRound();
 
+            // This is using localGameWorld as the base pointer (ClientLocalGameWorld) then adding offset MainPlayer which is EFT.Player
+            // This contains all the player data we need for isAiming
             var playerBasePtr = round1.AddEntry<ulong>(0, 0, localGameWorld, null, Offsets.LocalGameWorld.MainPlayer);
 
             var playerProfilePtr = round2.AddEntry<ulong>(0, 1, playerBasePtr, null, Offsets.Player.Profile);
@@ -556,6 +560,60 @@ namespace eft_dma_radar
 
             if (this.OriginalValues["weaponLn"] == -1f)
                 this.OriginalValues["weaponLn"] = this._weaponLn;
+
+
+            // Unoptimised Test stuff
+
+            float zoomAmount = 1;
+
+            if (IsADS)
+            {
+                int aimIndexValue = Memory.ReadValue<int>(this._proceduralWeaponAnimation + Offsets.ProceduralWeaponAnimation.FirearmAnimationData + Offsets.FirearmAnimationData.Item + Offsets.Weapon.AimIndex + Offsets.AimIndex.Value);
+                Console.WriteLine($"Aimindex: {aimIndexValue}");
+
+                var ScopeAimTransformsList = Memory.ReadPtr(this._proceduralWeaponAnimation + 0x98);
+                Console.WriteLine($"ScopeAimTransformsList: 0x{ScopeAimTransformsList:X}");
+
+                var ScopeAimTransforms = Memory.ReadPtr(ScopeAimTransformsList + 0x10);
+                Console.WriteLine($"ScopeAimTransforms: 0x{ScopeAimTransforms:X}");
+
+                var SightBone = Memory.ReadPtr(ScopeAimTransforms + 0x20 + ((uint)aimIndexValue * 0x8));
+                Console.WriteLine($"SightBone: 0x{SightBone:X}");
+
+                var sightComponent = Memory.ReadPtr(SightBone + 0x10);
+                Console.WriteLine($"SightComponent: 0x{sightComponent:X}");
+
+                var selectedScope = Memory.ReadValue<int>(sightComponent + 0x38);
+                Console.WriteLine($"SelectedScope: {selectedScope:X}");
+
+                var scopesSelectedModesArray = Memory.ReadPtr(sightComponent + 0x30);
+                Console.WriteLine($"ScopesSelectedModesArray: 0x{scopesSelectedModesArray:X}");
+
+                var scopesSelectedMode = Memory.ReadValue<int>(scopesSelectedModesArray + 0x20 + ((uint)selectedScope * 0x4));
+                Console.WriteLine($"ScopesSelectedMode: {scopesSelectedMode}");
+
+                var _template = Memory.ReadPtr(sightComponent + 0x20);
+                Console.WriteLine($"ScopeTemplate: {_template:X}");
+
+                if (_template != 0)
+                {
+                    var zoomsArray = Memory.ReadPtr(_template + 0x190); // Adjusted to 0x170 based on the structure
+                    Console.WriteLine($"ZoomsArray: {zoomsArray:X}");
+
+                    var zoomsSecondArray = Memory.ReadPtr(zoomsArray + 0x20 + ((uint)selectedScope * 0x8));
+                    Console.WriteLine($"ZoomsSecondArray: {zoomsSecondArray:X}");
+
+                    zoomAmount = Memory.ReadValue<float>(zoomsSecondArray + 0x20 + ((uint)scopesSelectedMode * 0x4));
+                    Console.WriteLine($"ZoomAmount: {zoomAmount}");
+                }
+                else
+                {
+                    Console.WriteLine("ScopeTemplate is invalid");
+                }
+
+                this._aimIndexValue = aimIndexValue;
+            }
+            this._zoomAmount = zoomAmount;
         }
 
         public void SetInfiniteStamina(bool on, ref List<IScatterWriteEntry> entries)

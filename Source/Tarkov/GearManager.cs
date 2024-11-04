@@ -1,4 +1,6 @@
-﻿using System.Collections.Concurrent;
+﻿using Offsets;
+using SharpDX.Win32;
+using System.Collections.Concurrent;
 
 namespace eft_dma_radar
 {
@@ -373,7 +375,6 @@ namespace eft_dma_radar
 
             if (this.ActiveWeapon.Item is null)
                 return;
-
             var count = 1;
 
             var scatterReadMap = new ScatterReadMap(count);
@@ -385,28 +386,41 @@ namespace eft_dma_radar
 
             for (int i = 0; i < count; i ++)
             {
-                var magSlotCache = round1.AddEntry<ulong>(i, 0, pointer, null, Offsets.WeaponItem.MagSlotCache);
+                var magSlotCache = round1.AddEntry<ulong>(i, 0, pointer, null, Offsets.WeaponItem.MagSlotCache); // to _magSlotCache
 
-                var containedItem = round2.AddEntry<ulong>(i, 1, magSlotCache, null, Offsets.Slot.ContainedItem);
+                var containedItem = round2.AddEntry<ulong>(i, 1, magSlotCache, null, Offsets.Slot.ContainedItem); // _magSlotCache to <ContainedItem>k_BackingField (EFT.InventoryLogic.Item)
 
-                var cartridges = round3.AddEntry<ulong>(i, 2, containedItem, null, Offsets.LootItemBase.Cartridges);
+                var cartridges = round3.AddEntry<ulong>(i, 2, containedItem, null, Offsets.LootItemBase.Cartridges); // <ContainedItem>k_BackingField to EFT.InventoryLogic.StackSlot
 
-                var cartridgeStack = round4.AddEntry<ulong>(i, 3, cartridges, null, Offsets.StackSlot.Items);
+                var cartridgeStack = round4.AddEntry<ulong>(i, 3, cartridges, null, Offsets.StackSlot.Items); // EFT.InventoryLogic.StackSlot to _items
+                var maxCount = round4.AddEntry<int>(i, 4, cartridges, null, Offsets.StackSlot.MaxCount); // EFT.InventoryLogic.StackSlot to MaxCount
 
-                var cartridgeStackList = round5.AddEntry<ulong>(i, 4, cartridgeStack, null, Offsets.UnityList.Base);
-                var cartridgeStackCount = round5.AddEntry<int>(i, 5, cartridgeStack, null, Offsets.UnityList.Count);
+                var cartridgeStackList = round5.AddEntry<ulong>(i, 5, cartridgeStack, null, Offsets.UnityList.Base);
+                var cartridgeStackCount = round5.AddEntry<int>(i, 6, cartridgeStack, null, Offsets.UnityList.Count);
             }
 
             scatterReadMap.Execute();
 
             for (int i = 0; i < count; i++)
             {
-                if (!scatterReadMap.Results[i][3].TryGetResult<ulong>(out var cartridgeStack))
+                if (!scatterReadMap.Results[i][0].TryGetResult<ulong>(out var magSlotCache))
                     return;
-                if (!scatterReadMap.Results[i][4].TryGetResult<ulong>(out var cartridgeStackList))
+                if (!scatterReadMap.Results[i][1].TryGetResult<ulong>(out var containedItem))
                     return;
-                if (!scatterReadMap.Results[i][5].TryGetResult<int>(out var cartridgeStackCount))
+                if (!scatterReadMap.Results[i][2].TryGetResult<ulong>(out var cartridgeStack))
                     return;
+                if (!scatterReadMap.Results[i][4].TryGetResult<int>(out var maxCount))
+                    return;
+                if (!scatterReadMap.Results[i][5].TryGetResult<ulong>(out var cartridgeStackList))
+                    return;
+                if (!scatterReadMap.Results[i][6].TryGetResult<int>(out var cartridgeStackCount))
+                    return;
+
+
+                //Console.WriteLine($"magSlotCache: {magSlotCache:X}");
+                //Console.WriteLine($"containedItem: {containedItem:X}");
+                //Console.WriteLine($"cartridges: {cartridgeStack:X}");
+                //Console.WriteLine($"maxCount: {maxCount}");
 
                 var ammoCount = 0;
                 var ammoType = "";
@@ -426,7 +440,7 @@ namespace eft_dma_radar
 
                         var cartridgeCount = ammoRound2.AddEntry<int>(j, 1, cartridgeBase, null, Offsets.Item.StackObjectsCount);
                         var cartridgeTemplate = ammoRound2.AddEntry<ulong>(j, 2, cartridgeBase, null, Offsets.LootItemBase.ItemTemplate);
-
+                         
                         var cartridgeBSGID = ammoRound3.AddEntry<ulong>(j, 3, cartridgeTemplate, null, Offsets.ItemTemplate.MongoID + Offsets.MongoID.ID);
                     }
 
@@ -457,8 +471,9 @@ namespace eft_dma_radar
                 {
                     Thermal = this.ActiveWeapon.Item.GearInfo.Thermal,
                     NightVision = this.ActiveWeapon.Item.GearInfo.NightVision,
-                    AmmoType = ammoType,
-                    AmmoCount = ammoCount
+                    AmmoType = ammoType,    
+                    AmmoCount = ammoCount,
+                    MaxMagCount = maxCount
                 };
 
                 this.ActiveWeapon.Item.GearInfo = newGearInfo;
@@ -471,6 +486,7 @@ namespace eft_dma_radar
             public string NightVision;
             public string AmmoType;
             public int AmmoCount;
+            public int MaxMagCount;
         }
 
         public struct GearSlot

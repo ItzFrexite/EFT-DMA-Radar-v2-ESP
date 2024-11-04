@@ -24,6 +24,9 @@ namespace eft_dma_radar
         private ulong _fovPtr;
 
         public static ulong _staticfpsCamera;
+        public static ulong _staticopticCamera;
+
+        public static ulong _staticCameraPtr;
 
         // Aimbot
         private Matrix _viewMatrik;
@@ -61,12 +64,12 @@ namespace eft_dma_radar
 
         #region Aimbot
 
-        //paskakoodi
+        // Aimbot
         public Matrix ViewMatrix
         {
             get => this._viewMatrik;
         }
-        //paskakoodi
+        // Aimbot
         public async void GetViewmatrixAsync()
         {
             await Task.Run(() =>
@@ -75,12 +78,12 @@ namespace eft_dma_radar
                 Thread.Sleep(1); //Sleep for 1 ms to prevent CPU rape
             });
         }
-        //Paskakoodi
+        // Aimbot
         public void GetViewMatrix()
         {
             if (!IsReady)
                 return;
-            ulong tempMatrixPtr = Memory.ReadPtrChain(_fpsCamera, Offsets.CameraShit.viewmatrix);
+            ulong tempMatrixPtr = Memory.ReadPtrChain(_fpsCamera, Offsets.CameraShift.ViewMatrix);
             ulong viewMatrixAddr = tempMatrixPtr + 0xDC;
             this._viewMatrik = Memory.ReadValue<Matrix>(viewMatrixAddr);
         }
@@ -105,7 +108,8 @@ namespace eft_dma_radar
                 var allCameras = round1.AddEntry<ulong>(i, 0, addr, null, 0x0);
                 var camera = round2.AddEntry<ulong>(i, 1, allCameras, null, (uint)i * 0x8);
                 var cameraObject = round3.AddEntry<ulong>(i, 2, camera, null, Offsets.GameObject.ObjectClass);
-                var cameraNamePtr = round4.AddEntry<ulong>(i, 3, cameraObject, null, Offsets.GameObject.ObjectName);
+                var cameraFOV = round3.AddEntry<float>(i, 3, camera, null, Offsets.Camera.FOV);
+                var cameraNamePtr = round4.AddEntry<ulong>(i, 4, cameraObject, null, Offsets.GameObject.ObjectName);
             }
 
             scatterReadMap.Execute();
@@ -118,14 +122,24 @@ namespace eft_dma_radar
                     continue;
                 if (!scatterReadMap.Results[i][2].TryGetResult<ulong>(out var cameraObject))
                     continue;
-                if (!scatterReadMap.Results[i][3].TryGetResult<ulong>(out var cameraNamePtr))
+                if (!scatterReadMap.Results[i][3].TryGetResult<float>(out var cameraFOV))
+                    continue;
+                if (!scatterReadMap.Results[i][4].TryGetResult<ulong>(out var cameraNamePtr))
                     continue;
 
                 var cameraName = Memory.ReadString(cameraNamePtr, 64).Replace("\0", string.Empty);
 
+                // Debug to list al cameras
+                //Console.WriteLine($"Current Camera Name: {cameraName}");
+
                 if (!foundOpticCamera && cameraName.Contains("BaseOpticCamera(Clone)", StringComparison.OrdinalIgnoreCase))
                 {
                     this._opticCamera = cameraObject;
+                    _staticopticCamera = _opticCamera;
+
+                    //Console.WriteLine($"All Cameras Address: 0x{allCameras:X}");
+                    //Console.WriteLine($"Camera Address: 0x{camera:X} : FOV From Address {cameraFOV}");
+                    Console.WriteLine($"Optic Camera Address: 0x{_opticCamera:X}");
 
                     if (!this.opticThermalComponentFound)
                     {
@@ -138,7 +152,13 @@ namespace eft_dma_radar
                 else if (!foundFPSCamera && cameraName.Contains("FPS Camera", StringComparison.OrdinalIgnoreCase))
                 {
                     this._fpsCamera = cameraObject;
-                    _staticfpsCamera = cameraObject;
+                    _staticfpsCamera = _fpsCamera;
+                    _staticCameraPtr = camera;
+
+                    //Console.WriteLine($"All Cameras Address: 0x{allCameras:X}");
+                    Console.WriteLine($"Camera Address: 0x{camera:X} : FOV From Address {cameraFOV}");
+                    Console.WriteLine($"FPS Camera Address: 0x{_staticfpsCamera:X}");
+
 
                     if (!this.visorComponentFound) {
                         this.visorComponent = this.GetComponentFromGameObject(this._fpsCamera, "VisorEffect");
@@ -432,10 +452,10 @@ namespace eft_dma_radar
 
             try
             {
-                var currentFOV = Memory.ReadValue<float>(this._fovPtr + 0x15C);
+                var currentFOV = Memory.ReadValue<float>(this._fovPtr + Offsets.Camera.FOV);
 
                 if (currentFOV != fov)
-                    entries.Add(new ScatterWriteDataEntry<float>(this._fovPtr + 0x15C, (float)fov));
+                    entries.Add(new ScatterWriteDataEntry<float>(this._fovPtr + Offsets.Camera.FOV, (float)fov));
             }
             catch (Exception ex)
             {

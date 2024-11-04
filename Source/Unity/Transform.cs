@@ -131,14 +131,113 @@ namespace eft_dma_radar
                 throw new Exception("Invalid Position!");
             }
 		}
-		#endregion
 
-		#region ReadMem
-		/// <summary>
-		/// IndicesAddress -> IndicesSize -> VerticesAddress -> VerticesSize
-		/// </summary>
-		/// <returns></returns>
-		public Tuple<ulong, int, ulong, int> GetScatterReadParameters()
+        public Dictionary<int, Vector3> GetPositions(IEnumerable<int> hierarchyIndices, object[] obj = null)
+        {
+            var bonePositions = new Dictionary<int, Vector3>();
+
+            foreach (var hierarchyIndex in hierarchyIndices)
+            {
+                try
+                {
+                    List<int> indices;
+                    List<Vector128<float>> vertices;
+
+                    // Load indices and vertices based on provided obj or standalone reading
+                    if (obj == null)
+                    {
+                        indices = ReadIndices(IndicesAddr, hierarchyIndex + 1); // address, count
+                        vertices = ReadVertices128(VerticesAddr, 3 * hierarchyIndex + 3);
+                    }
+                    else
+                    {
+                        indices = (List<int>)obj[0];
+                        vertices = (List<Vector128<float>>)obj[1];
+                    }
+
+                    if (indices == null || vertices == null)
+                        throw new Exception("Invalid Position!");
+
+                    var index = indices[hierarchyIndex];
+                    if (_isPlayerTransform && index != 0)
+                        throw new Exception("Invalid index!");
+
+                    var result = vertices[3 * hierarchyIndex];
+
+                    int iterations = 0;
+                    while (index >= 0)
+                    {
+                        if (_isPlayerTransform && index > 1)
+                            throw new Exception("Invalid index!");
+
+                        if (!_isPlayerTransform && index >= vertices.Count / 3)
+                            break;
+
+                        if (iterations++ >= 100)
+                            throw new Exception("Max SIMD Iterations! Invalid state.");
+
+                        // Perform SIMD calculations
+                        var v9 = vertices[3 * index + 1].AsInt32();
+                        var v10 = Sse.Multiply(vertices[3 * index + 2], result);
+
+                        var v11 = Sse2.Shuffle(v9, 0).AsSingle();
+                        var v12 = Sse2.Shuffle(v9, 0x71).AsSingle();
+                        var v13 = Sse2.Shuffle(v9, 0x8E).AsSingle();
+                        var v14 = Sse2.Shuffle(v9, 0x55).AsSingle();
+                        var v15 = Sse2.Shuffle(v9, 0xAA).AsSingle();
+                        var v16 = Sse2.Shuffle(v9, 0xDB).AsSingle();
+
+                        result = Sse.Add(
+                                    Sse.Add(
+                                        Sse.Add(
+                                            Sse.Multiply(
+                                                Sse.Subtract(
+                                                    Sse.Multiply(Sse.Multiply(v11, Xmm330), v13),
+                                                    Sse.Multiply(Sse.Multiply(v14, Xmm300), v16)),
+                                                Sse2.Shuffle(v10.AsInt32(), 0xAA).AsSingle()),
+                                            Sse.Multiply(
+                                                Sse.Subtract(
+                                                    Sse.Multiply(Sse.Multiply(v15, Xmm300), v16),
+                                                    Sse.Multiply(Sse.Multiply(v11, Xmm320), v12)),
+                                                Sse2.Shuffle(v10.AsInt32(), 0x55).AsSingle())),
+                                        Sse.Add(
+                                            Sse.Multiply(
+                                                Sse.Subtract(
+                                                    Sse.Multiply(Sse.Multiply(v14, Xmm320), v12),
+                                                    Sse.Multiply(Sse.Multiply(v15, Xmm330), v13)),
+                                                Sse2.Shuffle(v10.AsInt32(), 0).AsSingle()),
+                                            v10)),
+                                    vertices[3 * index]);
+
+                        index = indices[index];
+                    }
+
+                    // Convert result to Vector3 and add to the dictionary
+                    var pos = result.AsVector3();
+                    if (pos.X == 0 && pos.Y == 0 && pos.Z == 0)
+                        throw new Exception("Invalid Position!");
+
+                    bonePositions[hierarchyIndex] = new Vector3(pos.X, pos.Z, pos.Y); // Z & Y flipped
+                }
+                catch
+                {
+                    // Handle invalid bones or exceptions per bone if needed
+                    bonePositions[hierarchyIndex] = new Vector3(float.NaN, float.NaN, float.NaN); // Invalid placeholder
+                }
+            }
+
+            return bonePositions;
+        }
+
+
+        #endregion
+
+        #region ReadMem
+        /// <summary>
+        /// IndicesAddress -> IndicesSize -> VerticesAddress -> VerticesSize
+        /// </summary>
+        /// <returns></returns>
+        public Tuple<ulong, int, ulong, int> GetScatterReadParameters()
 		{
 			return new Tuple<ulong, int, ulong, int>(IndicesAddr, HierarchyIndex + 1, VerticesAddr, 3 * HierarchyIndex + 3);
 		}

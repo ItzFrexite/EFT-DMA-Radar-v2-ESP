@@ -1,4 +1,6 @@
-﻿namespace Offsets
+﻿using System;
+
+namespace Offsets
 {
     public struct UnityList
     {
@@ -123,22 +125,22 @@
         public const uint MovementContext = 0x50; // [50] <MovementContext>k__BackingField : EFT.MovementContext
         public const uint PlayerBody = 0xB8; // [B8] _playerBody : EFT.PlayerBody
         public const uint ProceduralWeaponAnimation = 0x1D8; // [1D8] <ProceduralWeaponAnimation>k__BackingField : EFT.Animations.ProceduralWeaponAnimation
-        public const uint Corpse = 0x418; // [418] Corpse : EFT.Interactive.Corpse
-        public const uint Profile = 0x640; // [640] <Profile>k__BackingField : EFT.Profile
-        public const uint InventoryController = 0x698; // [698] _inventoryController : -.Player.PlayerInventoryController
-        public const uint Location = 0x608; // [608] <Location>k__BackingField : String
-        public const uint Physical = 0x650; // [650] Physical : -.GClass07BE
-        public const uint HandsController = 0x6A0; // [6A0] _handsController : -.Player.AbstractHandsController
-        public const uint IsExtracting = 0x96A; // [96A] <ExitTriggerZone>k__BackingField : Boolean
+        public const uint Corpse = 0x420; // [420] Corpse : EFT.Interactive.Corpse
+        public const uint Profile = 0x648; // [648] <Profile>k__BackingField : EFT.Profile
+        public const uint InventoryController = 0x6A0; // [6A0] _inventoryController : -.Player.PlayerInventoryController
+        public const uint Location = 0x610; // [610] <Location>k__BackingField : String
+        public const uint Physical = 0x658; // [658] Physical : -.GClass
+        public const uint HandsController = 0x6A8; // [6A8] _handsController : -.Player.AbstractHandsController
+        public const uint IsExtracting = 0x972; // [972] <ExitTriggerZone>k__BackingField : Boolean
     }
 
     public struct Profile // EFT.Profile
     {
         public const uint Id = 0x10; // [10] Id : String
         public const uint AccountId = 0x18; // [18] AccountId : String
-        public const uint PlayerInfo = 0x28; // [28] Info : -.GClass1818
-        public const uint SkillManager = 0x60; //[60] Skills : EFT.SkillManager
-        public const uint QuestsData = 0x78; // [78] QuestsData : System.Collections.Generic.List<GClass342B>
+        public const uint PlayerInfo = 0x28; // [28] Info : -.GClass189D
+        public const uint SkillManager = 0x58; // [58] Skills : EFT.SkillManager
+        public const uint QuestsData = 0x70; // [70] QuestsData : System.Collections.Generic.List<GClass342B>
     }
 
     public struct ObservedPlayerView // [Class] EFT.NextObservedPlayer.ObservedPlayerView : MonoBehaviour
@@ -148,9 +150,11 @@
         public const uint NickName = 0x48; // [48] string_0x48 : String
         public const uint AccountID = 0x50; // [50] string_0x50 : String
         public const uint PlayerBody = 0x60; // [60] playerBody_0x60 : EFT.PlayerBody
-        public const uint ObservedPlayerController = 0x80; // [80] gClass231F_0x80 : -.GClass231F
-        public const uint PlayerSide = 0xF8; // [F8] int32_0xF8 : System.Int32
-        public const uint IsAI = 0x108; // [108] boolean_0x108 : Boolean
+        public const uint ObservedPlayerController = 0x80; // [80] gClass23A6_0x80 : -.GClass23A6
+        public const uint PlayerSide = 0x88; // [88] Side : System.Int32
+        public const uint RegistrationDate = 0x8C; // [8C] RegistrationDate : Int32
+        public const uint MemberCategory = 0x98; // [98] MemberCategory : System.Int32
+        public const uint IsAI = 0x109; // [109] boolean_0x109 : Boolean
         public static readonly uint[] To_MovementContext = new uint[] { ObservedPlayerController, 0xC8, 0x10 }; // to MovementContext
         public static readonly uint[] To_TransformInternal = new uint[] { PlayerBody, 0x28, 0x28, 0x10, 0x20, 0x10 }; // to TransformInternal
         public static readonly uint[] To_InventoryController = new uint[] { ObservedPlayerController, 0x118 }; // to InventoryController
@@ -191,7 +195,7 @@
 
     public struct Equipment
     {
-        public const uint Slots = 0x78; // to UnityList
+        public const uint Slots = 0x80; // [80] Slots : EFT.InventoryLogic.Slot[]
     }
 
     public struct Slot
@@ -223,19 +227,21 @@
     public struct LootItemBase //EFT.InventoryLogic.Item
     {
         public const uint ItemTemplate = 0x40; // [40] <Template>k__BackingField : EFT.InventoryLogic.ItemTemplate
-        public const uint Grids = 0x70; // to Grids
-        public const uint Slots = 0x78; // to UnityList
-        public const uint Cartridges = 0x98; // via -.GClass26C7 : GClass2694, IAmmoContainer , to StackSlot
+        public const uint Grids = 0x78; // to Grids
+        public const uint Slots = 0x80; // [80] Slots : EFT.InventoryLogic.Slot[]
+        public const uint Cartridges = 0xA0; // via -.GClass27B5 : GClass2782, IAmmoContainer , to StackSlot
     }
 
     public struct WeaponItem
     {
-        public const uint MagSlotCache = 0xC8; // [C8] _magSlotCache : EFT.InventoryLogic.Slot
+        public const uint MagSlotCache = 0xD0; // [D0] _magSlotCache : EFT.InventoryLogic.Slot
+        public const uint Slots = 0x80; // [80] Slots : EFT.InventoryLogic.Slot[]
     }
 
     public struct StackSlot // EFT.InventoryLogic.StackSlot : Object, IContainer
     {
         public const uint Items = 0x10; // [10] _items : System.Collections.Generic.List<Item>
+        public const uint MaxCount = 0x38; // [38] MaxCount : System.Int32
     }
 
     public struct ItemTemplate //EFT.InventoryLogic.ItemTemplate
@@ -285,12 +291,62 @@
         public const uint ForceReact = 0x40; // [40] ForceReact : -.ForceEffector
         public const uint Shooting = 0x48; // [48] Shootingg : -.ShotEffector
         public const uint FirearmContoller = 0xA8; // [A8] _firearmController : -.Player.FirearmController
+        public const uint FirearmAnimationData = 0xA0; // [A0] _firearmAnimationData : -.GInterface72D8
         public const uint Mask = 0x138; // [138] Mask : System.Int32
         public const uint IsAiming = 0x1BD; // [1BD] _isAiming : Boolean
         public const uint AimingSpeed = 0x1DC; // [1DC] _aimingSpeed : Single
         public const uint AimSwayStrength = 0x2B0; // [2B0] _aimSwayStrength : Single
         public const uint FovCompensatoryDistance = 0x1F0; // [1F0] _fovCompensatoryDistance : Single
+        public const uint ScopeAimTransformsList = 0x98; // [98] ScopeAimTransforms : System.Collections.Generic.List<SightNBone>
     }
+
+    public struct FirearmAnimationData
+    {
+        public const uint Item = 0x60; // [60] item_0x60 : EFT.IventoryLogic.Item
+    }
+
+    public struct  Weapon
+    {
+        public const uint AimIndex = 0xD8; // [D8] : -.GClass354D<Int32>
+    }
+
+    public struct AimIndex
+    {
+        public const uint Value = 0x30;
+    }
+
+    public struct ScopeAimTransformsList
+    {
+        public const uint ScopeAimTransforms = 0x10; // [10] Mod : EFT.InventoryLogic.SightComponent
+    }
+
+    public struct ScopeAimTransforms
+    {
+        public const uint Template = 0x20; // [20] _template : -.GInterfaceBEAA                   This needs + (AimIndex.Value * 0x8)]
+    }
+
+    public struct SightBone
+    {
+        public const uint SightComponent = 0x10; // [20] _template : -.GInterfaceBEAA
+    }
+
+    public struct SightComponent
+    {
+        public const uint Item = 0x10; // [10] Item : EFT.InventoryLogic.Item
+        public const uint ScopesSelectedModes = 0x30; // [30] ScopesSelectedModes : System.Int32[]
+        public const uint Template = 0x20; // [20] _template : -.GInterfaceBEAA
+    }
+
+    public struct ScopeTemplate
+    {
+        public const uint Zooms = 0x190; // [190] Zooms : System.Single[][]
+    }
+
+    public struct SelectedScope
+    {
+        public const uint CurrentSelectedScope = 0x38; // Also may be wrong : int
+    }
+
 
     public struct HandsContainer
     {
@@ -384,12 +440,12 @@
     {
         public const uint Nickname = 0x10; // [10] Nickname : String
         public const uint GroupId = 0x20; // [20] GroupId : String
-        public const uint EntryPoint = 0x30; // [30] EntryPoint : String
+        public const uint EntryPoint = 0x18; // [30] EntryPoint : String
         public const uint GameVersion = 0x38; // [38] GameVersion : String
         public const uint Settings = 0x50; // [50] Settings : -.GClass17F4
         public const uint PlayerSide = 0x70; // [70] Side : System.Int32
-        public const uint RegistrationDate = 0x74; // [74] RegistrationDate : Int32
-        public const uint MemberCategory = 0x90; // [90] MemberCategory : System.Int32
+        public const uint RegistrationDate = 0x8C; // [8C] RegistrationDate : Int32
+        public const uint MemberCategory = 0x78; // [78] MemberCategory : System.Int32
     }
 
     public struct ExfiltrationPoint
@@ -402,15 +458,15 @@
 
     public struct LocalGameWorld // [Class] -.ClientLocalGameWorld : ClientGameWorld
     {
-        public const uint TransitController = 0x18; // [18] gClass1513_0x18 : -.GClass1513
+        public const uint TransitController = 0x18; // [18] gClass157D_0x18 : -.GClass157D
         public const uint ExfilController = 0x20; // [20] gClass11CD_0x20 : -.GClass11FD
-        public const uint MapName = 0x60; // [60] string_0x60 : String
-        public const uint LootList = 0xD0; // [D0] LootList : System.Collections.Generic.List<GClass1CC5>
-        public const uint RegisteredPlayers = 0xF8; // [F8] RegisteredPlayers : System.Collections.Generic.List<IPlayer>
-        public const uint MainPlayer = 0x150; // [150] MainPlayer : EFT.Player
-        public const uint ToTripwireManager = 0x180; // [180] gClass2122_0x180 : -.GClass2122
-        public const uint Grenades = 0x1A8; // [1A8] Grenades : -.GClass084C<Int32, Throwable>
-        public const uint RaidStarted = 0x228; // [228] boolean_0x228 : Boolean
+        public const uint MapName = 0x78; // [78] string_0x60 : String
+        public const uint MainPlayer = 0x190; // [190] MainPlayer : EFT.Player
+        public const uint ToTripwireManager = 0x1C0; // [1C0] gClass219E_0x1C0 : -.GClass219E
+        public const uint LootList = 0x100; // [100] LootList : System.Collections.Generic.List<GInterface1C43>
+        public const uint RegisteredPlayers = 0x128; // [128] RegisteredPlayers : System.Collections.Generic.List<IPlayer>
+        public const uint Grenades = 0x1E8; // [1E8] Grenades : -.GClass0822<Int32, Throwable>
+        public const uint RaidStarted = 0x268; // [268] boolean_0x268 : Boolean
     }
 
     public struct ToTripwireManager
@@ -427,8 +483,8 @@
 
     public struct LootableContainer
     {
-        public const uint ItemOwner = 0x118; // [118] ItemOwner : -.GClass2845
-        public const uint Template = 0x120; // [120] Template : String
+        public const uint ItemOwner = 0x128; // [128] ItemOwner : -.GClass27E2
+        public const uint Template = 0x130; // [130] Template : String
     }
 
     public struct ObservedLootItem
@@ -607,13 +663,25 @@
         public const uint GameDateTime = 0x18; // [18] GameDateTime : EFT.GameDateTime
     }
 
-    public struct CameraShit
+    public struct CameraShift
     {
-        public static uint[] viewmatrix = new uint[] { 0x30, 0x18 };
+        public static uint[] ViewMatrix = new uint[] { 0x30, 0x18 }; // When updating also check var matrixPtr = round6.AddEntry<ulong> within PlayerManager to match
+        public const uint ViewMatrix1 = 0x30; // Split ViewMatrix
+        public const uint ViewMatrix2 = 0x18; // Split ViewMatrix
+    }
+
+    public struct ViewMatrix
+    {
+        public const uint Matrix = 0xDC;
     }
 
     public struct Fireport
     {
         public static readonly uint[] To_TransfromInternal = new uint[] { 0x10, 0x10 };
+    }
+
+    partial struct Camera
+    {
+        public const uint FOV = 0x15C;
     }
 }
