@@ -151,7 +151,7 @@ namespace Offsets
         public const uint AccountID = 0x50; // [50] string_0x50 : String
         public const uint PlayerBody = 0x60; // [60] playerBody_0x60 : EFT.PlayerBody
         public const uint ObservedPlayerController = 0x80; // [80] gClass23A6_0x80 : -.GClass23A6
-        public const uint PlayerSide = 0x88; // [88] Side : System.Int32
+        public const uint PlayerSide = 0xF8; // [F8] int32_0xF8 : System.Int32
         public const uint RegistrationDate = 0x8C; // [8C] RegistrationDate : Int32
         public const uint MemberCategory = 0x98; // [98] MemberCategory : System.Int32
         public const uint IsAI = 0x109; // [109] boolean_0x109 : Boolean
