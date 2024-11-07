@@ -571,12 +571,15 @@ public partial class Overlay : Form
                                                 renderPlayer = true;
                                                 name = player.Name;
                                                 boxColour = Brushes.RED;
-                                                distance = "[" + Math.Round(dist, 0) + "m]";
-                                                if (player.ItemInHands.Item != null && player.ItemInHands.Item.Short != null)
+                                                distance = "[" + Math.Round(dist, 0) + "m]"; 
+                                                if (player.ItemInHands.Item is not null)
                                                 {
-                                                    weapon = player.ItemInHands.Item.Short + " " + player.ItemInHands.Item.GearInfo.AmmoCount + "/" + player.ItemInHands.Item.GearInfo.MaxMagCount;
+                                                    if (!string.IsNullOrEmpty(player.ItemInHands.Item.Short))
+                                                        {
+                                                            weapon = player.ItemInHands.Item.Short + " " + player.ItemInHands.Item.GearInfo.AmmoCount + "/" + player.ItemInHands.Item.GearInfo.MaxMagCount;
+                                                        }
+                                                    }
                                                 }
-                                            }
                                             #endregion
                                             #region Scav
                                             if (player.Type is PlayerType.Scav && _config.ScavESP)

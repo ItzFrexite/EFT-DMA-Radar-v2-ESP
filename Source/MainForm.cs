@@ -1471,7 +1471,7 @@ namespace eft_dma_radar
 
         #endregion
 
-        private int GetPlayerTypeIndex(PlayerType type)
+        public static int GetPlayerTypeIndex(PlayerType type)
         {
             switch (type)
             {
@@ -1858,7 +1858,7 @@ namespace eft_dma_radar
             if (!this.InGame || this.LocalPlayer is null)
                 return;
 
-            var typeIndex = this.GetPlayerTypeIndex(player.Type);
+            var typeIndex = GetPlayerTypeIndex(player.Type);
             var type = PlayerTypeNames[typeIndex];
 
             var playerSettings = this.config.PlayerInformationSettings[type];
