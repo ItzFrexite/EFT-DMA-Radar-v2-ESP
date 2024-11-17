@@ -498,19 +498,34 @@ public partial class Overlay : Form
 
                                 else
                                 {
-                                    var playerHeadPos = new Vector3(player.HeadPosition.X, player.HeadPosition.Z, player.HeadPosition.Y);
-                                    var playerSpine3Pos = new Vector3(player.Spine3Position.X, player.Spine3Position.Z, player.Spine3Position.Y);
-                                    var playerLPalmPos = new Vector3(player.LPalmPosition.X, player.LPalmPosition.Z, player.LPalmPosition.Y);
-                                    var playerRPalmPos = new Vector3(player.RPalmPosition.X, player.RPalmPosition.Z, player.RPalmPosition.Y);
-                                    var playerPelvisPos = new Vector3(player.PelvisPosition.X, player.PelvisPosition.Z, player.PelvisPosition.Y);
-                                    var playerLFootPos = new Vector3(player.LFootPosition.X, player.LFootPosition.Z, player.LFootPosition.Y);
-                                    var playerRFootPos = new Vector3(player.RFootPosition.X, player.RFootPosition.Z, player.RFootPosition.Y);
+                                    var playerHeadPos = new Vector3(0, 0, 0);
+                                    var playerSpine3Pos = new Vector3(0, 0, 0);
+                                    var playerLPalmPos = new Vector3(0, 0, 0);
+                                    var playerRPalmPos = new Vector3(0, 0, 0);
+                                    var playerPelvisPos = new Vector3(0, 0, 0);
+                                    var playerLFootPos = new Vector3(0, 0, 0);
+                                    var playerRFootPos = new Vector3(0, 0, 0);
                                     var playerBasePos = new Vector3(player.Position.X, player.Position.Z, player.Position.Y);
-                                    var playerLForearm1Pos = new Vector3(player.LForearm1Position.X, player.LForearm1Position.Z, player.LForearm1Position.Y);
-                                    var playerRForearm1Pos = new Vector3(player.RForearm1Position.X, player.RForearm1Position.Z, player.RForearm1Position.Y);
-                                    var playerLCalfPos = new Vector3(player.LCalfPosition.X, player.LCalfPosition.Z, player.LCalfPosition.Y);
-                                    var playerRCalfPos = new Vector3(player.RCalfPosition.X, player.RCalfPosition.Z, player.RCalfPosition.Y);
-
+                                    var playerLForearm1Pos = new Vector3(0, 0, 0);
+                                    var playerRForearm1Pos = new Vector3(0, 0, 0);
+                                    var playerLCalfPos = new Vector3(0, 0, 0);
+                                    var playerRCalfPos = new Vector3(0, 0, 0);
+                                    if (player.OnScreen)
+                                    {
+                                        playerHeadPos = new Vector3(player.HeadPosition.X, player.HeadPosition.Z, player.HeadPosition.Y);
+                                        playerSpine3Pos = new Vector3(player.Spine3Position.X, player.Spine3Position.Z, player.Spine3Position.Y);
+                                        playerLPalmPos = new Vector3(player.LPalmPosition.X, player.LPalmPosition.Z, player.LPalmPosition.Y);
+                                        playerRPalmPos = new Vector3(player.RPalmPosition.X, player.RPalmPosition.Z, player.RPalmPosition.Y);
+                                        playerPelvisPos = new Vector3(player.PelvisPosition.X, player.PelvisPosition.Z, player.PelvisPosition.Y);
+                                        playerLFootPos = new Vector3(player.LFootPosition.X, player.LFootPosition.Z, player.LFootPosition.Y);
+                                        playerRFootPos = new Vector3(player.RFootPosition.X, player.RFootPosition.Z, player.RFootPosition.Y);
+                                        playerBasePos = new Vector3(player.Position.X, player.Position.Z, player.Position.Y);
+                                        playerLForearm1Pos = new Vector3(player.LForearm1Position.X, player.LForearm1Position.Z, player.LForearm1Position.Y);
+                                        playerRForearm1Pos = new Vector3(player.RForearm1Position.X, player.RForearm1Position.Z, player.RForearm1Position.Y);
+                                        playerLCalfPos = new Vector3(player.LCalfPosition.X, player.LCalfPosition.Z, player.LCalfPosition.Y);
+                                        playerRCalfPos = new Vector3(player.RCalfPosition.X, player.RCalfPosition.Z, player.RCalfPosition.Y);
+                                    }
+                                    
                                     var dist = Vector3.Distance(localPlayerPos, player.Position);
 
                                     // Check if player is valid for ESP drawing
@@ -536,6 +551,7 @@ public partial class Overlay : Form
 
                                         List<Vector3> coords = new List<Vector3>();
                                         WorldToScreenCombined(player, enemyPositions, coords);
+                                        WorldToScreen(player, playerBasePos, out var basePlayerCoords);
 
                                         Vector3 baseCoords = coords[0]; // Foot position
                                         Vector3 headCoords = coords[1]; // Head position
@@ -563,7 +579,7 @@ public partial class Overlay : Form
                                         boxWidth += paddingWidth;   // Add width padding
 
                                         // Draw the rectangle based on foot and head coordinates
-                                        if (baseCoords.X > 0 || baseCoords.Y > 0 || baseCoords.Z > 0)
+                                        if ((baseCoords.X > 0 || baseCoords.Y > 0 || baseCoords.Z > 0) && player.OnScreen)
                                         {
                                             #region PMC
                                             if ((player.Type is PlayerType.BEAR || player.Type is PlayerType.USEC) && _config.PlayerESP)
@@ -1255,12 +1271,8 @@ public partial class Overlay : Form
     {
         _Screen = new Vector3(0, 0, 0);
 
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-
         ulong tempMatrixPtr = Memory.ReadPtrChain(FPSCamera, Offsets.CameraShift.ViewMatrix);
         Numerics.Matrix4x4 temp = Numerics.Matrix4x4.Transpose(Memory.ReadValue<Numerics.Matrix4x4>(tempMatrixPtr + 0xDC));
-
 
         var translationVector = new Vector3(temp.M41, temp.M42, temp.M43);
         var up = new Vector3(temp.M21, temp.M22, temp.M23);
@@ -1268,20 +1280,27 @@ public partial class Overlay : Form
 
         var w = D3DXVec3Dot(translationVector, _Enemy) + temp.M44;
 
+        // Check if the point is behind the camera
         if (w < 0.098f)
+        {
+            player.OnScreen = false; // Player is off-screen
             return false;
+        }
 
         var y = D3DXVec3Dot(up, _Enemy) + temp.M24;
         var x = D3DXVec3Dot(right, _Enemy) + temp.M14;
 
+        // Calculate screen coordinates
         _Screen.X = Width / 2 * (1f + x / w);
         _Screen.Y = Height / 2 * (1f - y / w);
         _Screen.Z = w;
-        stopwatch.Stop();
-        Console.WriteLine($"Head Position Draw Time: {stopwatch.ElapsedMilliseconds} ms");
+
+        // Update player's OnScreen status
+        player.OnScreen = _Screen.X >= 0 && _Screen.X <= Width && _Screen.Y >= 0 && _Screen.Y <= Height;
 
         return true;
     }
+
 
     private bool lastAimingState = false;
     private bool WorldToScreenCombined(Player player, List<Vector3> enemyPositions, List<Vector3> screenCoords)
