@@ -310,8 +310,6 @@ namespace eft_dma_radar
         public List<ulong> BonePointers { get; } = new List<ulong>();
         public List<Vector3> BonePositions { get; } = new List<Vector3>();
         public List<Transform> BoneTransforms { get; } = new List<Transform>();
-        public bool OnScreen { get; set; } // To track screen visibility
-
         #endregion
 
         #region Getters

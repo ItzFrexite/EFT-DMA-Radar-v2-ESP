@@ -698,7 +698,7 @@ namespace eft_dma_radar
                     a.Z * b.Z);
         }
 
-        private bool WorldToScreen(Player player, Vector3 _Enemy, out Vector2 _Screen)
+        private bool WorldToScreen(Vector3 _Enemy, out Vector2 _Screen)
         {
             _Screen = new Vector2(0, 0);
 
@@ -713,7 +713,6 @@ namespace eft_dma_radar
 
             if (w < 0.098f)
             {
-                player.OnScreen = false;
                 return false;
             }
 
@@ -724,12 +723,10 @@ namespace eft_dma_radar
             _Screen.X = (screenWidth / 2f) * (1f + x / w);
             _Screen.Y = (screenHeight / 2f) * (1f - y / w);
 
-            player.OnScreen = true;
-
             return true;
         }
 
-        /*public bool GetHeadScr(Player player, out Vector2 screen, out Vector3 pos)
+        public bool GetHeadScr(Player player, out Vector2 screen, out Vector3 pos)
         {
             screen = new Vector2();
             pos = new Vector3();
@@ -744,20 +741,14 @@ namespace eft_dma_radar
                 }
             }
             return false;
-        }*/
+        }
 
         public bool GetBoneScr(Player player, PlayerBones bone, out Vector2 screen, out Vector3 pos)
         {
             screen = new Vector2();
             pos = new Vector3();
 
-            var playerBasePos = new Vector3(player.Position.X, player.Position.Z, player.Position.Y);
-            if (player.OnScreen == false)
-            {
-                WorldToScreen(player, playerBasePos, out var basePlayerCoords); 
-            }
-
-            if (player.OnScreen && player.boneTransforms != null && player.boneTransforms.Count > 0 && !player.IsLocalPlayer && !player.IsFriendlyActive && player.IsAlive && player.IsActive && Vector3.Distance(player.Position, LocalPlayer.Position) < _config.AimbotMaxDistance)
+            if (player.boneTransforms != null && player.boneTransforms.Count > 0 && !player.IsLocalPlayer && !player.IsFriendlyActive && player.IsAlive && player.IsActive && Vector3.Distance(player.Position, LocalPlayer.Position) < _config.AimbotMaxDistance)
             {
                 Vector3 BonePos;
 
@@ -785,7 +776,7 @@ namespace eft_dma_radar
                         return false; // Bone not found or handled
                 }
 
-                if (WorldToScreen(player, BonePos, out Vector2 scrpos))
+                if (WorldToScreen(BonePos, out Vector2 scrpos))
                 {
                     screen = scrpos;
                     pos = BonePos;
@@ -959,7 +950,7 @@ namespace eft_dma_radar
 
             return closestBonePos;
         }
-        /*public void AimerBotterKmBox()
+        public void AimerBotterKmBox()
         {
             if (!KmBoxWrapper.done_init)
             {
@@ -1047,6 +1038,6 @@ namespace eft_dma_radar
             {
                 Program.Log($"ERROR -> Aimer botter -> {ex.Message}\nStackTrace:{ex.StackTrace}");
             }
-        }*/
+        }
     }
 }

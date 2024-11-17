@@ -490,9 +490,13 @@ namespace eft_dma_radar
                             if (scatterMap.Results[i][6].TryGetResult<int>(out var hp))
                                 player.SetHealth(hp);
 
-                        if (checkBones && player.Type != PlayerType.LocalPlayer && player.OnScreen)
+                        if (checkBones && player.Type != PlayerType.LocalPlayer)
                         {
+                            //Stopwatch stopwatch = new Stopwatch();
+                            //stopwatch.Start();
                             player.ReadAllBonePositions(player);
+                            //stopwatch.Stop();
+                            //Console.WriteLine($"Elapsed Time: {stopwatch.ElapsedMilliseconds} ms");
                         }
 
                         if (checkWeaponInfo)
