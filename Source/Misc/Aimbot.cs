@@ -26,7 +26,6 @@ using static Vmmsharp.VmmProcess;
 
 namespace eft_dma_radar
 {
-
     public static class MemoryHandler
     {
         internal struct VMMDLL_MAP_EATENTRY
@@ -551,6 +550,10 @@ namespace eft_dma_radar
     {
         private Config _config;  // Declare _config
 
+        private Vector3 cameraPos = new Vector3(0, 0, 0);
+        private ulong handscontainer;
+        private Transform tranny;
+
         public static float _aimbotFOV;        // Field of View
         private float _aimbotMaxDistance; // Max Distance
         private int _aimbotKeybind;      // Keybind
@@ -685,8 +688,11 @@ namespace eft_dma_radar
                 MessageBox.Show("Not in game");
                 return new Vector3();
             }
-            ulong handscontainer = Memory.ReadPtrChain(playamanaga._proceduralWeaponAnimation, new uint[] { ProceduralWeaponAnimation.FirearmContoller, FirearmController.Fireport, Fireport.To_TransfromInternal[0], Fireport.To_TransfromInternal[1] });
-            Transform tranny = new Transform(handscontainer);
+            if (handscontainer == 0)
+            {
+                handscontainer = Memory.ReadPtrChain(playamanaga._proceduralWeaponAnimation, new uint[] { ProceduralWeaponAnimation.FirearmContoller, FirearmController.Fireport, Fireport.To_TransfromInternal[0], Fireport.To_TransfromInternal[1] });
+                tranny = new Transform(handscontainer);
+            }
             Vector3 goofy = tranny.GetPosition();
             return new Vector3(goofy.X, goofy.Z, goofy.Y);
         }
@@ -821,11 +827,13 @@ namespace eft_dma_radar
                         if (players != null && players.Any())
                         {
                             this._cameraManager.GetViewmatrixAsync();
-                            Vector3 cameraPos = GetFireportPos();
+
+                            cameraPos = GetFireportPos();
+                            //Console.WriteLine(cameraPos);
 
                             if (bHeld && bHeld == bLastHeld && _player != null && _player.IsAlive && _player.IsActive)
                             {
-                                Console.WriteLine("AimerBotter initialized");
+                                // Console.WriteLine("Aimbot initialized");
 
                                 // Existing target lock logic
                                 Vector3 targetPos = GetClosestBoneScr(_player, out Vector2 screenPos);
@@ -902,6 +910,8 @@ namespace eft_dma_radar
                                     }
                                 }
                             }
+
+
                         }
                     }
                 }
@@ -911,6 +921,7 @@ namespace eft_dma_radar
                 }
 
                 bLastHeld = bHeld;  // Update the held state for the next frame
+
             }
         }
 
